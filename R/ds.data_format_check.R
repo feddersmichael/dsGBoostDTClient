@@ -17,5 +17,6 @@ ds.data_format_check <- function(name, datasources = NULL){
   dsBaseClient::ds.testObjExists(name, datasources)
   
   # In the next step we check if the file with this name has the right format
+
 }
 
