@@ -27,7 +27,9 @@ ds.data_format_check <- function(name, datasources = NULL, only_numeric = FALSE)
   # If we activate the numeric option we need to check if all entries of
   # the matrix are numeric.
   if (only_numeric){
-    
+    if(!ds.data_class_numeric(name, datasources)){
+      stop("All columns in our data need to be continuous numeric values.")
+    }
   }
   
 }
