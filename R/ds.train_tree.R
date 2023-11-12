@@ -9,10 +9,13 @@ ds.train_tree <- function(data, max_treecount, regul_par, datasources = NULL){
     stop("max_treecount needs to be an integer.")
   }
   
-  # need to clarify if data is already split up
+  # We do some basic checks about the saved data
   ds.data_format_check(data, datasources)
   
-  
+  # Now we need to split up the data in a test and training data set.
+  # The training data is saved by adding the subscript '_training' to 'data'
+  # and the test data is saved by adding the subscript '_test' to 'data'.
+  ds.create_data_split(split_ratio)
   
   # We save our tree in a nx4 matrix.
   
