@@ -19,8 +19,8 @@ ds.data_format_check <- function(name, datasources = NULL, only_numeric = FALSE)
   }
   
   # In the next step we check if the file with this name has the right format
-  if (!dsBaseClient::ds.class(name, datasources) == "matrix"){
-    stop(paste0("The data needs to be saved as a matrix object instead of ", 
+  if (!"data.frame" %in%  dsBaseClient::ds.class(name, datasources)){
+    stop(paste0("The data needs to be saved as a data.frame object instead of ", 
                 dsBaseClient::ds.class(name, datasources)))
   }
   
