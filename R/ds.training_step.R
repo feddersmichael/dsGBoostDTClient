@@ -5,6 +5,8 @@ ds.training_step <- function(data, spp_mode, datasources = NULL){
     datasources <- DSI::datashield.connections_find()
   }
   
+  spp <- ds.gen_spp(data, spp_mode, datasources)
+
   tree <- matrix(nrow = 0, ncol = 4)
   
   while (TRUE) {
