@@ -8,10 +8,10 @@ ds.gen_spp <- function(data, mode = "percentile", datasources = NULL){
   }
   
   if (mode == "exact"){
-    spp <- exact_sppDS(data)
+    spp <- ds.exact_spp(data)
   }
   else if (mode == "percentile"){
-    spp <- percentile_sppDS(data)
+    spp <- ds.percentile_spp(data)
   }
   else {
     stop("'mode' is not one of the available options.")
