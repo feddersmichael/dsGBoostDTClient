@@ -1,5 +1,6 @@
 
-ds.train_tree <- function(data, max_treecount, regul_par, datasources = NULL){
+ds.train_tree <- function(data, max_treecount, regul_par, spp_mode, 
+                          datasources = NULL){
   
   if (is.null(datasources)) {
     datasources <- DSI::datashield.connections_find()
@@ -31,7 +32,7 @@ ds.train_tree <- function(data, max_treecount, regul_par, datasources = NULL){
   tree_list <- list()
   
   for (i in 1:max_treecount){
-    tree <- ds.training_step(data)
+    tree <- ds.training_step(data, spp_mode)
     append(tree_list, list(tree))
     # need break criteria
   }
