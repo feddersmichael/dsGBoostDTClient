@@ -18,7 +18,7 @@ ds.train_tree <- function(data, max_treecount, regul_par, spp_mode,
   # and the test data is saved by adding the subscript '_test' to 'data'.
   ds.create_data_split(split_ratio)
   
-  # We save our tree in a nx4 matrix.
+  # We save our tree in a (amount of splits)x4 matrix.
   
   # The first two columns save the split points.
   # Each row represents one split point with the first column showing the
@@ -34,6 +34,7 @@ ds.train_tree <- function(data, max_treecount, regul_par, spp_mode,
   for (i in 1:max_treecount){
     tree <- ds.training_step(data, spp_mode)
     append(tree_list, list(tree))
-    # need break criteria
+    # need additional break criteria
   }
+  
 }
