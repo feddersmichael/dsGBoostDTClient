@@ -1,7 +1,10 @@
 
-
 # Generate splitting points
-ds.gen_spp_cand <- function(data_name, cand_select_mode = "percentile", datasources = NULL){
+ds.gen_spp_cand <- function(data_name, cand_select_mode = "percentile", 
+                              datasources = NULL){
+  
+  # need name change for training_data
+  
   
   if (is.null(datasources)) {
     datasources <- DSI::datashield.connections_find()
@@ -29,7 +32,8 @@ ds.gen_spp_cand <- function(data_name, cand_select_mode = "percentile", datasour
     spp <- ds.ithess_spp_cand(data_name)
   }
   else {
-    cat(paste0("The specified mode '", cand_select_mode, "' is not supported. \n"))
+    cat(paste0("The specified mode '", cand_select_mode, 
+               "' is not supported. \n"))
     if (tolower(readline(prompt = "Do you want to proceed with 
                          the splitting candidates method 'Iterative Hessian'? 
                          (y/n): ")) == "y"){
