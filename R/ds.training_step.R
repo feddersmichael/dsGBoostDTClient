@@ -14,6 +14,23 @@ ds.training_step <- function(data, spp_mode, datasources = NULL){
     # where we added a split -> the rest should stay the same
     spp <- ds.gen_spp(data, spp_mode, datasources)
     
+    # ---
+    # from original big exact splitting point function
+    # ---
+    # from server need y_i and \hat{y}_i and maybe data security level
+    
+    # check for data sensibility at server
+    # 1: data can be shared
+    # 2: histograms can be shared
+    # 3: only optimal splitting point on local data is shared
+    
+    # Tasks which need to be performed:
+    # go through all possible splits
+    # calculate split score fore each split
+    #   this include summing up histograms -> Secure Multi-Party Computation (MPC)
+    # save all or only highest... ?
+    # select highest split to expand tree
+    
     hist <- ds.calc_hist()
     
     # Probably just different feedback if ssc <= 0 instead of sending back all
