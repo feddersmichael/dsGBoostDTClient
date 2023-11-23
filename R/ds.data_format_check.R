@@ -1,6 +1,8 @@
+
 # We want to check in a generic way if the uploaded data fulfills
 # our requirements to be used in this analysis.
 
+# TODO: dimension check between servers
 ds.data_format_check <- function(data_name, split_ratio, only_numeric = FALSE, datasources = NULL){
   
   #TODO needs clarification how exactly the right data source is checked.
