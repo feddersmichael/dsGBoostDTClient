@@ -10,9 +10,9 @@ ds.prepare_dataset <- function(train_ratio, data_name, datsources = NULL){
   ds.save_column_names(data_name, datsources)
   
   # We separate features and output
-  # could maybe be done more efficient with specific function ds.sep_variables
-  dsBaseClient::ds.dataFrameSubset(data_name)
+  ds.sep_variables(data_name, datasources)
   
-  ds.create_data_split(train_ratio, datsources)
+  
+  ds.create_data_split(data_name, train_ratio, datsources)
   
 }
