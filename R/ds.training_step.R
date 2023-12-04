@@ -1,18 +1,20 @@
 
-ds.training_step <- function(data, spp_mode, datasources = NULL){
+ds.training_step <- function(data_name, cand_select_mode, datasources = NULL){
   
   if (is.null(datasources)) {
     datasources <- DSI::datashield.connections_find()
   }
   
-  spp <- ds.gen_spp(data, spp_mode, datasources)
+  # do we need to update spp every round or just at the start? if they are
+  # permanent we can save them directly on the server
+  spp_cand <- ds.gen_spp_cand(data_name, cand_select_mode, datasources)
 
   tree <- matrix(nrow = 0, ncol = 4)
   
   while (TRUE) {
     # Probably better to find a way to update split points in the one feature
     # where we added a split -> the rest should stay the same
-    spp <- ds.gen_spp(data, spp_mode, datasources)
+    spp_cand <- ds.gen_spp(data_name, cand_select_mode, datasources)
     
     # ---
     # from original big exact splitting point function

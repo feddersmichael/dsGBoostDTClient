@@ -1,5 +1,5 @@
 
-ds.train_tree <- function(data, max_treecount, regul_par, spp_mode, 
+ds.train_tree <- function(data_name, max_treecount, regul_par, cand_select_mode, 
                           datasources = NULL){
   
   if (is.null(datasources)) {
@@ -11,12 +11,12 @@ ds.train_tree <- function(data, max_treecount, regul_par, spp_mode,
   }
   
   # We do some basic checks about the saved data
-  ds.data_format_check(data, datasources)
+  ds.data_format_check(data_name, split_ratio, only_numeric, datasources)
   
   # Now we need to split up the data in a test and training data set.
-  # The training data is saved by adding the subscript '_training' to 'data'
-  # and the test data is saved by adding the subscript '_test' to 'data'.
-  ds.create_data_split(split_ratio)
+  # In this process we also save the column names and the feature and output
+  # data frames separately on the server
+  ds.prepare_dataset(train_test_ratio, data_name, datasources)
   
   # We save our tree in a (amount of splits)x4 matrix.
   
@@ -32,9 +32,11 @@ ds.train_tree <- function(data, max_treecount, regul_par, spp_mode,
   tree_list <- list()
   
   for (i in 1:max_treecount){
-    tree <- ds.training_step(data, spp_mode)
+    tree <- ds.training_step(data_name, cand_select_mode)
     append(tree_list, list(tree))
     # need additional break criteria
   }
+  
+  ds.save_tree()
   
 }

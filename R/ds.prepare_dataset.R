@@ -15,6 +15,6 @@ ds.prepare_dataset <- function(train_test_ratio, data_name, datsources = NULL){
   ds.create_data_split(data_name, train_test_ratio, datsources)
   
   # We separate features and output
-  # TODO: Is this even necessary?
+  # TODO: merge with create_data_split + consider if necessary
   ds.sep_variables(data_name, datasources)
 }

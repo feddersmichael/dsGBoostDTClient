@@ -22,6 +22,7 @@ ds.gen_spp_cand <- function(data_name, cand_select_mode = "percentile",
   # We need to have bounds for the feature space so that we can select a
   # specified amount of splitting candidates. Could be an option to add
   # logarithmic scale as well
+  # Returnes 
   else if (cand_select_mode == "uniform"){
     spp_cand <- ds.uniform_spp_cand(data_name, amt_spp, min_max, seed)
   }
