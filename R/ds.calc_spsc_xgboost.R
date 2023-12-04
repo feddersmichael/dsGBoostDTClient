@@ -5,7 +5,7 @@ ds.calc_spsc_xgboost <- function(data_name, spp_cand, datasources = NULL){
     datasources <- DSI::datashield.connections_find()
   }
   
-  # for now assume that we just need g_i / h_i + lambda in total
+  # we need the histogram sums
   cally <- call("calc_spsc_xgboostDS", data_name, spp_cand, lambda)
   result <- DSI::datashield.aggregate(datasources, cally)
   

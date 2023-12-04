@@ -5,8 +5,10 @@ ds.training_step <- function(data_name, cand_select_mode, datasources = NULL){
     datasources <- DSI::datashield.connections_find()
   }
   
-  # do we need to update spp every round or just at the start? if they are
+  # TODO: do we need to update spp every round or just at the start? if they are
   # permanent we can save them directly on the server
+  # maybe sth like spliting spp_cand methods in group global and local and
+  # change algorithm based on that
   spp_cand <- ds.gen_spp_cand(data_name, cand_select_mode, datasources)
 
   tree <- matrix(nrow = 0, ncol = 4)
