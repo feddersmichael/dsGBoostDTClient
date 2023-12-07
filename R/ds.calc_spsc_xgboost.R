@@ -6,7 +6,7 @@ ds.calc_spsc_xgboost <- function(data_name, spp_cand, datasources = NULL){
   }
   
   # we need the histogram sums
-  cally <- call("calc_spsc_xgboostDS", data_name, spp_cand, lambda)
+  cally <- call("calc_histDS", data_name, spp_cand, "quadratic")
   result <- DSI::datashield.aggregate(datasources, cally)
   
   
