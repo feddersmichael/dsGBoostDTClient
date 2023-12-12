@@ -28,19 +28,19 @@ ds.train_boosted_tree <- function(max_treecount = 50, seed = NULL,
   # we stop the loop and return the trained boosted tree.
   
   # We initiate our list of trees
-  tree_list <- list()
+  tree_list <- list(0)
   
   for (i in 1:max_treecount){
     
     # We train the next tree.
-    tree <- ds.train_tree(data_name, cand_select_mode)
+    tree <- ds.train_tree(treelist[[length(tree_list)]])
     
     # Depending on the outcome we add the tree or end the model training.
     if (is.character(tree)){
       break
     }
     else {
-      append(tree_list, list(tree))
+      tree_list[[i]] <- list(tree)
     }
     
   }

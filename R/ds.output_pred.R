@@ -1,5 +1,6 @@
 
-ds.output_pred <- function(boosted_tree, datasources = NULL){
+# TODO: edge case no tree yet trained, i = 0
+ds.output_pred <- function(last_tr_tree, datasources = NULL){
   
   # We first check all the inputs for appropriate class and set defaults if
   # no input is given.
@@ -10,10 +11,10 @@ ds.output_pred <- function(boosted_tree, datasources = NULL){
     stop("'datasources' needs to be a an object of the 'DSConnection' class.")
   }
   
-  if (!is.data.frame(boosted_tree)){
-    stop("'boosted_tree' needs to be an object of type 'data frame'.")
+  if (!is.data.frame(last_tr_tree)){
+    stop("'last_tr_tree' needs to be an object of type 'data frame'.")
   }
   
-  cally <- call("output_predDS", boosted_tree)
+  cally <- call("output_predDS", last_tr_tree)
   output <- DSI::datashield.assign.expr(datasources, "output_prediction", cally)
 }
