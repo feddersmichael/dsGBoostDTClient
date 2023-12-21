@@ -1,5 +1,5 @@
 
-ds.train_tree <- function(last_tr_tree, max_splits = 10, datasources = NULL){
+ds.train_tree <- function(data_name, last_tr_tree, max_splits = 10, datasources = NULL){
   
   # We first check all the inputs for appropriate class and set defaults if
   # no input is given.
@@ -10,7 +10,11 @@ ds.train_tree <- function(last_tr_tree, max_splits = 10, datasources = NULL){
     stop("'datasources' needs to be a an object of the 'DSConnection' class.")
   }
   
-  if (!is.data.frame(last_tr_tree)){
+  if (!is.character(data_name)){
+    stop("'data_name' needs to have data type 'character'.")
+  }
+  
+  if (!is.data.frame(last_tr_tree) && !is.null(last_tr_tree)){
     stop("'last_tr_tree' needs to be an object of type 'data frame'.")
   }
   
@@ -18,15 +22,15 @@ ds.train_tree <- function(last_tr_tree, max_splits = 10, datasources = NULL){
     stop("'max_splits' needs to have data type 'integer'.")
   }
   
+  
   # We need to update the predicted output value for all data points in the 
   # training set on the server to calculate the histograms
-  ds.output_pred(last_tr_tree, datasources)
+  ds.output_pred(data_name, last_tr_tree, datasources)
   
   
-  # In this we loop we split up to 'max_splits' amount of times.
+  # In this loop we split up the data up to 'max_splits' amount of times.
   # If the function 'ds.select_split' returns a break criteria instead of a new
   # split we stop the loop and return the finished tree.
-  
   for (i in 1:max_splits){
     
     # We search for the next split point.

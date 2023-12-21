@@ -40,7 +40,7 @@ ds.select_split <- function(spp_cand = NULL, amt_spp = NULL, min_max = NULL,
   histograms <- ds.calc_hist(spp_cand, datasources)
   
   # Now we can calculate the split score for all possibilities.
-  spscores <- ds.calc_spsc()
+  spscores <- ds.calc_spsc(histograms)
   
   # From all split scores we can now choose the best split.
   best_split <- ds.best_split()

@@ -1,11 +1,8 @@
 
-# TODO: Check for integer seed
-ds.create_data_split <- function(data_name, train_test_ratio, datsources, 
-                                 seed = NULL){
+ds.create_data_split <- function(data_name, train_test_ratio, datsources){
   
-  # We split up the dataset in a training and test part. If reproducibility is
-  # desired we can use a seed.
-  cally <- call("create_data_splitDS", data_name, train_test_ratio, seed)
+  # We split up the dataset in a training and test part.
+  cally <- call("create_data_splitDS", data_name, train_test_ratio)
   result <- DSI::datashield.assign.expr(datasources, 
                                       paste0(data_name, "_training_test_split"), 
                                       cally)
