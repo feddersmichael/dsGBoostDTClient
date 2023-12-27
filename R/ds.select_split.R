@@ -1,6 +1,6 @@
 
-# TODO: Structure which variables should be mentioned explicitely and which
-# ones only under a general variabl-list
+# TODO: Structure which variables should be mentioned explicitly and which
+# ones only under a general variable-list
 ds.select_split <- function(spp_cand = NULL, amt_spp = NULL, min_max = NULL, 
                             datasources = NULL){
   
@@ -37,7 +37,8 @@ ds.select_split <- function(spp_cand = NULL, amt_spp = NULL, min_max = NULL,
   
   # Now we need to calculate the histograms for all splitting-point candidates
   # in all leaves.
-  histograms <- ds.calc_hist(spp_cand, datasources)
+  histograms <- ds.calc_hist(data_name, loss_function, data_type, spp_cand, 
+                             datasources)
   
   # Now we can calculate the split score for all possibilities.
   spscores <- ds.calc_spsc(histograms)

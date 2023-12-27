@@ -1,5 +1,6 @@
 
-ds.train_boosted_tree <- function(max_treecount = 50, seed = NULL, 
+ds.train_boosted_tree <- function(data_name, max_treecount = 50, seed = NULL, 
+                                  train_test_ratio, split_status, 
                                   datasources = NULL){
   
   # We first check all the inputs for appropriate class and set defaults if
@@ -25,7 +26,7 @@ ds.train_boosted_tree <- function(max_treecount = 50, seed = NULL,
   
   # Before we start training our model we split up the data set into a training
   # and test part.
-  ds.create_data_split(data_name, train_test_ratio, datsources)
+  ds.create_data_split(data_name, train_test_ratio, split_status, datsources)
   
   
   # In this loop we train up to 'max_treecount' amount of trees.

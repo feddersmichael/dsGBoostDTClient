@@ -1,15 +1,14 @@
 
-# sth like c(ssc, feature_number, split_number, origin_split)
-# obj_mode like 1st or 2nd order taylor, which regularization
-# TODO: What if data is too big to load into the environment all at once?
-# TODO: Where is max_min saved
-ds.calc_spsc <- function(data_name, obj_mode, spp_cand, datasources = NULL){
+ds.calc_spsc <- function(loss_function, datasources = NULL){
   
+  # We first check all the inputs for appropriate class and set defaults if
+  # no input is given.
   if (is.null(datasources)) {
     datasources <- DSI::datashield.connections_find()
+  } 
+  else if (!DSI:::.isDSConnection(datasources)) {
+    stop("'datasources' needs to be a an object of the 'DSConnection' class.")
   }
   
-  if (obj_mode == "XGBoost"){
-    ds.calc_spsc_xgboost()
-  }
+  
 }
