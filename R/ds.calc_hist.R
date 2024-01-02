@@ -1,5 +1,5 @@
 
-ds.calc_hist <- function(data_name, loss_function, data_type, spp_cand, 
+ds.calc_hist <- function(data_name, last_tr_tree, loss_function,
                          datasources = NULL){
   
   # We first check all the inputs for appropriate class and set defaults if
@@ -18,32 +18,25 @@ ds.calc_hist <- function(data_name, loss_function, data_type, spp_cand,
   if (!is.character(loss_function)){
     stop("'loss_function' needs to have data type 'character'.")
   }
+  # We call the server to generate the new histogram values based on the
+  # predicted output, updated through the last trained tree
   
-  if (!is.character(data_type)){
-    stop("'data_type' needs to have data type 'character'.")
+  # If 'last_tr_tree' is NULL we initialise the predicted output with 0's.
+  if (is.null(last_tr_tree)){
+    cally <- call("calc_hist_initDS", data_name, loss_function)
+    output <- DSI::datashield.assign.expr(datasources, 
+                                          paste0(data_name, "_training"), cally)
   }
-  
-  if (!is.list(spp_cand)){
-    stop("'spp_cand' needs to be an object of type 'list'.")
-  }
-  
-  # We call the server to generate the histograms based on the splitting-point
-  # candidates and the current tree structure
-  cally <- call("calc_histDS", data_name, min_max, spp_cand, loss_function, 
-                data_type)
-  hist <- DSI::datashield.aggregate(datasources, cally)
-  
-  # Now we introduce a help function to add up the histograms from the different
-  # data servers.
-  reduce_hist <- function(S_1, S_2){
+  # if we already trained a tree before we just add up the predicted value from
+  # the last trained tree
+  else {
+    if (!is.data.frame(last_tr_tree)){
+      stop("'last_tr_tree' needs to be an object of type 'data frame'.")
+    }
     
-    mapply(function(F_1, F_2){return(F_1 + F_2)}, S_1, S_2)
+    cally <- call("calc_histDS", data_name, last_tr_tree, loss_function)
+    output <- DSI::datashield.assign.expr(datasources, 
+                                          paste0(data_name, "_training"), cally)
   }
   
-  # first derivative histograms
-  hist_1 <- Reduce(reduce_hist, hist[[1]])
-  # second derivative histograms
-  hist_2 <- Reduce(reduce_hist, hist[[2]])
-  
-  return(list(hist_1, hist_2))
 }

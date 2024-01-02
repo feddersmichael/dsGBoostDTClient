@@ -1,5 +1,6 @@
 
-ds.train_tree <- function(data_name, last_tr_tree, max_splits = 10, datasources = NULL){
+ds.train_tree <- function(data_name, last_tr_tree, max_splits = 10,
+                          spp_cand = NULL, datasources = NULL){
   
   # We first check all the inputs for appropriate class and set defaults if
   # no input is given.
@@ -22,21 +23,27 @@ ds.train_tree <- function(data_name, last_tr_tree, max_splits = 10, datasources 
     stop("'max_splits' needs to have data type 'integer'.")
   }
   
+  # We first update the histogram values, which are based on the previously
+  # trained trees.
   
-  # We need to update the predicted output value for all data points in the 
-  # training set on the server to calculate the histograms
-  ds.output_pred(data_name, last_tr_tree, datasources)
+  ds.calc_hist(data_name, last_tr_tree, loss_function,
+                             datasources)
   
+  current_tree <- data.frame(Feature = numeric(), split_value = numeric(),
+                             w_s_left = logical(), w_s_left_value = numeric(),
+                             w_s_right = logical(), w_s_right_value = numeric(),
+                             par_spp = numeric(), par_dir = logical())
   
-  # In this loop we split up the data up to 'max_splits' amount of times.
-  # If the function 'ds.select_split' returns a break criteria instead of a new
-  # split we stop the loop and return the finished tree.
+  # In this loop we bild a tree with up to 'max_splits' many splits.
   for (i in 1:max_splits){
     
-    # We search for the next split point.
-    split <- ds.select_split()
+    ds.split_bins(current_tree)
     
-    #
+    # We search for the next split point.
+    split <- ds.select_split(current_tree, histograms, datasources)
+    
+    # If the function 'ds.select_split' returns a break criteria instead of a new
+    # split we stop the loop and return the finished tree.
     if (is.character(split)){
       break
     }

@@ -1,6 +1,6 @@
 
 ds.create_data_split <- function(data_name, train_test_ratio, 
-                                 split_status = NULL, datsources = NULL){
+                                 split_status = NULL, datasources = NULL){
   
   
   # We first check all the inputs for appropriate class and set defaults if
@@ -18,9 +18,16 @@ ds.create_data_split <- function(data_name, train_test_ratio,
     }
     
     # We split up the dataset in a training and test part.
-    cally <- call("create_data_splitDS", data_name, train_test_ratio, split_status)
+    cally <- call("create_data_splitDS", data_name, train_test_ratio,
+                  split_status)
     result <- DSI::datashield.assign.expr(datasources, 
-                                          paste0(data_name, "_training_test_split"), 
+                                          paste0(data_name,
+                                                 "_training_test_split"), 
+                                          cally)
+    
+    cally <- call("save_trainingDS", data_name)
+    result <- DSI::datashield.assign.expr(datasources, paste0(data_name,
+                                                              "_training"), 
                                           cally)
   }
   else if (split_status == 'Train'){
@@ -29,9 +36,16 @@ ds.create_data_split <- function(data_name, train_test_ratio,
     }
     
     # We save the training data-set under a general name.
-    cally <- call("create_data_splitDS", data_name[1], train_test_ratio, split_status)
+    cally <- call("create_data_splitDS", data_name[1], train_test_ratio,
+                  split_status)
     result <- DSI::datashield.assign.expr(datasources, 
-                                          paste0(data_name[2], "_training_test_split"), 
+                                          paste0(data_name[2],
+                                                 "_training_test_split"), 
+                                          cally)
+    
+    cally <- call("save_trainingDS", data_name)
+    result <- DSI::datashield.assign.expr(datasources, paste0(data_name[2],
+                                                              "_training"), 
                                           cally)
   }
   else if (split_status == 'Train_Test'){
@@ -40,9 +54,16 @@ ds.create_data_split <- function(data_name, train_test_ratio,
     }
     
     # We save the training data-set under a general name.
-    cally <- call("create_data_splitDS", data_name[1:2], train_test_ratio, split_status)
+    cally <- call("create_data_splitDS", data_name[1:2],
+                  train_test_ratio, split_status)
     result <- DSI::datashield.assign.expr(datasources, 
-                                          paste0(data_name[3], "_training_test_split"), 
+                                          paste0(data_name[3],
+                                                 "_training_test_split"), 
+                                          cally)
+    
+    cally <- call("save_trainingDS", data_name)
+    result <- DSI::datashield.assign.expr(datasources, paste0(data_name[3],
+                                                              "_training"), 
                                           cally)
   }
   else {
