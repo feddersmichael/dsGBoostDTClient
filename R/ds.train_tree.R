@@ -26,21 +26,23 @@ ds.train_tree <- function(data_name, last_tr_tree, max_splits = 10,
   # We first update the histogram values, which are based on the previously
   # trained trees.
   
-  ds.calc_hist(data_name, last_tr_tree, loss_function,
-                             datasources)
+  ds.calc_hist(data_name, last_tr_tree, loss_function, datasources)
   
   current_tree <- data.frame(Feature = numeric(), split_value = numeric(),
                              w_s_left = logical(), w_s_left_value = numeric(),
                              w_s_right = logical(), w_s_right_value = numeric(),
                              par_spp = numeric(), par_dir = logical())
+  histograms <- list()
   
-  # In this loop we bild a tree with up to 'max_splits' many splits.
+  # In this loop we build a tree with up to 'max_splits' many splits.
   for (i in 1:max_splits){
     
-    ds.split_bins(current_tree)
+    hist_bins_per_leave <- ds.split_bins(data_name, min_max, current_tree,
+                                         spp_cand, current_tree, data_type,
+                                         datasources)
     
     # We search for the next split point.
-    split <- ds.select_split(current_tree, histograms, datasources)
+    split <- ds.select_split(hist_bins_per_leave, spp_cand)
     
     # If the function 'ds.select_split' returns a break criteria instead of a new
     # split we stop the loop and return the finished tree.

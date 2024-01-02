@@ -1,18 +1,13 @@
 
 # TODO: Structure which variables should be mentioned explicitly and which
 # ones only under a general variable-list
-ds.select_split <- function(current_tree, histograms, datasources = NULL){
+ds.select_split <- function(histograms, spp_cand){
   
-  # We first check all the inputs for appropriate class and set defaults if
-  # no input is given.
-  if (is.null(datasources)) {
-    datasources <- DSI::datashield.connections_find()
-  } 
-  else if (!DSI:::.isDSConnection(datasources)) {
-    stop("'datasources' needs to be a an object of the 'DSConnection' class.")
-  }
+  
 
-  
+  for (leaf in histograms){
+    
+  }
   
   
   
