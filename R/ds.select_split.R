@@ -1,12 +1,21 @@
 
 # TODO: Structure which variables should be mentioned explicitly and which
 # ones only under a general variable-list
+# TODO: Save if the best split contains NA values
 ds.select_split <- function(histograms, spp_cand){
   
   
 
   for (leaf in histograms){
     
+    na_check <- function(bins, cand){
+      return(length(bins) > length(cand))
+    }
+    NA_val <- mapply(na_check, leaf[[1]], spp_cand)
+    
+    
+    grad_sums <- mapply(sums, leaf[[1]], NA_val)
+    hess_sums <- mapply()
   }
   
   
