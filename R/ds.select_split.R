@@ -2,7 +2,7 @@
 # TODO: Structure which variables should be mentioned explicitly and which
 # ones only under a general variable-list
 # TODO: Save if the best split contains NA values
-ds.select_split <- function(histograms, spp_cand){
+ds.select_split <- function(histograms, spp_cand, reg_par){
   
   split_sums <- list()
   
@@ -64,11 +64,11 @@ ds.select_split <- function(histograms, spp_cand){
     compl_sum[[1]] <- grad_sums[[1]][[1]] + grad_sums[[1]][[2]]
     compl_sum[[2]] <- hess_sums[[1]][[1]] + hess_sums[[1]][[2]]
     
-    split_sums <- append(split_sumsm, list(grad_sums, hess_sums, compl_sum))
+    split_sums <- append(split_sums, list(grad_sums, hess_sums, compl_sum))
   }
   
   # Now we can calculate the split score for all possibilities.
-  spscores <- ds.calc_spsc(histograms)
+  
   
   # From all split scores we can now choose the best split.
   best_split <- ds.best_split()
