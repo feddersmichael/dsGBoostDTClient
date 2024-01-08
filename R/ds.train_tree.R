@@ -33,7 +33,13 @@ ds.train_tree <- function(data_name, last_tr_tree, max_splits = 10,
                              w_s_right = logical(), w_s_right_value = numeric(),
                              par_spp = numeric(), par_dir = logical())
   
-  split_scores <- list()
+  split_scores_left <- data.frame(sp_sc = numeric(), feature = numeric(),
+                                  split_val = numeric(), cont_NA = numeric(),
+                                  weight_l = numeric(), weight_r = numeric())
+  
+  split_scores_right <- data.frame(sp_sc = numeric(), feature = numeric(),
+                                  split_val = numeric(), cont_NA = numeric(),
+                                  weight_l = numeric(), weight_r = numeric())
   
   # In this loop we build a tree with up to 'max_splits' many splits.
   for (i in 1:max_splits){
@@ -46,14 +52,30 @@ ds.train_tree <- function(data_name, last_tr_tree, max_splits = 10,
     best_split <- ds.select_split(hist_bins_per_leave, spp_cand)
     
     if (nrow(current_tree) == 0){
-      first_split <- c(best_split$feature[1], best_split$split_pt[1],
+      first_split <- c(best_split$feature[1], best_split$split_val[1],
                        TRUE, best_split$weight_l[1], TRUE,
-                       best_split$weight_r[1])
+                       best_split$weight_r[1], 0, TRUE)
       current_tree <- rbind(current_tree, first_split)
     }
     else {
-      split_scores <- append(split_scores, best_split)
+      split_scores_left <- rbind(split_scores_left, best_split[[1]])
+      split_scores_right <- rbind(split_scores_right, best_split[[2]])
       
+      max_l <- which.max(split_scores_left$sp_sc)
+      max_r <- which.max(split_scores_right$sp_sc)
+      
+      if (split_scores_left$sp_sc[max_l] > split_scores_right$sp_sc[max_r]){
+        next_split <- split_scores_left[max_l, ]
+        current_tree <- rbind(current_tree, c(next_split[2], next_split[3],
+                                              TRUE, next_split[5], TRUE,
+                                              next_split[6], max_l, TRUE))
+      }
+      else {
+        next_split <- split_scores_right[max_r, ]
+        current_tree <- rbind(current_tree, c(next_split[2], next_split[3],
+                                              TRUE, next_split[5], TRUE,
+                                              next_split[6], max_r, FALSE))
+      }
     }
     
   }

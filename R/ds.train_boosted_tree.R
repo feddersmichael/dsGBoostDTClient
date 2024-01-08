@@ -72,11 +72,12 @@ ds.train_boosted_tree <- function(max_treecount = 50, seed = NULL,
       break
     }
     else {
-      tree_list[[i]] <- list(tree)
+      tree_list <- append(tree_list, tree)
     }
-    
   }
   
   # After the training we can save our model locally.
-  ds.save_boosted_tree()
+  # ds.save_boosted_tree()
+  
+  return(tree_list)
 }
