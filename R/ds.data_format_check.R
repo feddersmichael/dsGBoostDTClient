@@ -1,18 +1,14 @@
 
-#' We want to check in a generic way if the uploaded data fulfills
-#  our requirements to be used in this analysis.
+#' Check Data for basic rules
 #'
-#' @param data_name 
-#' @param split_ratio 
-#' @param only_numeric 
-#' @param datasources 
+#' @param data_name The name under which the data is saved on the server.
+#' @param datasources DATASHIELD server connection.
 #'
-#' @return
+#' @return NONE.
 #' @export
-#'
-#' @examples
-ds.data_format_check <- function(data_name, split_ratio, only_numeric = FALSE, 
-                                 datasources = NULL){
+ds.data_format_check <- function(data_name, datasources = NULL){
+  # We want to check in a generic way if the uploaded data fulfills
+  # our requirements to be used in this analysis.
   # TODO: dimension check between servers
   
   #TODO needs clarification how exactly the right data source is checked.
@@ -34,14 +30,6 @@ ds.data_format_check <- function(data_name, split_ratio, only_numeric = FALSE,
   if (!"data.frame" %in%  dsBaseClient::ds.class(data_name, datasources)){
     stop(paste0("The data needs to be saved as a data frame object instead of ", 
                 dsBaseClient::ds.class(data_name, datasources)))
-  }
-  
-  # If we activate the numeric option we need to check if all entries of
-  # the data frame are numeric.
-  if (only_numeric){
-    if(!ds.data_class_numeric(data_name, datasources)){
-      stop("All columns in our data need to be continuous numeric values.")
-    }
   }
   
 }

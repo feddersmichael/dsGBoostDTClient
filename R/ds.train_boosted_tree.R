@@ -1,15 +1,22 @@
 
-#' ds.train_boosted_tree
+
+#' Training of a Gradient Boosted Decision Tree
 #'
-#' @param max_treecount 
-#' @param seed 
-#' @param datasources 
+#' @param data_name The name under which the data is saved on the server.
+#' @param train_test_ratio Percentage of the data which should be used for 
+#' Training.
+#' @param split_status Defines if 'data_name' saves the full data, is already
+#' split up into Training and Test data or saves only one of them.
+#' @param max_treecount Maximum amount of trees to build our boosted decision
+#' tree.
+#' @param amt_spp The amount of split-points per feature.
+#' @param seed If we want to choose a specific random behavior client side.
+#' @param datasources DATASHIELD server connection.
 #'
-#' @return
+#' @return The trained decisiom tree model.
 #' @export
-#'
-#' @examples
-ds.train_boosted_tree <- function(max_treecount = 50, seed = NULL,
+ds.train_boosted_tree <- function(data_name, train_test_ratio, split_status,
+                                  max_treecount = 50, amt_spp, seed = NULL,
                                   datasources = NULL){
   
   # We first check all the inputs for appropriate class and set defaults if
@@ -33,12 +40,12 @@ ds.train_boosted_tree <- function(max_treecount = 50, seed = NULL,
   }
   
   # We do some basic checks about the saved data
-  ds.data_format_check(data_name, split_ratio, only_numeric, datasources)
+  ds.data_format_check(data_name, datasources)
   
   
   # Before we start training our model we split up the data set into a training
   # and test part.
-  ds.create_data_split(data_name, train_test_ratio, split_status, datsources)
+  ds.create_data_split(data_name, train_test_ratio, split_status, datasources)
   
   
   # We save our tree in a (amount of splits)x8 data frame. Each row represents
@@ -75,7 +82,7 @@ ds.train_boosted_tree <- function(max_treecount = 50, seed = NULL,
   for (i in 1:max_treecount){
     
     # We train the next tree.
-    tree <- ds.train_tree(treelist[[length(tree_list)]])
+    tree <- ds.train_tree(tree_list[[length(tree_list)]], amt_spp)
     
     # Depending on the outcome we add the tree or end the model training.
     if (is.character(tree)){

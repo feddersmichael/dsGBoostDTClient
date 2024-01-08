@@ -1,13 +1,11 @@
 
-#' ds.exact_spp_cand
+#' Creating exact Splitting-points
 #'
-#' @param data_name 
-#' @param datasources 
+#' @param data_name The name under which the data is saved on the server.
+#' @param datasources DATASHIELD server connection.
 #'
-#' @return
+#' @return The splitting point candidates.
 #' @export
-#'
-#' @examples
 ds.exact_spp_cand <- function(data_name, datasources = NULL){
   
   if (is.null(datasources)) {

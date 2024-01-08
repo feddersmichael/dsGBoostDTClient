@@ -1,15 +1,14 @@
 
-#' ds.calc_hist
+#' Calculate the predicted output
 #'
-#' @param data_name 
-#' @param last_tr_tree 
-#' @param loss_function 
-#' @param datasources 
+#' @param data_name The name under which the data is saved on the server.
+#' @param last_tr_tree The last tree which was trained under the boosting step.
+#' @param loss_function The loss function under which we optimize our boosted
+#' tree building process.
+#' @param datasources DATASHIELD server connection.
 #'
-#' @return
+#' @return None.
 #' @export
-#'
-#' @examples
 ds.calc_hist <- function(data_name, last_tr_tree, loss_function,
                          datasources = NULL){
   

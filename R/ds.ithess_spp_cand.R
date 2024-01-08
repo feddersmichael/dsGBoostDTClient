@@ -1,10 +1,8 @@
 
-#' ds.ithess_spp_cand
+#' Create Splitting-point candidates through the iterative hessian method.
 #'
-#' @return
+#' @return The Splitting-point candidates
 #' @export
-#'
-#' @examples
 ds.ithess_spp_cand <- function(){
-  
+  return(NULL)
 }

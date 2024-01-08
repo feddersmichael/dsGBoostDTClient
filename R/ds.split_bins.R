@@ -1,20 +1,19 @@
 
-#' ds.split_bins
+#' Split the data into bins
 #'
-#' @param data_name 
-#' @param min_max 
-#' @param current_tree 
-#' @param spp_cand 
-#' @param current_tree 
-#' @param data_type 
-#' @param datasources 
+#' @param data_name The name under which the data is saved on the server.
+#' @param min_max The maximum and minimum values of all features.
+#' @param current_tree The tree which gets currently trained.
+#' @param spp_cand The candidates for a possible further split of the current
+#' tree.
+#' @param data_type Denotes for each feature if it is numeric or (originally)
+#' categorical.
+#' @param datasources DATASHIELD server connection.
 #'
-#' @return
+#' @return The histogram sums for each bin for all features.
 #' @export
-#'
-#' @examples
-ds.split_bins <- function(data_name, min_max, current_tree, spp_cand,
-                          current_tree, data_type, datasources = NULL){
+ds.split_bins <- function(data_name, min_max, spp_cand, current_tree,
+                          data_type, datasources = NULL){
   
   # We first check all the inputs for appropriate class and set defaults if
   # no input is given.

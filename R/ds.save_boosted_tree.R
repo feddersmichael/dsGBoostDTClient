@@ -1,10 +1,8 @@
 
-#' ds.save_boosted_tree
+#' Save the fully trained tree.
 #'
-#' @return
+#' @return The trained tree.
 #' @export
-#'
-#' @examples
 ds.save_boosted_tree <- function(){
   
 }

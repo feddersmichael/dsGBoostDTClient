@@ -1,18 +1,17 @@
 
-#' ds.create_data_split
+#' Split the data into 'Test' and 'Training'
 #'
-#' @param data_name 
-#' @param train_test_ratio 
-#' @param split_status 
-#' @param datasources 
+#' @param data_name The name under which the data is saved on the server.
+#' @param train_test_ratio Percentage of the data which should be used for 
+#' Training.
+#' @param split_status Defines if 'data_name' saves the full data, is already
+#' split up into Training and Test data or saves only one of them.
+#' @param datasources DATASHIELD server connection.
 #'
-#' @return
+#' @return None.
 #' @export
-#'
-#' @examples
 ds.create_data_split <- function(data_name, train_test_ratio, 
                                  split_status = NULL, datasources = NULL){
-  
   
   # We first check all the inputs for appropriate class and set defaults if
   # no input is given.
@@ -26,6 +25,12 @@ ds.create_data_split <- function(data_name, train_test_ratio,
   if (is.null(split_status)){
     if (!is.character(data_name) || !(length(data_name) != 1)){
       stop("'data_name' needs to be an atomic vector with data type 'character'.")
+    }
+    
+    if (!is.numeric(train_test_ratio) || (numeric(train_test_ratio) < 0) || 
+        (numeric(train_test_ratio) > 1)){
+      stop(paste0("'train_test_ratio' needs to have data type 'numeric' and lie",
+                  " between 0 and 1."))
     }
     
     # We split up the dataset in a training and test part.
@@ -79,11 +84,6 @@ ds.create_data_split <- function(data_name, train_test_ratio,
   }
   else {
     stop("'split_status' needs to be either 'NULL' or an atomic vector with data type 'character'.")
-  }
-  
-  if (!is.numeric(train_test_ratio) || !(0 <= numeric(train_test_ratio) <= 1)){
-    stop(paste0("'train_test_ratio' needs to have data type 'numeric' and lie",
-                " between 0 and 1."))
   }
   
 }

@@ -1,18 +1,23 @@
 
-#' ds.train_tree
+#' Train a single tree
 #'
-#' @param data_name 
-#' @param last_tr_tree 
-#' @param max_splits 
-#' @param spp_cand 
-#' @param datasources 
+#' @param data_name The name under which the data is saved on the server.
+#' @param last_tr_tree The last trained tree.
+#' @param loss_function The type of loss function under which we optimise the
+#' tree.
+#' @param min_max The maximum and minimum values of each feature space.
+#' @param data_type Denotes for each feature if it is numeric or (originally)
+#' categorical.
+#' @param max_splits The maximum amount of splits in the trained tree.
+#' @param amt_spp The amount of splitting point candidates per feature.
+#' @param spp_cand The splitting point candidates for each feature.
+#' @param datasources DATASHIELD server connection.
 #'
-#' @return
+#' @return The trained tree.
 #' @export
-#'
-#' @examples
-ds.train_tree <- function(data_name, last_tr_tree, max_splits = 10,
-                          spp_cand = NULL, datasources = NULL){
+ds.train_tree <- function(data_name, last_tr_tree, loss_function, min_max,
+                          data_type, max_splits = 10, amt_spp, spp_cand = NULL,
+                          datasources = NULL){
   
   # We first check all the inputs for appropriate class and set defaults if
   # no input is given.
@@ -40,6 +45,8 @@ ds.train_tree <- function(data_name, last_tr_tree, max_splits = 10,
   
   ds.calc_hist(data_name, last_tr_tree, loss_function, datasources)
   
+  ds.gen_spp_cand(amt_spp, min_max, "uniform", datasources)
+  
   current_tree <- data.frame(Feature = numeric(), split_value = numeric(),
                              w_s_left = logical(), w_s_left_value = numeric(),
                              w_s_right = logical(), w_s_right_value = numeric(),
@@ -57,8 +64,7 @@ ds.train_tree <- function(data_name, last_tr_tree, max_splits = 10,
   for (i in 1:max_splits){
     
     hist_bins_per_leave <- ds.split_bins(data_name, min_max, current_tree,
-                                         spp_cand, current_tree, data_type,
-                                         datasources)
+                                         spp_cand, data_type, datasources)
     
     # We search for the best possible split(s) in the newly added branch.
     best_split <- ds.select_split(hist_bins_per_leave, spp_cand)

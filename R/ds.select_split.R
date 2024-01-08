@@ -1,14 +1,13 @@
 
-#' ds.select_split
+#' Choose the best split
 #'
-#' @param histograms 
-#' @param spp_cand 
-#' @param reg_par 
+#' @param histograms Histogram-sums for all features and split-bins.
+#' @param spp_cand The candidates for a possible further split of the current
+#' tree.
+#' @param reg_par Regularisation parameters which specify the loss function.
 #'
-#' @return
+#' @return The best possible split under the possible ones.
 #' @export
-#'
-#' @examples
 ds.select_split <- function(histograms, spp_cand, reg_par){
   
   # TODO: Structure which variables should be mentioned explicitly and which

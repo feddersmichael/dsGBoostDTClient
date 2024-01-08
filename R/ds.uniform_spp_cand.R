@@ -1,14 +1,12 @@
 
-#' ds.uniform_spp_cand
+#' Create Splitting-point candidates through uniform distribution
 #'
-#' @param amt_spp 
-#' @param min_max 
-#' @param seed 
+#' @param amt_spp The amount of splitting points per feature.
+#' @param min_max The boundaries of every feature.
+#' @param seed If wanted a seed for the random sample.
 #'
-#' @return
+#' @return The Splitting-point candidates.
 #' @export
-#'
-#' @examples
 ds.uniform_spp_cand <- function(amt_spp, min_max, seed = NULL){
   
   # We first check all the inputs for appropriate class and set defaults if
@@ -38,7 +36,9 @@ ds.uniform_spp_cand <- function(amt_spp, min_max, seed = NULL){
   
   # This is a help function to create all splitting-point candidates at once 
   # through 'mapply'.
-  unif_appl <- function(min_max, amt_spp) runif(amt_spp, min_max[1], min_max[2])
+  unif_appl <- function(min_max, amt_spp) {
+    stats::runif(amt_spp, min_max[1], min_max[2])
+  }
   
   # 'spp_cand' is a list of length 'length(amt_spp)' and the element at place i 
   # contains 'amt_spp[[i]]' splitting-pint candidates.

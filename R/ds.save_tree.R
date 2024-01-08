@@ -1,10 +1,8 @@
 
-#' ds.save_tree
+#' Save a single trained tree
 #'
-#' @return
+#' @return None
 #' @export
-#'
-#' @examples
 ds.save_tree <- function(){
   
 }

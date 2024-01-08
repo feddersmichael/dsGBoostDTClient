@@ -1,17 +1,18 @@
 
-#' ds.gen_spp_cand
+#' Generate Splitting point candidates
 #'
-#' @param amt_spp 
-#' @param min_max 
-#' @param cand_select_mode 
-#' @param datasources 
+#' @param data_name The name under which the data is saved on the server.
+#' @param amt_spp How many splitting points per feature shall be created.
+#' @param min_max What are the boundaries of each feature.
+#' @param cand_select_mode Through which function shall the splitting points be
+#' selected.
+#' @param datasources DATASHIELD server connection.
 #'
-#' @return
+#' @return The created splitting points.
 #' @export
-#'
-#' @examples
-ds.gen_spp_cand <- function(amt_spp, min_max, cand_select_mode = "percentile", 
-                              datasources = NULL){
+ds.gen_spp_cand <- function(data_name, amt_spp, min_max,
+                            cand_select_mode = "percentile",
+                            datasources = NULL){
   # Idea: if we want to introduce other 'cand_select_mode' which needs different
   # parameters than 'amt_spp' and 'min_max' we ask for a general list 'parameters'
   # and then just pass the elements through 'parameters[[1]]', 'parameters[[2]]'
@@ -64,7 +65,7 @@ ds.gen_spp_cand <- function(amt_spp, min_max, cand_select_mode = "percentile",
   }
   # here we need the Hessian histograms, procedure as describes in Maddock
   else if (cand_select_mode == "ithess"){
-    spp_cand <- ds.ithess_spp_cand(data_name)
+    spp_cand <- ds.ithess_spp_cand()
   }
   else {
     cat(paste0("The specified mode '", cand_select_mode, 
@@ -72,7 +73,7 @@ ds.gen_spp_cand <- function(amt_spp, min_max, cand_select_mode = "percentile",
     if (tolower(readline(prompt = "Do you want to proceed with 
                          the splitting candidates method 'Iterative Hessian'? 
                          (y/n): ")) == "y"){
-      spp_cand <- ds.ithess_spp_cand(data_name)
+      spp_cand <- ds.ithess_spp_cand()
     }
     else {
       stop("Please retry with one of the supported splitting candidate methods.
