@@ -1,4 +1,13 @@
 
+#' ds.exact_spp_cand
+#'
+#' @param data_name 
+#' @param datasources 
+#'
+#' @return
+#' @export
+#'
+#' @examples
 ds.exact_spp_cand <- function(data_name, datasources = NULL){
   
   if (is.null(datasources)) {

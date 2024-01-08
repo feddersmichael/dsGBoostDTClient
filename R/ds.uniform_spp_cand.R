@@ -1,4 +1,14 @@
 
+#' ds.uniform_spp_cand
+#'
+#' @param amt_spp 
+#' @param min_max 
+#' @param seed 
+#'
+#' @return
+#' @export
+#'
+#' @examples
 ds.uniform_spp_cand <- function(amt_spp, min_max, seed = NULL){
   
   # We first check all the inputs for appropriate class and set defaults if

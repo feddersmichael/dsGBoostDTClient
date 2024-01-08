@@ -1,12 +1,24 @@
 
-# Idea: if we want to introduce other 'cand_select_mode' which needs different
-# parameters than 'amt_spp' and 'min_max' we ask for a general list 'parameters'
-# and then just pass the elements through 'parameters[[1]]', 'parameters[[2]]'
-# etc.
-# Idea: add mode for logarithmic scale e.g. for uniform
-# TODO: implement iterative hessian
+#' ds.gen_spp_cand
+#'
+#' @param amt_spp 
+#' @param min_max 
+#' @param cand_select_mode 
+#' @param datasources 
+#'
+#' @return
+#' @export
+#'
+#' @examples
 ds.gen_spp_cand <- function(amt_spp, min_max, cand_select_mode = "percentile", 
                               datasources = NULL){
+  # Idea: if we want to introduce other 'cand_select_mode' which needs different
+  # parameters than 'amt_spp' and 'min_max' we ask for a general list 'parameters'
+  # and then just pass the elements through 'parameters[[1]]', 'parameters[[2]]'
+  # etc.
+  # Idea: add mode for logarithmic scale e.g. for uniform
+  # TODO: implement iterative hessian
+  
   
   # We first check all the inputs for appropriate class and set defaults if
   # no input is given.

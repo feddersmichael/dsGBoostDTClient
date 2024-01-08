@@ -1,4 +1,15 @@
 
+#' ds.create_data_split
+#'
+#' @param data_name 
+#' @param train_test_ratio 
+#' @param split_status 
+#' @param datasources 
+#'
+#' @return
+#' @export
+#'
+#' @examples
 ds.create_data_split <- function(data_name, train_test_ratio, 
                                  split_status = NULL, datasources = NULL){
   

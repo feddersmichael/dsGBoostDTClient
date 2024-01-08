@@ -1,4 +1,16 @@
 
+#' ds.train_tree
+#'
+#' @param data_name 
+#' @param last_tr_tree 
+#' @param max_splits 
+#' @param spp_cand 
+#' @param datasources 
+#'
+#' @return
+#' @export
+#'
+#' @examples
 ds.train_tree <- function(data_name, last_tr_tree, max_splits = 10,
                           spp_cand = NULL, datasources = NULL){
   

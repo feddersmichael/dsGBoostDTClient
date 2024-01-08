@@ -1,4 +1,14 @@
 
+#' ds.train_boosted_tree
+#'
+#' @param max_treecount 
+#' @param seed 
+#' @param datasources 
+#'
+#' @return
+#' @export
+#'
+#' @examples
 ds.train_boosted_tree <- function(max_treecount = 50, seed = NULL,
                                   datasources = NULL){
   

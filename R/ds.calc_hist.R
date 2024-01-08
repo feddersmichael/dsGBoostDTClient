@@ -1,4 +1,15 @@
 
+#' ds.calc_hist
+#'
+#' @param data_name 
+#' @param last_tr_tree 
+#' @param loss_function 
+#' @param datasources 
+#'
+#' @return
+#' @export
+#'
+#' @examples
 ds.calc_hist <- function(data_name, last_tr_tree, loss_function,
                          datasources = NULL){
   

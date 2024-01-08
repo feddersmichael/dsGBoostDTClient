@@ -1,4 +1,18 @@
 
+#' ds.split_bins
+#'
+#' @param data_name 
+#' @param min_max 
+#' @param current_tree 
+#' @param spp_cand 
+#' @param current_tree 
+#' @param data_type 
+#' @param datasources 
+#'
+#' @return
+#' @export
+#'
+#' @examples
 ds.split_bins <- function(data_name, min_max, current_tree, spp_cand,
                           current_tree, data_type, datasources = NULL){
   

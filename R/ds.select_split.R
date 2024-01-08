@@ -1,9 +1,19 @@
 
-# TODO: Structure which variables should be mentioned explicitly and which
-# ones only under a general variable-list
-# TODO: Save if the best split contains NA values
+#' ds.select_split
+#'
+#' @param histograms 
+#' @param spp_cand 
+#' @param reg_par 
+#'
+#' @return
+#' @export
+#'
+#' @examples
 ds.select_split <- function(histograms, spp_cand, reg_par){
   
+  # TODO: Structure which variables should be mentioned explicitly and which
+  # ones only under a general variable-list
+  # TODO: Save if the best split contains NA values
   split_sums <- list()
   
   for (leaf in histograms){
