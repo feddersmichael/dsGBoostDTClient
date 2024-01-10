@@ -24,7 +24,7 @@ ds.train_boosted_tree <- function(data_name, train_test_ratio, split_status,
   if (is.null(datasources)) {
     datasources <- DSI::datashield.connections_find()
   } 
-  else if (!DSI:::.isDSConnection(datasources)) {
+  else if (!all(sapply(datasources, DSI:::.isDSConnection))) {
     stop("'datasources' needs to be a an object of the 'DSConnection' class.")
   }
   
@@ -45,7 +45,8 @@ ds.train_boosted_tree <- function(data_name, train_test_ratio, split_status,
   
   # Before we start training our model we split up the data set into a training
   # and test part.
-  ds.create_data_split(data_name, train_test_ratio, split_status, datasources)
+  data_name <- ds.create_data_split(data_name, train_test_ratio, split_status,
+                                    datasources)
   
   
   # We save our tree in a (amount of splits)x8 data frame. Each row represents

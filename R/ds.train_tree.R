@@ -24,7 +24,7 @@ ds.train_tree <- function(data_name, last_tr_tree, loss_function, min_max,
   if (is.null(datasources)) {
     datasources <- DSI::datashield.connections_find()
   } 
-  else if (!DSI:::.isDSConnection(datasources)) {
+  else if (!all(sapply(datasources, DSI:::.isDSConnection))) {
     stop("'datasources' needs to be a an object of the 'DSConnection' class.")
   }
   
