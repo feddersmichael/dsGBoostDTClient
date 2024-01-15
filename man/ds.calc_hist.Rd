@@ -4,7 +4,13 @@
 \alias{ds.calc_hist}
 \title{Calculate the predicted output}
 \usage{
-ds.calc_hist(data_name, last_tr_tree, loss_function, datasources = NULL)
+ds.calc_hist(
+  data_name,
+  last_tr_tree,
+  loss_function,
+  output_var,
+  datasources = NULL
+)
 }
 \arguments{
 \item{data_name}{The name under which the data is saved on the server.}
@@ -13,6 +19,8 @@ ds.calc_hist(data_name, last_tr_tree, loss_function, datasources = NULL)
 
 \item{loss_function}{The loss function under which we optimize our boosted
 tree building process.}
+
+\item{output_var}{The name of the column containing the output.}
 
 \item{datasources}{DATASHIELD server connection.}
 }

@@ -2,16 +2,17 @@
 #' Generate Splitting point candidates
 #'
 #' @param data_name The name under which the data is saved on the server.
-#' @param amt_spp How many splitting points per feature shall be created.
-#' @param min_max What are the boundaries of each feature.
-#' @param cand_select_num Through which function shall the splitting points be
-#' selected.
+#' @param cand_select A data frame defining the split-point generation for all
+#' different types.
+#' @param cand_hyper Hyperparameter for all candidate selection methods.
+#' @param data_classes List of data class per column.
+#' @param amt_spp Amount of splitting points per feature.
 #' @param datasources DATASHIELD server connection.
 #'
 #' @return The created splitting points.
 #' @export
-ds.gen_spp_cand <- function(data_name, amt_spp, min_max, cand_select, cand_hyper,
-                            datasources = NULL){
+ds.gen_spp_cand <- function(data_name, cand_select, cand_hyper, data_classes,
+                            amt_spp, datasources = NULL){
   # Idea: if we want to introduce other 'cand_select_mode' which needs different
   # parameters than 'amt_spp' and 'min_max' we ask for a general list 'parameters'
   # and then just pass the elements through 'parameters[[1]]', 'parameters[[2]]'
@@ -53,18 +54,22 @@ ds.gen_spp_cand <- function(data_name, amt_spp, min_max, cand_select, cand_hyper
   
   # To generate the splitting-point candidates we need to have min_max values
   # for each feature for which we want to create 'amt_spp' splitting points.
-  if (length(amt_spp) != length(min_max)) {
-    stop("'amt_spp' and 'min_max' need to have the same length.")
-  }
-  
+
   # For each type of candidate-selection we call a different function.
-  if (cand_select_num == "uniform"){
+  if (cand_select == "uniform"){
+    
+    min_max <- list()
+    
+    if (length(amt_spp) != length(min_max)) {
+      stop("'amt_spp' and 'min_max' need to have the same length.")
+    }
+    
     unif_appl <- function(min_max, amt_spp) {
       stats::runif(amt_spp, min_max[1], min_max[2])
     }
     spp_cand <- mapply(unif_appl, min_max, amt_spp)
   }
-  else if (cand_select_num == "ithess"){
+  else if (cand_select == "ithess"){
     spp_cand <- ds.ithess_spp_cand()
   }
   

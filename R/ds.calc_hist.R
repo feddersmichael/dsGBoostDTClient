@@ -5,11 +5,12 @@
 #' @param last_tr_tree The last tree which was trained under the boosting step.
 #' @param loss_function The loss function under which we optimize our boosted
 #' tree building process.
+#' @param output_var The name of the column containing the output.
 #' @param datasources DATASHIELD server connection.
 #'
 #' @return None.
 #' @export
-ds.calc_hist <- function(data_name, last_tr_tree, loss_function,
+ds.calc_hist <- function(data_name, last_tr_tree, loss_function, output_var,
                          datasources = NULL) {
 
   # We first check all the inputs for appropriate class and set defaults if
@@ -33,7 +34,7 @@ ds.calc_hist <- function(data_name, last_tr_tree, loss_function,
 
   # If 'last_tr_tree' is NULL we initialise the predicted output with 0's.
   if (is.null(last_tr_tree)) {
-    cally <- call("calc_hist_initDS", data_name, loss_function)
+    cally <- call("calc_hist_initDS", data_name, loss_function, output_var)
     output <- DSI::datashield.assign.expr(datasources, 
                                           paste0(data_name, "_training"), cally)
   }

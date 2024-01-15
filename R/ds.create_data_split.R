@@ -2,6 +2,9 @@
 #' Split the data into 'Test' and 'Training'
 #'
 #' @param data_name The name under which the data is saved on the server.
+#' @param data_classes List of data class for each column.
+#' @param output_var The name of the column which contains the output variable.
+#' @param drop_columns Which columns should be excluded from the data analysis.
 #' @param train_test_ratio Percentage of the data which should be used for 
 #' Training.
 #' @param datasources DATASHIELD server connection.
@@ -28,7 +31,7 @@ ds.create_data_split <- function(data_name, data_classes, output_var,
   }
   
   if (output_var %in% drop_columns) {
-    stop("The output variable can't be dropped.")
+    stop("The output variable can't be removed from the data.")
   }
 
   # We split up the data set in a training and test part.

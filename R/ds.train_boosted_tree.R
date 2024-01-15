@@ -11,12 +11,20 @@
 #' tree.
 #' @param amt_spp The amount of split-points per feature.
 #' @param seed If we want to choose a specific random behavior client side.
+#' @param drop_NA If NA data in the output variable should be removed.
+#' @param bounds_and_levels Bounds for numeric columns and levels for factors.
+#' @param output_var The name of the column containing the output variable.
+#' @param loss_function The name of the loss function we want to use for our
+#' boosted tree.
+#' @param drop_columns Vector of data columns which shall be removed.
 #' @param datasources DATASHIELD server connection.
 #'
-#' @return The trained decisiom tree model.
+#' @return The trained decision tree model.
 #' @export
 ds.train_boosted_tree <- function(data_name, train_test_ratio, split_status,
                                   max_treecount = 50, amt_spp, seed = NULL,
+                                  drop_NA, bounds_and_levels, output_var,
+                                  loss_function, drop_columns,
                                   datasources = NULL){
   
   # We first check all the inputs for appropriate class and set defaults if
@@ -67,8 +75,10 @@ ds.train_boosted_tree <- function(data_name, train_test_ratio, split_status,
   
   # Before we start training our model we split up the data set into a training
   # and test part.
-  ds.create_data_split(data_name, data_classes, output_var, train_test_ratio,
-                       datasources)
+  ds.create_data_split(data_name, data_classes, output_var, drop_columns,
+                       train_test_ratio, datasources)
+  
+  # Now we can adapt the 
   
   # We save our tree in a (amount of splits)x8 data frame. Each row represents
   # one split point.
