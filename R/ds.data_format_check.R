@@ -1,17 +1,22 @@
 
 #' Check Data for basic rules
 #'
-#' @param data_name The name under which the data is saved on the server.
+#' @param data_name The name under which the data is saved on the server
+#' @param bounds_and_levels List of all columns which stores either bounds or
+#' level sets for all variables.
+#' @param output_var The name of the output variable.
+#' @param loss_function The loss function which we use to optimize our boosted
+#' tree.
+#' @param drop_NA If NA-values should be deleted.
 #' @param datasources DATASHIELD server connection.
 #'
-#' @return NONE.
+#' @return The data classes (in the sense of data.class()) for all columns.
 #' @export
-
-ds.data_format_check <- function(data_name, bounds_and_levels, drop_NA = FALSE,
+ds.data_format_check <- function(data_name, bounds_and_levels, output_var,
+                                 loss_function, drop_NA = FALSE,
                                  datasources = NULL) {
   # We want to check in a generic way if the uploaded data fulfills
   # our requirements to be used in this analysis.
-  # TODO: dimension check between servers
 
   if (is.null(datasources)) {
     datasources <- DSI::datashield.connections_find()
@@ -20,23 +25,30 @@ ds.data_format_check <- function(data_name, bounds_and_levels, drop_NA = FALSE,
     stop("'datasources' needs to be a an object of the 'DSConnection' class.")
   }
 
-  # We check if 'data_name' is of type character.
-  if (!is.character(data_name)){
-    stop("'data_name' needs to have data type 'character'.")
-  }
-  
-  if (!is.logical(drop_NA)) {
-    stop("'drop_NA' needs to have data type 'logical'.")
-  }
-  
-  if (!is.list(bounds_and_levels)) {
-    stop("'bounds_and_levels' needs be an object of type 'list'.")
+  if (!output_var %in% names(bounds_and_levels)) {
+    stop("'output_var' needs to be an element of 'bounds_and_levels'.")
   }
 
-  # We start by checking if a data frame with name 'data_name' exists on all
-  # servers and their column names coincide.
+  cally <- call("data_format_checkDS", data_name, bounds_and_levels, output_var,
+                loss_function, drop_NA)
+  data_classes <- DSI::datashield.aggregate(datasources, cally)
   
-  cally <- call("data_format_checkDS", data_name, col_names, drop_NA)
-  result <- DSI::datashield.aggregate(datasources, cally)
-
+  data_server <- 1
+  
+  check_data_class <- function(A, B) {
+    
+    data_server <- data_server + 1
+    
+    if (!identical(A, B)) {
+      stop(paste0("The data classes of the data frame columns from server ",
+                  data_server, " don't coincide with the previous ones."))
+    }
+    else {
+      return(B)
+    }
+  }
+  
+  output <- Reduce(check_data_class, data_classes)
+  
+  return(output)
 }

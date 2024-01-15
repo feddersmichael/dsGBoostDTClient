@@ -35,19 +35,40 @@ ds.train_boosted_tree <- function(data_name, train_test_ratio, split_status,
   if (is.null(seed)){
     set.seed()
   }
-  else if (!is.integer(seed)){
-    stop("'seed' needs to have data type 'integer'.")
+  else {
+    if (!is.integer(seed)){
+      stop("'seed' needs to have data type 'integer'.")
+    }
+    else {
+      set.seed(seed)
+    }
   }
   
-  # We do some basic checks about the saved data
-  ds.data_format_check(data_name, datasources)
+  if (!is.character(data_name)){
+    stop("'data_name' needs to have data type 'character'.")
+  }
   
+  if (!is.list(bounds_and_levels)) {
+    stop("'bounds_and_levels' needs be an object of type 'list'.")
+  }
+  
+  if (!is.character(output_var)) {
+    stop("'output_var' needs to have data type 'character'.")
+  }
+  
+  if (!is.logical(drop_NA)) {
+    stop("'drop_NA' needs to have data type 'logical'.")
+  }
+    
+  
+  # We do some basic checks about the saved data
+  data_classes <- ds.data_format_check(data_name, bounds_and_levels, output_var,
+                                       loss_function, drop_NA, datasources)
   
   # Before we start training our model we split up the data set into a training
   # and test part.
-  data_name <- ds.create_data_split(data_name, train_test_ratio, split_status,
-                                    datasources)
-  
+  ds.create_data_split(data_name, data_classes, output_var, train_test_ratio,
+                       datasources)
   
   # We save our tree in a (amount of splits)x8 data frame. Each row represents
   # one split point.
@@ -65,10 +86,6 @@ ds.train_boosted_tree <- function(data_name, train_test_ratio, split_status,
   # Column 6 denotes either the row-number of the split-point or the weight at
   # the right leaf.
   
-  # Columns 5 shows whether the right leave is a 'split' or a 'weight' and
-  # column 6 has either the row-number of the split-point or the weight at the 
-  # right leaf
-  
   # Column 7 identifies the row of the parent split point.
   # Column 8 is 'TRUE' if we reach the parent node from the 'left' or 'FALSE' if
   # we reach the parent node from the 'right' branch.
@@ -83,7 +100,7 @@ ds.train_boosted_tree <- function(data_name, train_test_ratio, split_status,
   for (i in 1:max_treecount){
     
     # We train the next tree.
-    tree <- ds.train_tree(tree_list[[length(tree_list)]], amt_spp)
+    tree <- ds.train_tree(tree_list[[length(tree_list)]], amt_spp, data_classes)
     
     # Depending on the outcome we add the tree or end the model training.
     if (is.character(tree)){
