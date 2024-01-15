@@ -4,15 +4,32 @@
 \alias{ds.data_format_check}
 \title{Check Data for basic rules}
 \usage{
-ds.data_format_check(data_name, datasources = NULL)
+ds.data_format_check(
+  data_name,
+  bounds_and_levels,
+  output_var,
+  loss_function,
+  drop_NA = FALSE,
+  datasources = NULL
+)
 }
 \arguments{
-\item{data_name}{The name under which the data is saved on the server.}
+\item{data_name}{The name under which the data is saved on the server}
+
+\item{bounds_and_levels}{List of all columns which stores either bounds or
+level sets for all variables.}
+
+\item{output_var}{The name of the output variable.}
+
+\item{loss_function}{The loss function which we use to optimize our boosted
+tree.}
+
+\item{drop_NA}{If NA-values should be deleted.}
 
 \item{datasources}{DATASHIELD server connection.}
 }
 \value{
-NONE.
+The data classes (in the sense of data.class()) for all columns.
 }
 \description{
 Check Data for basic rules

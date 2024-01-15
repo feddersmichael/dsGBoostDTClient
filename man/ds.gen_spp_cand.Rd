@@ -6,21 +6,24 @@
 \usage{
 ds.gen_spp_cand(
   data_name,
+  cand_select,
+  cand_hyper,
+  data_classes,
   amt_spp,
-  min_max,
-  cand_select_mode = "percentile",
   datasources = NULL
 )
 }
 \arguments{
 \item{data_name}{The name under which the data is saved on the server.}
 
-\item{amt_spp}{How many splitting points per feature shall be created.}
+\item{cand_select}{A data frame defining the split-point generation for all
+different types.}
 
-\item{min_max}{What are the boundaries of each feature.}
+\item{cand_hyper}{Hyperparameter for all candidate selection methods.}
 
-\item{cand_select_mode}{Through which function shall the splitting points be
-selected.}
+\item{data_classes}{List of data class per column.}
+
+\item{amt_spp}{Amount of splitting points per feature.}
 
 \item{datasources}{DATASHIELD server connection.}
 }

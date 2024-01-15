@@ -11,6 +11,11 @@ ds.train_boosted_tree(
   max_treecount = 50,
   amt_spp,
   seed = NULL,
+  drop_NA,
+  bounds_and_levels,
+  output_var,
+  loss_function,
+  drop_columns,
   datasources = NULL
 )
 }
@@ -30,10 +35,21 @@ tree.}
 
 \item{seed}{If we want to choose a specific random behavior client side.}
 
+\item{drop_NA}{If NA data in the output variable should be removed.}
+
+\item{bounds_and_levels}{Bounds for numeric columns and levels for factors.}
+
+\item{output_var}{The name of the column containing the output variable.}
+
+\item{loss_function}{The name of the loss function we want to use for our
+boosted tree.}
+
+\item{drop_columns}{Vector of data columns which shall be removed.}
+
 \item{datasources}{DATASHIELD server connection.}
 }
 \value{
-The trained decisiom tree model.
+The trained decision tree model.
 }
 \description{
 Training of a Gradient Boosted Decision Tree

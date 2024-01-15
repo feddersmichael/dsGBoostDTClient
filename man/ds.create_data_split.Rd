@@ -6,19 +6,24 @@
 \usage{
 ds.create_data_split(
   data_name,
-  train_test_ratio,
-  split_status = NULL,
+  data_classes,
+  output_var,
+  drop_columns = NULL,
+  train_test_ratio = 0.8,
   datasources = NULL
 )
 }
 \arguments{
 \item{data_name}{The name under which the data is saved on the server.}
 
+\item{data_classes}{List of data class for each column.}
+
+\item{output_var}{The name of the column which contains the output variable.}
+
+\item{drop_columns}{Which columns should be excluded from the data analysis.}
+
 \item{train_test_ratio}{Percentage of the data which should be used for
 Training.}
-
-\item{split_status}{Defines if 'data_name' saves the full data, is already
-split up into Training and Test data or saves only one of them.}
 
 \item{datasources}{DATASHIELD server connection.}
 }

@@ -43,11 +43,32 @@ ds.train_tree <- function(data_name, last_tr_tree, loss_function, min_max,
   # We first update the histogram values, which are based on the previously
   # trained trees.
   
-  ds.calc_hist(data_name, last_tr_tree, loss_function, datasources)
+  ds.calc_hist(data_name, last_tr_tree, loss_function, output_var, datasources)
   
-  ds.gen_spp_cand(amt_spp, min_max, "uniform", datasources)
+  spp_cand <- ds.gen_spp_cand(bounds_and_levels, data_classes, cand_select,
+                              amt_spp)
   
-  current_tree <- data.frame(Feature = numeric(), split_value = numeric(),
+  # We save our tree in a (amount of splits)x8 data frame. Each row represents
+  # one split point.
+  
+  # Column 1 denotes the feature along which we split (5th e.g.).
+  # Column 2 then denotes the exact splitting value along we split the data.
+  
+  # Columns 3 is 'TRUE' if the left leave is a 'weight' and 'FALSE' if the left
+  # leave is a 'weight'.
+  # Column 4 denotes either the row-number of the split-point or the weight at
+  # the left leaf.
+  
+  # Columns 5 is 'TRUE' if the right leave is a 'weight' and 'FALSE' if the
+  # right leave is a 'weight'.
+  # Column 6 denotes either the row-number of the split-point or the weight at
+  # the right leaf.
+  
+  # Column 7 identifies the row of the parent split point.
+  # Column 8 is 'TRUE' if we reach the parent node from the 'left' or 'FALSE' if
+  # we reach the parent node from the 'right' branch.
+  
+  current_tree <- data.frame(feature = numeric(), split_value = numeric(),
                              w_s_left = logical(), w_s_left_value = numeric(),
                              w_s_right = logical(), w_s_right_value = numeric(),
                              par_spp = numeric(), par_dir = logical())
