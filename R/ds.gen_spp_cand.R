@@ -11,17 +11,9 @@
 #'
 #' @return The created splitting points.
 #' @export
-<<<<<<< HEAD
+
 ds.gen_spp_cand <- function(bounds_and_levels, data_classes, cand_select,
                             amt_spp){
-=======
-ds.gen_spp_cand <- function(data_name, cand_select, cand_hyper, data_classes,
-                            amt_spp, datasources = NULL){
-  # Idea: if we want to introduce other 'cand_select_mode' which needs different
-  # parameters than 'amt_spp' and 'min_max' we ask for a general list 'parameters'
-  # and then just pass the elements through 'parameters[[1]]', 'parameters[[2]]'
-  # etc.
->>>>>>> b1be14c27b0c1d88085d21d398f80eb4225d34f7
   # Idea: add mode for logarithmic scale e.g. for uniform
   # TODO: implement iterative hessian
   
@@ -49,7 +41,6 @@ ds.gen_spp_cand <- function(data_name, cand_select, cand_hyper, data_classes,
 
   spp_cand <- list()
   
-<<<<<<< HEAD
   for (feature in names(data_classes)) {
     
     if (data_classes[feature] == "numeric") {
@@ -60,27 +51,7 @@ ds.gen_spp_cand <- function(data_name, cand_select, cand_hyper, data_classes,
       spp_cand[[feature]] <- ds.gen_factor_spp_cand(bounds_and_levels[[feature]],
                                                     amt_spp[[feature]], cand_select$factor)
     }
-=======
-  # To generate the splitting-point candidates we need to have min_max values
-  # for each feature for which we want to create 'amt_spp' splitting points.
 
-  # For each type of candidate-selection we call a different function.
-  if (cand_select == "uniform"){
-    
-    min_max <- list()
-    
-    if (length(amt_spp) != length(min_max)) {
-      stop("'amt_spp' and 'min_max' need to have the same length.")
-    }
-    
-    unif_appl <- function(min_max, amt_spp) {
-      stats::runif(amt_spp, min_max[1], min_max[2])
-    }
-    spp_cand <- mapply(unif_appl, min_max, amt_spp)
-  }
-  else if (cand_select == "ithess"){
-    spp_cand <- ds.ithess_spp_cand()
->>>>>>> b1be14c27b0c1d88085d21d398f80eb4225d34f7
   }
 
   return(spp_cand)
