@@ -15,6 +15,7 @@
 #' and levels for factor features.
 #' @param data_classes Data class for all features.
 #' @param cand_select Splitting-point selection for numeric and factor features.
+#' @param reg_par Regularisation parameter which prevent overfitting.
 #' @param spp_cand The splitting point candidates for each feature.
 #' @param datasources DATASHIELD server connection.
 #'
@@ -22,8 +23,8 @@
 #' @export
 ds.train_tree <- function(data_name, last_tr_tree, loss_function, min_max,
                           data_type, max_splits = 10, amt_spp, output_var,
-                          bounds_and_levels, data_classes, cand_select,
-                          spp_cand = NULL, datasources = NULL){
+                          bounds_and_levels, data_classes, cand_select, reg_par,
+                          spp_cand, datasources = NULL){
   
   # We first check all the inputs for appropriate class and set defaults if
   # no input is given.
@@ -90,11 +91,11 @@ ds.train_tree <- function(data_name, last_tr_tree, loss_function, min_max,
   # In this loop we build a tree with up to 'max_splits' many splits.
   for (i in 1:max_splits){
     
-    hist_bins_per_leave <- ds.split_bins(data_name, min_max, current_tree,
+    histograms_per_leave <- ds.split_bins(data_name, min_max, current_tree,
                                          spp_cand, data_type, datasources)
     
     # We search for the best possible split(s) in the newly added branch.
-    best_split <- ds.select_split(hist_bins_per_leave, spp_cand)
+    best_split <- ds.select_split(histograms_per_leave, spp_cand, reg_par)
     
     if (nrow(current_tree) == 0){
       first_split <- c(best_split$feature[1], best_split$split_val[1],

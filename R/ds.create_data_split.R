@@ -5,7 +5,7 @@
 #' @param data_classes List of data class for each column.
 #' @param output_var The name of the column which contains the output variable.
 #' @param drop_columns Which columns should be excluded from the data analysis.
-#' @param train_test_ratio Percentage of the data which should be used for 
+#' @param train_test_ratio Percentage of the data which should be used for
 #' Training.
 #' @param datasources DATASHIELD server connection.
 #'
@@ -15,7 +15,7 @@ ds.create_data_split <- function(data_name, data_classes, output_var,
                                  drop_columns = NULL, train_test_ratio = 0.8,
                                  datasources = NULL) {
   # TODO: keep certain characteristics similar in Train and test
-  
+
   # We first check all the inputs for appropriate class and set defaults if
   # no input is given.
   if (is.null(datasources)) {
@@ -26,10 +26,10 @@ ds.create_data_split <- function(data_name, data_classes, output_var,
   }
 
   if (!is.numeric(train_test_ratio) || (train_test_ratio < 0) ||
-      (train_test_ratio > 1)) {
+        (train_test_ratio > 1)) {
     stop("'train_test_ratio' needs to have data type 'numeric' and lie between 0 and 1.")
   }
-  
+
   if (output_var %in% drop_columns) {
     stop("The output variable can't be removed from the data.")
   }
@@ -38,6 +38,7 @@ ds.create_data_split <- function(data_name, data_classes, output_var,
   cally <- call("create_data_splitDS", data_name, data_classes, output_var,
                 drop_columns, train_test_ratio)
   result <- DSI::datashield.assign.expr(datasources,
-                                        paste0(data_name, "_training_test_split"), cally)
+                                        paste0(data_name,
+                                               "_training_test_split"), cally)
 
 }

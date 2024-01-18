@@ -13,6 +13,7 @@ ds.select_split <- function(histograms, spp_cand, reg_par){
   # TODO: Structure which variables should be mentioned explicitly and which
   # ones only under a general variable-list
   # TODO: Save if the best split contains NA values
+  # TODO: Add gamma at the end.
   split_sums <- list()
   
   for (leaf in histograms){
@@ -21,6 +22,24 @@ ds.select_split <- function(histograms, spp_cand, reg_par){
       return(length(bins) > length(cand))
     }
     NA_val <- mapply(na_check, leaf[[1]], spp_cand)
+    
+    grad_sums <- list()
+    hess_sums <- list()
+    
+    for (feature in names(spp_cand)) {
+      
+      amt_bins <- length(leaf$grad[[feature]])
+      
+      if (!is.null(leaf$grad[[feature]]["NA"])) {
+        
+        bin_sums_grad <- data.frame(sum_L_NA = numeric(), sum_R = numeric(),
+                               sum_L = numeric(), sum_R_NA = numeric())
+        NA_elem_grad <- leaf$grad[[feature]]["NA"]
+      }
+      else {
+        
+      }
+    }
     
     bin_sums <- function(bins, cont_NA){
       if (cont_NA){

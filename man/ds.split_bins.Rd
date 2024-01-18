@@ -9,7 +9,7 @@ ds.split_bins(
   bounds_and_levels,
   spp_cand,
   current_tree,
-  data_type,
+  data_classes,
   datasources = NULL
 )
 }
@@ -24,8 +24,7 @@ tree.}
 
 \item{current_tree}{The tree which gets currently trained.}
 
-\item{data_type}{Denotes for each feature if it is numeric or (originally)
-categorical.}
+\item{data_classes}{Denotes for each feature if it is numeric or a factor.}
 
 \item{datasources}{DATASHIELD server connection.}
 }

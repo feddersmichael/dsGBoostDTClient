@@ -12,26 +12,26 @@
 #' @export
 
 ds.gen_spp_cand <- function(bounds_and_levels, data_classes, cand_select,
-                            amt_spp){
+                            amt_spp) {
   # Idea: add mode for logarithmic scale e.g. for uniform
   # TODO: implement iterative hessian
-  
-  
+
+
   cand_modes <- names(cand_select)
-  
-  if (!is.list(cand_select)){
+
+  if (!is.list(cand_select)) {
     stop("'cand_select' needs to be an object of type 'list'.")
   }
   else if (!length(cand_select) == 2) {
     stop("'cand_select' is supposed to have two entries")
   }
-  else if(!identical(cand_modes, c("numeric", "factor"))) {
+  else if (!identical(cand_modes, c("numeric", "factor"))) {
     stop("The two data classes for which we generate splitting points are 'numeric' and 'factor'.")
   }
-  
+
   supported_modes <- list(numeric = c("uniform", "loguniform", "ithess"),
                           factor = c("exact"))
-  
+
   for (cur_mode in cand_modes) {
     if (!cand_select[[cur_mode]] %in% supported_modes[[cur_mode]]) {
       stop(paste0("'", cand_select[[cur_mode]], "' is not a supported split-point generating method for '", cur_mode, "'."))
@@ -39,9 +39,9 @@ ds.gen_spp_cand <- function(bounds_and_levels, data_classes, cand_select,
   }
 
   spp_cand <- list()
-  
+
   for (feature in names(data_classes)) {
-    
+
     if (data_classes[feature] == "numeric") {
       spp_cand[[feature]] <- ds.gen_numeric_spp_cand(bounds_and_levels[[feature]],
                                                      amt_spp[[feature]], cand_select$numeric)

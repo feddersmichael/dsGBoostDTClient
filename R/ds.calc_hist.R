@@ -35,7 +35,7 @@ ds.calc_hist <- function(data_name, last_tr_tree, loss_function, output_var,
   # If 'last_tr_tree' is NULL we initialise the predicted output with 0's.
   if (is.null(last_tr_tree)) {
     cally <- call("calc_hist_initDS", data_name, loss_function, output_var)
-    output <- DSI::datashield.assign.expr(datasources, 
+    output <- DSI::datashield.assign.expr(datasources,
                                           paste0(data_name, "_training"), cally)
   }
   # if we already trained a tree before we just add up the predicted value from
@@ -49,5 +49,5 @@ ds.calc_hist <- function(data_name, last_tr_tree, loss_function, output_var,
     output <- DSI::datashield.assign.expr(datasources,
                                           paste0(data_name, "_training"), cally)
   }
-  
+
 }

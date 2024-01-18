@@ -32,13 +32,13 @@ ds.data_format_check <- function(data_name, bounds_and_levels, output_var,
   cally <- call("data_format_checkDS", data_name, bounds_and_levels, output_var,
                 loss_function, drop_NA)
   data_classes <- DSI::datashield.aggregate(datasources, cally)
-  
+
   data_server <- 1
-  
+
   check_data_class <- function(A, B) {
-    
+
     data_server <- data_server + 1
-    
+
     if (!identical(A, B)) {
       stop(paste0("The data classes of the data frame columns from server ",
                   data_server, " don't coincide with the previous ones."))
@@ -47,8 +47,8 @@ ds.data_format_check <- function(data_name, bounds_and_levels, output_var,
       return(B)
     }
   }
-  
+
   output <- Reduce(check_data_class, data_classes)
-  
+
   return(output)
 }

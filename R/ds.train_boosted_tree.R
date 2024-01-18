@@ -3,7 +3,7 @@
 #' Training of a Gradient Boosted Decision Tree
 #'
 #' @param data_name The name under which the data is saved on the server.
-#' @param train_test_ratio Percentage of the data which should be used for 
+#' @param train_test_ratio Percentage of the data which should be used for
 #' Training.
 #' @param split_status Defines if 'data_name' saves the full data, is already
 #' split up into Training and Test data or saves only one of them.
@@ -25,45 +25,45 @@ ds.train_boosted_tree <- function(data_name, train_test_ratio, split_status,
                                   max_treecount = 50, amt_spp, seed = NULL,
                                   drop_NA, bounds_and_levels, output_var,
                                   loss_function, drop_columns,
-                                  datasources = NULL){
-  
+                                  datasources = NULL) {
+
   # We first check all the inputs for appropriate class and set defaults if
   # no input is given.
   if (is.null(datasources)) {
     datasources <- DSI::datashield.connections_find()
-  } 
+  }
   else if (!all(sapply(datasources, DSI:::.isDSConnection))) {
     stop("'datasources' needs to be a an object of the 'DSConnection' class.")
   }
-  
-  if (!is.integer(max_treecount)){
+
+  if (!is.integer(max_treecount)) {
     stop("'max_treecount' needs to have data type 'integer'.")
   }
-  
-  if (is.null(seed)){
+
+  if (is.null(seed)) {
     set.seed()
   }
   else {
-    if (!is.integer(seed)){
+    if (!is.integer(seed)) {
       stop("'seed' needs to have data type 'integer'.")
     }
     else {
       set.seed(seed)
     }
   }
-  
-  if (!is.character(data_name)){
+
+  if (!is.character(data_name)) {
     stop("'data_name' needs to have data type 'character'.")
   }
-  
+
   if (!is.list(bounds_and_levels)) {
     stop("'bounds_and_levels' needs be an object of type 'list'.")
   }
-  
+
   if (!is.character(output_var)) {
     stop("'output_var' needs to have data type 'character'.")
   }
-  
+
   if (!is.logical(drop_NA)) {
     stop("'drop_NA' needs to have data type 'logical'.")
   }

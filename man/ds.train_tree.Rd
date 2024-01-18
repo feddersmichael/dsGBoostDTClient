@@ -16,7 +16,8 @@ ds.train_tree(
   bounds_and_levels,
   data_classes,
   cand_select,
-  spp_cand = NULL,
+  reg_par,
+  spp_cand,
   datasources = NULL
 )
 }
@@ -45,6 +46,8 @@ and levels for factor features.}
 \item{data_classes}{Data class for all features.}
 
 \item{cand_select}{Splitting-point selection for numeric and factor features.}
+
+\item{reg_par}{Regularisation parameter which prevent overfitting.}
 
 \item{spp_cand}{The splitting point candidates for each feature.}
 
