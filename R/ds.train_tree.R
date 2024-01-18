@@ -10,14 +10,20 @@
 #' categorical.
 #' @param max_splits The maximum amount of splits in the trained tree.
 #' @param amt_spp The amount of splitting point candidates per feature.
+#' @param output_var Name of the output variable.
+#' @param bounds_and_levels The maximum and minimum values for numeric features
+#' and levels for factor features.
+#' @param data_classes Data class for all features.
+#' @param cand_select Splitting-point selection for numeric and factor features.
 #' @param spp_cand The splitting point candidates for each feature.
 #' @param datasources DATASHIELD server connection.
 #'
 #' @return The trained tree.
 #' @export
 ds.train_tree <- function(data_name, last_tr_tree, loss_function, min_max,
-                          data_type, max_splits = 10, amt_spp, spp_cand = NULL,
-                          datasources = NULL){
+                          data_type, max_splits = 10, amt_spp, output_var,
+                          bounds_and_levels, data_classes, cand_select,
+                          spp_cand = NULL, datasources = NULL){
   
   # We first check all the inputs for appropriate class and set defaults if
   # no input is given.
@@ -51,7 +57,7 @@ ds.train_tree <- function(data_name, last_tr_tree, loss_function, min_max,
   # We save our tree in a (amount of splits)x8 data frame. Each row represents
   # one split point.
   
-  # Column 1 denotes the feature along which we split (5th e.g.).
+  # Column 1 denotes the feature along which we split by name as a character.
   # Column 2 then denotes the exact splitting value along we split the data.
   
   # Columns 3 is 'TRUE' if the left leave is a 'weight' and 'FALSE' if the left
@@ -68,16 +74,16 @@ ds.train_tree <- function(data_name, last_tr_tree, loss_function, min_max,
   # Column 8 is 'TRUE' if we reach the parent node from the 'left' or 'FALSE' if
   # we reach the parent node from the 'right' branch.
   
-  current_tree <- data.frame(feature = numeric(), split_value = numeric(),
+  current_tree <- data.frame(feature = character(), split_value = numeric(),
                              w_s_left = logical(), w_s_left_value = numeric(),
                              w_s_right = logical(), w_s_right_value = numeric(),
                              par_spp = numeric(), par_dir = logical())
   
-  split_scores_left <- data.frame(sp_sc = numeric(), feature = numeric(),
+  split_scores_left <- data.frame(sp_sc = numeric(), feature = character(),
                                   split_val = numeric(), cont_NA = numeric(),
                                   weight_l = numeric(), weight_r = numeric())
   
-  split_scores_right <- data.frame(sp_sc = numeric(), feature = numeric(),
+  split_scores_right <- data.frame(sp_sc = numeric(), feature = character(),
                                   split_val = numeric(), cont_NA = numeric(),
                                   weight_l = numeric(), weight_r = numeric())
   

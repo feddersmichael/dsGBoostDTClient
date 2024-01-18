@@ -6,7 +6,7 @@
 \usage{
 ds.split_bins(
   data_name,
-  min_max,
+  bounds_and_levels,
   spp_cand,
   current_tree,
   data_type,
@@ -16,7 +16,8 @@ ds.split_bins(
 \arguments{
 \item{data_name}{The name under which the data is saved on the server.}
 
-\item{min_max}{The maximum and minimum values of all features.}
+\item{bounds_and_levels}{The maximum and minimum values for numeric features
+and levels for factor features.}
 
 \item{spp_cand}{The candidates for a possible further split of the current
 tree.}

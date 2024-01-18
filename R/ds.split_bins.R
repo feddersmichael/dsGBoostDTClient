@@ -2,7 +2,8 @@
 #' Split the data into bins
 #'
 #' @param data_name The name under which the data is saved on the server.
-#' @param min_max The maximum and minimum values of all features.
+#' @param bounds_and_levels The maximum and minimum values for numeric features
+#' and levels for factor features.
 #' @param current_tree The tree which gets currently trained.
 #' @param spp_cand The candidates for a possible further split of the current
 #' tree.
@@ -12,7 +13,7 @@
 #'
 #' @return The histogram sums for each bin for all features.
 #' @export
-ds.split_bins <- function(data_name, min_max, spp_cand, current_tree,
+ds.split_bins <- function(data_name, bounds_and_levels, spp_cand, current_tree,
                           data_type, datasources = NULL){
   
   # We first check all the inputs for appropriate class and set defaults if
@@ -32,7 +33,7 @@ ds.split_bins <- function(data_name, min_max, spp_cand, current_tree,
     stop("'spp_cand' needs to be an object of type 'list'.")
   }
   
-  cally <- call("split_binsDS", data_name, min_max, spp_cand, current_tree,
+  cally <- call("split_binsDS", data_name, bounds_and_levels, spp_cand, current_tree,
                 data_type)
   hist <- DSI::datashield.aggregate(datasources, cally)
   

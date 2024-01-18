@@ -12,6 +12,10 @@ ds.train_tree(
   data_type,
   max_splits = 10,
   amt_spp,
+  output_var,
+  bounds_and_levels,
+  data_classes,
+  cand_select,
   spp_cand = NULL,
   datasources = NULL
 )
@@ -32,6 +36,15 @@ categorical.}
 \item{max_splits}{The maximum amount of splits in the trained tree.}
 
 \item{amt_spp}{The amount of splitting point candidates per feature.}
+
+\item{output_var}{Name of the output variable.}
+
+\item{bounds_and_levels}{The maximum and minimum values for numeric features
+and levels for factor features.}
+
+\item{data_classes}{Data class for all features.}
+
+\item{cand_select}{Splitting-point selection for numeric and factor features.}
 
 \item{spp_cand}{The splitting point candidates for each feature.}
 

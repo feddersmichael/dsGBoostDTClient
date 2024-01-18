@@ -4,28 +4,18 @@
 \alias{ds.gen_spp_cand}
 \title{Generate Splitting point candidates}
 \usage{
-ds.gen_spp_cand(
-  data_name,
-  cand_select,
-  cand_hyper,
-  data_classes,
-  amt_spp,
-  datasources = NULL
-)
+ds.gen_spp_cand(bounds_and_levels, data_classes, cand_select, amt_spp)
 }
 \arguments{
-\item{data_name}{The name under which the data is saved on the server.}
-
-\item{cand_select}{A data frame defining the split-point generation for all
-different types.}
-
-\item{cand_hyper}{Hyperparameter for all candidate selection methods.}
+\item{bounds_and_levels}{Bounds for numeric variables and level sets for
+factor variables.}
 
 \item{data_classes}{List of data class per column.}
 
-\item{amt_spp}{Amount of splitting points per feature.}
+\item{cand_select}{Which splitting-point candidate selection is used for
+numeric and factor data.}
 
-\item{datasources}{DATASHIELD server connection.}
+\item{amt_spp}{Amount of splitting points per feature.}
 }
 \value{
 The created splitting points.
