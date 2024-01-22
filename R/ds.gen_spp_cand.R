@@ -15,6 +15,7 @@ ds.gen_spp_cand <- function(bounds_and_levels, data_classes, cand_select,
                             amt_spp) {
   # Idea: add mode for logarithmic scale e.g. for uniform
   # TODO: implement iterative hessian
+  # TODO: CHeck that each feature has at least one spp
 
 
   cand_modes <- names(cand_select)

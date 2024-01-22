@@ -4,10 +4,10 @@
 \alias{ds.select_split}
 \title{Choose the best split}
 \usage{
-ds.select_split(histograms, spp_cand, reg_par)
+ds.select_split(leaves, spp_cand, reg_par)
 }
 \arguments{
-\item{histograms}{Histogram-sums for all features and split-bins.}
+\item{leaves}{Histogram-sums for all features and split-bins for each leaf.}
 
 \item{spp_cand}{The candidates for a possible further split of the current
 tree.}
