@@ -112,7 +112,7 @@ ds.train_boosted_tree <- function(data_name, train_test_ratio, split_status,
       break
     }
     else {
-      tree_list <- append(tree_list, tree)
+      tree_list[[i]] <- tree
     }
   }
   

@@ -54,7 +54,7 @@ ds.split_bins <- function(data_name, bounds_and_levels, spp_cand, current_tree,
         comb_histograms$hess[[feature]] <- mapply(sum, S_1[[i]][[2]][[feature]],
                                                   S_2[[i]][[2]][[feature]])
       }
-      leaves <- append(leaves, list(comb_histograms))
+      leaves[[i]] <- comb_histograms
     }
 
     return(leaves)
