@@ -10,6 +10,8 @@ ds.summed_bins <- function(leaves) {
 
   for (i in 1:length(leaves)) {
     leaf <- leaves[[i]]
+    
+    cont_NA <- leaf$cont_NA
 
     sums_per_leaf <- list(grad = list(), hess = list(),
                           compl = list(grad = NULL, hess = NULL))
@@ -23,7 +25,7 @@ ds.summed_bins <- function(leaves) {
         bins <- histogram[[feature]]
         amt_bins <- length(bins)
 
-        if (!is.na(histogram[[feature]]["NA"])) {
+        if (cont_NA[feature]) {
           bin_sums <- data.frame(sum_L_NA = numeric(), sum_R = numeric(),
                                  sum_L = numeric(), sum_R_NA = numeric())
           NA_elem <- histogram[[feature]]["NA"]
@@ -59,18 +61,10 @@ ds.summed_bins <- function(leaves) {
       }
     }
 
-    if (!is.na(leaf$grad[[1]]["NA"])) {
-      sums_per_leaf$compl$grad <- sums_per_leaf$grad[[1]][1, 1] + 
-                                       sums_per_leaf$grad[[1]][1, 2]
-      sums_per_leaf$compl$hess <- sums_per_leaf$hess[[1]][1, 1] + 
-                                       sums_per_leaf$hess[[1]][1, 2]
-    }
-    else {
-      sums_per_leaf$compl$grad <- sums_per_leaf$grad[[1]][1, 1] +
-                                  sums_per_leaf$grad[[1]][1, 2]
-      sums_per_leaf$compl$hess <- sums_per_leaf$hess[[1]][1, 1] +
-                                  sums_per_leaf$hess[[1]][1, 2]
-    }
+    sums_per_leaf$compl$grad <- sums_per_leaf$grad[[1]][1, 1] + 
+                                sums_per_leaf$grad[[1]][1, 2]
+    sums_per_leaf$compl$hess <- sums_per_leaf$hess[[1]][1, 1] + 
+                                sums_per_leaf$hess[[1]][1, 2]
 
     split_sums[[i]] <- sums_per_leaf
   }
