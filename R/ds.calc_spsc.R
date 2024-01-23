@@ -5,99 +5,125 @@
 #' @param spp_cand The split-point candidates for which the bins were 
 #' calculated.
 #' @param reg_par The regularisation parameters.
+#' @param cont_NA Vector which numeric feature has additional NA values.
 #'
 #' @return The split with the best split score.
-ds.calc_spsc <- function(split_sums, spp_cand, reg_par) {
+ds.calc_spsc <- function(split_sums, spp_cand, reg_par, cont_NA) {
+  # TODO: What does lambda + hessian = 0 mean?
+  
+  lambda <- reg_par[[1]]
+  gamma <- reg_par[[2]]
   
   # Now we can calculate the split score for all possibilities.
   # From all split scores we can then choose the best split.
-  best_split <- data.frame(sp_sc = numeric(), feature = numeric(),
+  opt_sp_per_leaf <- data.frame(sp_sc = numeric(), feature = numeric(),
                            split_val = numeric(), cont_NA = numeric(),
                            weight_l = numeric(), weight_r = numeric())
-  lambda <- reg_par[[1]]
-  for (leaf in 1:length(split_sums)) {
+  
+  
+  for (i in 1:length(split_sums)) {
     
-    sums <- split_sums[[leaf]]
+    sums <- split_sums[[i]]
     # can be subtracted at the very end probably
     prev_sc <- sums$compl$grad^2 / (sums$compl$hess + lambda)
     
     # We write it saving based to check correctness first
-    calc_spsc <- function(grad, hess){
+    
+    grad <- sums$grad
+    hess <- sums$hess
+    
+    split_val <- list()
+    
+    for (feature in names(spp_cand)) {
       
-      if (ncol(grad) == 4){
-        split_val <- data.frame(spsc_NA_l = numeric(), spsc_NA_r = numeric())
+      if (cont_NA[[i]][feature]) {
         
-        for (i in 1:nrow(grad)){
-          left_split_NA <- grad$sum_L_NA[i]^2 / (hess$sum_L_NA[i] + lambda)
-          left_split <- grad$sum_L[i]^2 / (hess$sum_L[i] + lambda)
-          right_split_NA <- grad$sum_R_NA[i]^2 / (hess$sum_R_NA[i] + lambda)
-          right_split <- grad$sum_R[i]^2 / (hess$sum_R[i] + lambda)
+        split_val[[feature]] <- data.frame(spsc_NA_l = numeric(),
+                                           spsc_NA_r = numeric())
+        
+        for (j in 1:nrow(grad[[feature]])){
+          left_split_NA <- grad[[feature]]$sum_L_NA[j]^2 / 
+                           (hess[[feature]]$sum_L_NA[j] + lambda)
+          left_split <- grad[[feature]]$sum_L[j]^2 / 
+                        (hess[[feature]]$sum_L[j] + lambda)
+          right_split_NA <- grad[[feature]]$sum_R_NA[j]^2 / 
+                            (hess[[feature]]$sum_R_NA[j] + lambda)
+          right_split <- grad[[feature]]$sum_R[j]^2 / 
+                         (hess[[feature]]$sum_R[j] + lambda)
           
-          split_val[i, ] <- c(left_split_NA + right_split + prev_sc,
-                              left_split + right_split_NA + prev_sc)
+          split_val[[feature]][j, ] <- c(left_split_NA + right_split + prev_sc,
+                                         left_split + right_split_NA + prev_sc)
         }
       }
       else {
-        split_val <- data.frame(spsc = numeric())
+        split_val[[feature]] <- data.frame(spsc = numeric())
         
-        for (i in 1:nrow(grad)){
-          left_split <- grad$sum_L[i]^2 / (hess$sum_L[i] + lambda)
-          right_split <- grad$sum_R[i]^2 / (hess$sum_R[i] + lambda)
+        for (j in 1:nrow(grad[[feature]])){
+          left_split <- grad[[feature]]$sum_L[j]^2 / 
+                        (hess[[feature]]$sum_L[j] + lambda)
+          right_split <- grad[[feature]]$sum_R[j]^2 / 
+                         (hess[[feature]]$sum_R[j] + lambda)
           
-          split_val[i, ] <- c(left_split + right_split + prev_sc)
+          split_val[[feature]][j, ] <- c(left_split + right_split + prev_sc)
         }
       }
-      
-      return(split_val)
     }
     
-    split_val <- mapply(calc_spsc, sums$grad, sums$hess)
-    
-    cont_NA <- NULL
-    feature <- NULL
+    split_cont_NA <- NULL
+    split_feature <- NULL
     split_pt <- NULL
     spsc <- 0
     weight_l <- NULL
     weight_r <- NULL
     
-    for (i in 1:length(split_val)){
-      for (j in 1:nrow(split_val[[i]])){
-        if (ncol(split_val[[i]]) == 2){
-          if (split_val[[i]]$spsc_NA_l[j] > spsc){
-            spsc <- split_val[[i]]$spsc_NA_l[j]
-            feature <- i
-            cont_NA <- 1
-            split_pt <- spp_cand[[i]][j]
-            weight_l <- -sums[[1]][[i]]$sum_L_NA[j] / 
-              (sums[[2]][[i]]$sum_L_NA[j])
-            weight_r <- -sums[[1]][[i]]$sum_R[j] / (sums[[2]][[i]]$sum_R[j])
+    for (feature in names(split_val)){
+      
+      cur_split <- split_val[[feature]]
+      
+      if (cont_NA[[i]][feature]) {
+        for (j in 1:nrow(cur_split)) {
+          if (cur_split$spsc_NA_l[j] > spsc){
+            spsc <- cur_split$spsc_NA_l[j]
+            split_feature <- feature
+            split_cont_NA <- 1
+            split_pt <- spp_cand[[feature]][j]
+            weight_l <- -sums$grad[[feature]]$sum_L_NA[j] / 
+                         sums$hess[[feature]]$sum_L_NA[j]
+            weight_r <- -sums$grad[[feature]]$sum_R[j] / 
+                         sums$hess[[feature]]$sum_R[j]
           }
-          if (split_val[[i]]$spsc_NA_r[j] > spsc){
-            spsc <- split_val[[i]]$spsc_NA_l[j]
-            feature <- i
-            cont_NA <- 2
+          if (cur_split$spsc_NA_r[j] > spsc){
+            spsc <- cur_split$spsc_NA_l[j]
+            split_feature <- feature
+            split_cont_NA <- 2
             split_pt <- spp_cand[[i]][j]
             weight_l <- -sums[[1]][[i]]$sum_L[j] / (sums[[2]][[i]]$sum_L[j])
-            weight_r <- -sums[[1]][[i]]$sum_R_NA[j] /
-              (sums[[2]][[i]]$sum_R_NA[j])
-          }
-        }
-        else {
-          if (split_val[[i]]$spsc[j] > spsc){
-            spsc <- split_val[[i]]$spsc[j]
-            feature <- i
-            cont_NA <- 0
-            split_pt <- spp_cand[[i]][j]
-            weight_l <- -sums[[1]][[i]]$sum_L[j] / (sums[[2]][[i]]$sum_L[j])
-            weight_r <- -sums[[1]][[i]]$sum_R[j] / (sums[[2]][[i]]$sum_R[j])
+            weight_r <- -sums[[1]][[i]]$sum_R_NA[j] / (sums[[2]][[i]]$sum_R_NA[j])
           }
         }
       }
+      else {
+        for (j in 1:nrow(cur_split)) {
+          if (cur_split$spsc[j] > spsc) {
+            spsc <- cur_split$spsc[j]
+            split_feature <-feature
+            split_cont_NA <- 0
+            split_pt <- spp_cand[[feature]][j]
+            weight_l <- -sums$grad[[feature]]$sum_L[j] / 
+                         (sums$hess[[feature]]$sum_L[j])
+            weight_r <- -sums$grad[[feature]]$sum_R[j] /
+                         (sums[[2]][[i]]$sum_R[j])
+          }
+        }
+        
+      }
     }
     
-    best_split[leaf, ] <- c(spsc, feature, split_pt, cont_NA, weight_l,
-                            weight_r)
+    best_split <- c(spsc, split_feature, split_pt, split_cont_NA, weight_l,
+                    weight_r)
+    opt_sp_per_leaf[i, ] <- best_split
   } 
+
   # Finally we return our choice.
-  return(best_split)
+  return(opt_sp_per_leaf)
 }

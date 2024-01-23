@@ -60,7 +60,26 @@ ds.split_bins <- function(data_name, bounds_and_levels, spp_cand, current_tree,
     return(leaves)
   }
 
-  histograms_per_leave <- Reduce(reduce_hist, histogram_per_server)
+  histograms_per_leaf <- Reduce(reduce_hist, histogram_per_server)
+  
+  for (i in 1:amt_leaves) {
+    
+    cont_NA <- logical()
+    
+    for (feature in names(spp_cand)) {
+      
+      categories <- histograms_per_leaf[[i]]$grad[[feature]]
+      
+      if ("NA" %in% names(categories) && (categories["NA"] != 0)) {
+        cont_NA[feature] <- TRUE
+      }
+      else {
+        cont_NA[feature] <- FALSE
+      }
+    }
+    
+    histograms_per_leaf[[i]][["cont_NA"]] <- cont_NA
+  }
 
-  return(histograms_per_leave)
+  return(histograms_per_leaf)
 }
