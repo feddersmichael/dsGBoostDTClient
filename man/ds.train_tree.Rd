@@ -8,9 +8,7 @@ ds.train_tree(
   data_name,
   last_tr_tree,
   loss_function,
-  min_max,
-  data_type,
-  max_splits = 10,
+  max_splits = 5,
   amt_spp,
   output_var,
   bounds_and_levels,
@@ -28,11 +26,6 @@ ds.train_tree(
 
 \item{loss_function}{The type of loss function under which we optimise the
 tree.}
-
-\item{min_max}{The maximum and minimum values of each feature space.}
-
-\item{data_type}{Denotes for each feature if it is numeric or (originally)
-categorical.}
 
 \item{max_splits}{The maximum amount of splits in the trained tree.}
 

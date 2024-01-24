@@ -5,9 +5,6 @@
 #' @param last_tr_tree The last trained tree.
 #' @param loss_function The type of loss function under which we optimise the
 #' tree.
-#' @param min_max The maximum and minimum values of each feature space.
-#' @param data_type Denotes for each feature if it is numeric or (originally)
-#' categorical.
 #' @param max_splits The maximum amount of splits in the trained tree.
 #' @param amt_spp The amount of splitting point candidates per feature.
 #' @param output_var Name of the output variable.
@@ -21,8 +18,8 @@
 #'
 #' @return The trained tree.
 #' @export
-ds.train_tree <- function(data_name, last_tr_tree, loss_function, min_max,
-                          data_type, max_splits = 10, amt_spp, output_var,
+ds.train_tree <- function(data_name, last_tr_tree, loss_function, 
+                          max_splits = 5, amt_spp, output_var,
                           bounds_and_levels, data_classes, cand_select, reg_par,
                           spp_cand, datasources = NULL){
   
@@ -41,10 +38,6 @@ ds.train_tree <- function(data_name, last_tr_tree, loss_function, min_max,
   
   if (!is.data.frame(last_tr_tree) && !is.null(last_tr_tree)){
     stop("'last_tr_tree' needs to be an object of type 'data frame'.")
-  }
-  
-  if (!is.integer(max_splits)){
-    stop("'max_splits' needs to have data type 'integer'.")
   }
   
   # We first update the histogram values, which are based on the previously
@@ -76,9 +69,10 @@ ds.train_tree <- function(data_name, last_tr_tree, loss_function, min_max,
   # we reach the parent node from the 'right' branch.
   
   current_tree <- data.frame(feature = character(), split_value = numeric(),
-                             w_s_left = logical(), w_s_left_value = numeric(),
-                             w_s_right = logical(), w_s_right_value = numeric(),
-                             par_spp = numeric(), par_dir = logical())
+                             cont_NA = numeric(), w_s_left = logical(),
+                             w_s_left_value = numeric(), w_s_right = logical(),
+                             w_s_right_value = numeric(), par_spp = numeric(),
+                             par_dir = logical())
   
   split_scores_left <- data.frame(sp_sc = numeric(), feature = character(),
                                   split_val = numeric(), cont_NA = numeric(),
@@ -100,15 +94,15 @@ ds.train_tree <- function(data_name, last_tr_tree, loss_function, min_max,
     amt_splits <- nrow(current_tree)
     
     if (amt_splits == 0){
-      first_split <- c(best_split$feature[1], best_split$split_val[1],
-                       TRUE, best_split$weight_l[1], TRUE,
-                       best_split$weight_r[1], 0, TRUE)
+      first_split <- list(best_split$feature[1], best_split$split_val[1],
+                       best_split$cont_NA[1], TRUE, best_split$weight_l[1],
+                       TRUE, best_split$weight_r[1], 0, TRUE)
       current_tree[1, ] <- first_split
     }
     else {
       
-      split_scores_left[amt_splits + 1, ] <- best_split[[1]]
-      split_scores_right[amt_splits + 1, ] <- best_split[[2]]
+      split_scores_left[amt_splits, ] <- best_split[1, ]
+      split_scores_right[amt_splits, ] <- best_split[2, ]
       
       max_l_index <- which.max(split_scores_left$sp_sc)
       max_r_index <- which.max(split_scores_right$sp_sc)
@@ -116,24 +110,30 @@ ds.train_tree <- function(data_name, last_tr_tree, loss_function, min_max,
       max_l <- split_scores_left$sp_sc[max_l_index]
       max_r <- split_scores_right$sp_sc[max_r_index]
       
-      if (max_l > 0 && max_r > 0) {
+      if (max_l > 0 || max_r > 0) {
         if (max_l > max_r) {
           next_split <- split_scores_left[max_l_index, ]
-          current_tree[amt_splits + 1, ] <- c(next_split[2], next_split[3], TRUE,
-                                              next_split[5], TRUE, next_split[6],
+          current_tree[amt_splits + 1, ] <- list(next_split$feature[1],
+                                              next_split$split_val[1],
+                                              next_split$cont_NA[1], TRUE,
+                                              next_split$weight_l[1], TRUE,
+                                              next_split$weight_r[1],
                                               max_l_index, TRUE)
           current_tree$w_s_left[max_l_index] <- FALSE
           current_tree$w_s_left_value[max_l_index] <- amt_splits + 1
-          max_l <- 0
+          split_scores_left$sp_sc[max_l_index] <- 0
         }
         else {
           next_split <- split_scores_right[max_r_index, ]
-          current_tree[amt_splits + 1, ] <- c(next_split[2], next_split[3], TRUE,
-                                              next_split[5], TRUE, next_split[6],
+          current_tree[amt_splits + 1, ] <- list(next_split$feature[1],
+                                              next_split$split_val[1],
+                                              next_split$cont_NA[1], TRUE,
+                                              next_split$weight_l[1], TRUE,
+                                              next_split$weight_r[1],
                                               max_r_index, FALSE)
           current_tree$w_s_right[max_r_index] <- FALSE
           current_tree$w_s_right_value[max_r_index] <- amt_splits + 1
-          max_r <- 0
+          split_scores_right$sp_sc[max_r_index] <- 0
         }
       }
       else {
