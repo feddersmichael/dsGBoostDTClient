@@ -24,8 +24,14 @@ ds.calc_spsc <- function(split_sums, spp_cand, reg_par, cont_NA) {
   for (i in 1:length(split_sums)) {
     
     sums <- split_sums[[i]]
-    # can be subtracted at the very end probably
-    prev_sc <- sums$compl$grad^2 / (sums$compl$hess + lambda)
+    
+    if ((sums$compl$hess + lambda) == 0) {
+      opt_sp_per_leaf[i, ] <- c(0, NULL, NULL, NULL, NULL, NULL)
+      next
+    }
+    else {
+      prev_sc <- sums$compl$grad^2 / (sums$compl$hess + lambda)
+    }
     
     # We write it saving based to check correctness first
     
@@ -33,6 +39,9 @@ ds.calc_spsc <- function(split_sums, spp_cand, reg_par, cont_NA) {
     hess <- sums$hess
     
     split_val <- list()
+    
+    denom_check_l <- 0
+    debom_check_r <- 0
     
     for (feature in names(spp_cand)) {
       
@@ -42,29 +51,47 @@ ds.calc_spsc <- function(split_sums, spp_cand, reg_par, cont_NA) {
                                            spsc_NA_r = numeric())
         
         for (j in 1:nrow(grad[[feature]])){
-          left_split_NA <- grad[[feature]]$sum_L_NA[j]^2 / 
-                           (hess[[feature]]$sum_L_NA[j] + lambda)
-          left_split <- grad[[feature]]$sum_L[j]^2 / 
-                        (hess[[feature]]$sum_L[j] + lambda)
-          right_split_NA <- grad[[feature]]$sum_R_NA[j]^2 / 
-                            (hess[[feature]]$sum_R_NA[j] + lambda)
-          right_split <- grad[[feature]]$sum_R[j]^2 / 
-                         (hess[[feature]]$sum_R[j] + lambda)
           
-          split_val[[feature]][j, ] <- c(left_split_NA + right_split + prev_sc,
-                                         left_split + right_split_NA + prev_sc)
+          if ((denom_check_l <- hess[[feature]]$sum_L_NA[j] + lambda) != 0 &&
+              (denom_check_r <- hess[[feature]]$sum_R[j] + lambda) != 0) {
+            left_split_NA <- grad[[feature]]$sum_L_NA[j]^2 / denom_check_l
+            right_split <- grad[[feature]]$sum_R[j]^2 / denom_check_r
+          }
+          else {
+            left_split_NA <- 0
+            right_split <- 0
+          }
+          
+          if ((denom_check_l <- hess[[feature]]$sum_L[j] + lambda) != 0 &&
+              (denom_check_r <- hess[[feature]]$sum_R_NA[j] + lambda) != 0) {
+            left_split <- grad[[feature]]$sum_L[j]^2 / denom_check_l
+            right_split_NA <- grad[[feature]]$sum_R_NA[j]^2 / denom_check_r
+          }
+          else {
+            left_split <- 0
+            right_split_NA <- 0
+          }
+          
+          split_val[[feature]][j, ] <- c(left_split_NA + right_split,
+                                         left_split + right_split_NA)
         }
       }
       else {
         split_val[[feature]] <- data.frame(spsc = numeric())
         
         for (j in 1:nrow(grad[[feature]])){
-          left_split <- grad[[feature]]$sum_L[j]^2 / 
-                        (hess[[feature]]$sum_L[j] + lambda)
-          right_split <- grad[[feature]]$sum_R[j]^2 / 
-                         (hess[[feature]]$sum_R[j] + lambda)
           
-          split_val[[feature]][j, ] <- c(left_split + right_split + prev_sc)
+          if ((denom_check_l <- hess[[feature]]$sum_L[j] + lambda) != 0 &&
+              (denom_check_r <- hess[[feature]]$sum_R[j] + lambda) != 0) {
+            left_split <- grad[[feature]]$sum_L[j]^2 / denom_check_l
+            right_split <- grad[[feature]]$sum_R[j]^2 / denom_check_r
+          }
+          else {
+            left_split <- 0
+            right_split <- 0
+          }
+          
+          split_val[[feature]][j, ] <- c(left_split + right_split)
         }
       }
     }
@@ -93,10 +120,10 @@ ds.calc_spsc <- function(split_sums, spp_cand, reg_par, cont_NA) {
                          (sums$hess[[feature]]$sum_R[j] + lambda)
           }
           if (cur_split$spsc_NA_r[j] > spsc){
-            spsc <- cur_split$spsc_NA_l[j]
+            spsc <- cur_split$spsc_NA_r[j]
             split_feature <- feature
             split_cont_NA <- 2
-            split_pt <- spp_cand[[i]][j]
+            split_pt <- spp_cand[[feature]][j]
             weight_l <- -sums$grad[[feature]]$sum_L[j] /
                          (sums$hess[[feature]]$sum_L[j] + lambda)
             weight_r <- -sums$grad[[feature]]$sum_R_NA[j] /
@@ -114,13 +141,13 @@ ds.calc_spsc <- function(split_sums, spp_cand, reg_par, cont_NA) {
             weight_l <- -sums$grad[[feature]]$sum_L[j] / 
                          (sums$hess[[feature]]$sum_L[j] + lambda)
             weight_r <- -sums$grad[[feature]]$sum_R[j] /
-                         (sums[[2]][[i]]$sum_R[j] + lambda)
+                         (sums$hess[[feature]]$sum_R[j] + lambda)
           }
         }
         
       }
     }
-    spsc <- spsc / 2 - gamma
+    spsc <- (spsc - prev_sc) / 2 - gamma
     
     best_split <- c(spsc, split_feature, split_pt, split_cont_NA, weight_l,
                     weight_r)
