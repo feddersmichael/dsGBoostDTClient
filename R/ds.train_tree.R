@@ -99,7 +99,6 @@ ds.train_tree <- function(data_name, last_tr_tree, loss_function, min_max,
     
     amt_splits <- nrow(current_tree)
     
-    # TODO: maybe remove chosen split from spp_cand
     if (amt_splits == 0){
       first_split <- c(best_split$feature[1], best_split$split_val[1],
                        TRUE, best_split$weight_l[1], TRUE,
