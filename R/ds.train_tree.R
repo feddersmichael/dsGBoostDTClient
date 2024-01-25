@@ -100,7 +100,7 @@ ds.train_tree <- function(data_name, last_tr_tree, loss_function,
       current_tree[1, ] <- first_split
     }
     else {
-      
+      # TODO: Fix rownames for copying rows into df
       split_scores_left[amt_splits, ] <- best_split[1, ]
       split_scores_right[amt_splits, ] <- best_split[2, ]
       

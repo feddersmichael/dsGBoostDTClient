@@ -41,7 +41,7 @@ ds.calc_spsc <- function(split_sums, spp_cand, reg_par, cont_NA) {
     split_val <- list()
     
     denom_check_l <- 0
-    debom_check_r <- 0
+    denom_check_r <- 0
     
     for (feature in names(spp_cand)) {
       
@@ -52,8 +52,9 @@ ds.calc_spsc <- function(split_sums, spp_cand, reg_par, cont_NA) {
         
         for (j in 1:nrow(grad[[feature]])){
           
-          if ((denom_check_l <- hess[[feature]]$sum_L_NA[j] + lambda) != 0 &&
-              (denom_check_r <- hess[[feature]]$sum_R[j] + lambda) != 0) {
+          denom_check_l <- hess[[feature]]$sum_L_NA[j] + lambda
+          denom_check_r <- hess[[feature]]$sum_R[j] + lambda
+          if (denom_check_l != 0 && denom_check_r != 0) {
             left_split_NA <- grad[[feature]]$sum_L_NA[j]^2 / denom_check_l
             right_split <- grad[[feature]]$sum_R[j]^2 / denom_check_r
           }
@@ -62,8 +63,9 @@ ds.calc_spsc <- function(split_sums, spp_cand, reg_par, cont_NA) {
             right_split <- 0
           }
           
-          if ((denom_check_l <- hess[[feature]]$sum_L[j] + lambda) != 0 &&
-              (denom_check_r <- hess[[feature]]$sum_R_NA[j] + lambda) != 0) {
+          denom_check_l <- hess[[feature]]$sum_L[j] + lambda
+          denom_check_r <- hess[[feature]]$sum_R_NA[j] + lambda
+          if (denom_check_l != 0 && denom_check_r != 0) {
             left_split <- grad[[feature]]$sum_L[j]^2 / denom_check_l
             right_split_NA <- grad[[feature]]$sum_R_NA[j]^2 / denom_check_r
           }
@@ -81,8 +83,9 @@ ds.calc_spsc <- function(split_sums, spp_cand, reg_par, cont_NA) {
         
         for (j in 1:nrow(grad[[feature]])){
           
-          if ((denom_check_l <- hess[[feature]]$sum_L[j] + lambda) != 0 &&
-              (denom_check_r <- hess[[feature]]$sum_R[j] + lambda) != 0) {
+          denom_check_l <- hess[[feature]]$sum_L[j] + lambda
+          denom_check_r <- hess[[feature]]$sum_R[j] + lambda
+          if (denom_check_l != 0 && denom_check_r != 0) {
             left_split <- grad[[feature]]$sum_L[j]^2 / denom_check_l
             right_split <- grad[[feature]]$sum_R[j]^2 / denom_check_r
           }
