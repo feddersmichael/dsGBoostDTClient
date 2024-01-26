@@ -6,7 +6,6 @@
 \usage{
 ds.create_data_split(
   data_name,
-  data_classes,
   output_var,
   drop_columns = NULL,
   train_test_ratio = 0.8,
@@ -15,8 +14,6 @@ ds.create_data_split(
 }
 \arguments{
 \item{data_name}{The name under which the data is saved on the server.}
-
-\item{data_classes}{List of data class for each column.}
 
 \item{output_var}{The name of the column which contains the output variable.}
 

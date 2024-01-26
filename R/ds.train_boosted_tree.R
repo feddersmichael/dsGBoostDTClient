@@ -5,8 +5,6 @@
 #' @param data_name The name under which the data is saved on the server.
 #' @param train_test_ratio Percentage of the data which should be used for
 #' Training.
-#' @param split_status Defines if 'data_name' saves the full data, is already
-#' split up into Training and Test data or saves only one of them.
 #' @param max_treecount Maximum amount of trees to build our boosted decision
 #' tree.
 #' @param amt_spp The amount of split-points per feature.
@@ -17,14 +15,18 @@
 #' @param loss_function The name of the loss function we want to use for our
 #' boosted tree.
 #' @param drop_columns Vector of data columns which shall be removed.
+#' @param cand_select Splitting-point selection for numeric and factor features.
+#' @param reg_par Regularisation parameter which prevent overfitting.
+#' @param spp_cand The splitting point candidates for each feature.
 #' @param datasources DATASHIELD server connection.
 #'
 #' @return The trained decision tree model.
 #' @export
-ds.train_boosted_tree <- function(data_name, train_test_ratio, split_status,
+ds.train_boosted_tree <- function(data_name, train_test_ratio, 
                                   max_treecount = 50, amt_spp, seed = NULL,
                                   drop_NA, bounds_and_levels, output_var,
-                                  loss_function, drop_columns,
+                                  loss_function, cand_select, reg_par,
+                                  spp_cand, drop_columns = NULL,
                                   datasources = NULL) {
 
   # We first check all the inputs for appropriate class and set defaults if
@@ -67,16 +69,16 @@ ds.train_boosted_tree <- function(data_name, train_test_ratio, split_status,
   if (!is.logical(drop_NA)) {
     stop("'drop_NA' needs to have data type 'logical'.")
   }
-    
   
   # We do some basic checks about the saved data
   data_classes <- ds.data_format_check(data_name, bounds_and_levels, output_var,
-                                       loss_function, drop_NA, datasources)
+                                       loss_function, drop_NA, drop_columns,
+                                       datasources)
   
   # Before we start training our model we split up the data set into a training
   # and test part.
-  ds.create_data_split(data_name, data_classes, output_var, drop_columns,
-                       train_test_ratio, datasources)
+  ds.create_data_split(data_name, output_var, drop_columns, train_test_ratio,
+                       datasources)
   
   # We can now remove the output variable from the data_classes and the boundary.
   # list
@@ -85,16 +87,6 @@ ds.train_boosted_tree <- function(data_name, train_test_ratio, split_status,
   data_classes <- data_classes[-var_no]
   bounds_and_levels <- bounds_and_levels[-var_no]
   
-  # We also remove the dropped columns if necessary.
-  if (!is.null(drop_columns)) {
-    for (column in drop_columns) {
-      available_columns <- names(data_classes)
-      var_no <- which(column == available_columns)[1]
-      data_classes <- data_classes[-var_no]
-      bounds_and_levels <- bounds_and_levels[-var_no]
-    }
-  }
-
   # We initiate our list of trees with 'NULL' which symbolizes an empty tree
   tree_list <- list(NULL)
   
@@ -105,7 +97,10 @@ ds.train_boosted_tree <- function(data_name, train_test_ratio, split_status,
   for (i in 1:max_treecount){
     
     # We train the next tree.
-    tree <- ds.train_tree(tree_list[[length(tree_list)]], amt_spp, data_classes)
+    tree <- ds.train_tree(data_name, tree_list[[length(tree_list)]], loss_function, 
+                          max_splits = 5, amt_spp, output_var,
+                          bounds_and_levels, data_classes, cand_select, reg_par,
+                          spp_cand, datasources)
     
     # Depending on the outcome we add the tree or end the model training.
     if (is.character(tree)){

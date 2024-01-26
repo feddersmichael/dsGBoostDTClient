@@ -10,6 +10,7 @@ ds.data_format_check(
   output_var,
   loss_function,
   drop_NA = FALSE,
+  drop_columns,
   datasources = NULL
 )
 }
@@ -25,6 +26,8 @@ level sets for all variables.}
 tree.}
 
 \item{drop_NA}{If NA-values should be deleted.}
+
+\item{drop_columns}{Remove unnecessary columns from the data_check}
 
 \item{datasources}{DATASHIELD server connection.}
 }

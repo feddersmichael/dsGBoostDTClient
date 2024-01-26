@@ -7,7 +7,6 @@
 ds.train_boosted_tree(
   data_name,
   train_test_ratio,
-  split_status,
   max_treecount = 50,
   amt_spp,
   seed = NULL,
@@ -15,7 +14,10 @@ ds.train_boosted_tree(
   bounds_and_levels,
   output_var,
   loss_function,
-  drop_columns,
+  cand_select,
+  reg_par,
+  spp_cand,
+  drop_columns = NULL,
   datasources = NULL
 )
 }
@@ -24,9 +26,6 @@ ds.train_boosted_tree(
 
 \item{train_test_ratio}{Percentage of the data which should be used for
 Training.}
-
-\item{split_status}{Defines if 'data_name' saves the full data, is already
-split up into Training and Test data or saves only one of them.}
 
 \item{max_treecount}{Maximum amount of trees to build our boosted decision
 tree.}
@@ -43,6 +42,12 @@ tree.}
 
 \item{loss_function}{The name of the loss function we want to use for our
 boosted tree.}
+
+\item{cand_select}{Splitting-point selection for numeric and factor features.}
+
+\item{reg_par}{Regularisation parameter which prevent overfitting.}
+
+\item{spp_cand}{The splitting point candidates for each feature.}
 
 \item{drop_columns}{Vector of data columns which shall be removed.}
 
