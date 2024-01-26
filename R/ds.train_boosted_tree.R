@@ -5,8 +5,6 @@
 #' @param data_name The name under which the data is saved on the server.
 #' @param train_test_ratio Percentage of the data which should be used for
 #' Training.
-#' @param split_status Defines if 'data_name' saves the full data, is already
-#' split up into Training and Test data or saves only one of them.
 #' @param max_treecount Maximum amount of trees to build our boosted decision
 #' tree.
 #' @param amt_spp The amount of split-points per feature.
@@ -21,10 +19,10 @@
 #'
 #' @return The trained decision tree model.
 #' @export
-ds.train_boosted_tree <- function(data_name, train_test_ratio, split_status,
+ds.train_boosted_tree <- function(data_name, train_test_ratio, 
                                   max_treecount = 50, amt_spp, seed = NULL,
                                   drop_NA, bounds_and_levels, output_var,
-                                  loss_function, drop_columns,
+                                  loss_function, drop_columns = NULL,
                                   datasources = NULL) {
 
   # We first check all the inputs for appropriate class and set defaults if
@@ -67,11 +65,11 @@ ds.train_boosted_tree <- function(data_name, train_test_ratio, split_status,
   if (!is.logical(drop_NA)) {
     stop("'drop_NA' needs to have data type 'logical'.")
   }
-    
   
   # We do some basic checks about the saved data
   data_classes <- ds.data_format_check(data_name, bounds_and_levels, output_var,
-                                       loss_function, drop_NA, datasources)
+                                       loss_function, drop_NA, drop_columns,
+                                       datasources)
   
   # Before we start training our model we split up the data set into a training
   # and test part.
