@@ -8,6 +8,7 @@ ds.calc_hist(
   data_name,
   last_tr_tree,
   loss_function,
+  data_classes,
   output_var,
   datasources = NULL
 )
@@ -19,6 +20,8 @@ ds.calc_hist(
 
 \item{loss_function}{The loss function under which we optimize our boosted
 tree building process.}
+
+\item{data_classes}{Data class for all features.}
 
 \item{output_var}{The name of the column containing the output.}
 

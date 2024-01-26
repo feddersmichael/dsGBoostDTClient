@@ -43,7 +43,8 @@ ds.train_tree <- function(data_name, last_tr_tree, loss_function,
   # We first update the histogram values, which are based on the previously
   # trained trees.
   
-  ds.calc_hist(data_name, last_tr_tree, loss_function, output_var, datasources)
+  ds.calc_hist(data_name, last_tr_tree, loss_function, data_classes, output_var,
+               datasources)
   
   spp_cand <- ds.gen_spp_cand(bounds_and_levels, data_classes, cand_select,
                               amt_spp)
