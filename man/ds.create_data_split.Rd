@@ -7,7 +7,7 @@
 ds.create_data_split(
   data_name,
   output_var,
-  drop_columns = NULL,
+  drop_columns,
   train_test_ratio = 0.8,
   datasources = NULL
 )

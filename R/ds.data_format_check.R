@@ -7,15 +7,15 @@
 #' @param output_var The name of the output variable.
 #' @param loss_function The loss function which we use to optimize our boosted
 #' tree.
-#' @param drop_NA If NA-values should be deleted.
 #' @param drop_columns Remove unnecessary columns from the data_check
+#' @param drop_NA If NA-values should be deleted.
 #' @param datasources DATASHIELD server connection.
 #'
 #' @return The data classes (in the sense of data.class()) for all columns.
 #' @export
 ds.data_format_check <- function(data_name, bounds_and_levels, output_var,
-                                 loss_function, drop_NA = FALSE, drop_columns,
-                                 datasources = NULL) {
+                                 loss_function, drop_columns = NULL,
+                                 drop_NA = TRUE, datasources = NULL) {
   # We want to check in a generic way if the uploaded data fulfills
   # our requirements to be used in this analysis.
 
@@ -30,30 +30,13 @@ ds.data_format_check <- function(data_name, bounds_and_levels, output_var,
     stop("'output_var' needs to be an element of 'bounds_and_levels'.")
   }
   
-  if (output_var %in% drop_columns) {
-    stop("The output variable can't be removed from the data.")
+  if (any(drop_columns %in% names(bounds_and_levels))) {
+    stop("The variables for which we specified bounds and levels can't be dropped.")
   }
-
+  
   cally <- call("data_format_checkDS", data_name, bounds_and_levels, output_var,
                 loss_function, drop_columns, drop_NA)
   data_classes <- DSI::datashield.aggregate(datasources, cally)
 
-  data_server <- 1
-
-  check_data_class <- function(A, B) {
-
-    data_server <- data_server + 1
-
-    if (!identical(A, B)) {
-      stop(paste0("The data classes of the data frame columns from server ",
-                  data_server, " don't coincide with the previous ones."))
-    }
-    else {
-      return(B)
-    }
-  }
-
-  output <- Reduce(check_data_class, data_classes)
-
-  return(output)
+  return(data_classes[[1]])
 }

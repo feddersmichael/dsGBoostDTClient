@@ -10,10 +10,9 @@
 #'
 #' @return None.
 #' @export
-ds.create_data_split <- function(data_name, output_var,
-                                 drop_columns = NULL, train_test_ratio = 0.8,
-                                 datasources = NULL) {
-  # TODO: keep certain characteristics similar in Train and test
+ds.create_data_split <- function(data_name, output_var, drop_columns,
+                                 train_test_ratio = 0.8, datasources = NULL) {
+  # TODO: keep certain characteristics similar in train and test
 
   # We first check all the inputs for appropriate class and set defaults if
   # no input is given.
@@ -22,11 +21,6 @@ ds.create_data_split <- function(data_name, output_var,
   }
   else if (!all(sapply(datasources, DSI:::.isDSConnection))) {
     stop("'datasources' needs to be a an object of the 'DSConnection' class.")
-  }
-
-  if (!is.numeric(train_test_ratio) || (train_test_ratio < 0) ||
-        (train_test_ratio > 1)) {
-    stop("'train_test_ratio' needs to have data type 'numeric' and lie between 0 and 1.")
   }
 
   # We split up the data set in a training and test part.

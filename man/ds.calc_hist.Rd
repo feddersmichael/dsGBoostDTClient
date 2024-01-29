@@ -7,9 +7,9 @@
 ds.calc_hist(
   data_name,
   last_tr_tree,
-  loss_function,
   data_classes,
   output_var,
+  loss_function,
   datasources = NULL
 )
 }
@@ -18,12 +18,12 @@ ds.calc_hist(
 
 \item{last_tr_tree}{The last tree which was trained under the boosting step.}
 
-\item{loss_function}{The loss function under which we optimize our boosted
-tree building process.}
-
 \item{data_classes}{Data class for all features.}
 
 \item{output_var}{The name of the column containing the output.}
+
+\item{loss_function}{The loss function under which we optimize our boosted
+tree building process.}
 
 \item{datasources}{DATASHIELD server connection.}
 }

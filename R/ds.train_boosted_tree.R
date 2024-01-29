@@ -3,31 +3,31 @@
 #' Training of a Gradient Boosted Decision Tree
 #'
 #' @param data_name The name under which the data is saved on the server.
-#' @param train_test_ratio Percentage of the data which should be used for
-#' Training.
-#' @param max_treecount Maximum amount of trees to build our boosted decision
-#' tree.
-#' @param amt_spp The amount of split-points per feature.
-#' @param seed If we want to choose a specific random behavior client side.
-#' @param drop_NA If NA data in the output variable should be removed.
 #' @param bounds_and_levels Bounds for numeric columns and levels for factors.
 #' @param output_var The name of the column containing the output variable.
 #' @param loss_function The name of the loss function we want to use for our
 #' boosted tree.
-#' @param drop_columns Vector of data columns which shall be removed.
+#' @param train_test_ratio Percentage of the data which should be used for
+#' Training.
+#' @param amt_spp The amount of split-points per feature.
 #' @param cand_select Splitting-point selection for numeric and factor features.
+#' @param drop_columns Vector of data columns which shall be removed.
+#' @param drop_NA If NA data in the output variable should be removed.
 #' @param reg_par Regularisation parameter which prevent overfitting.
-#' @param spp_cand The splitting point candidates for each feature.
+#' @param max_treecount Maximum amount of trees to build our boosted decision
+#' tree.
+#' @param max_splits The maximum amount of splits in the trained tree.
+#' @param seed If we want to choose a specific random behavior client side.
 #' @param datasources DATASHIELD server connection.
 #'
 #' @return The trained decision tree model.
 #' @export
-ds.train_boosted_tree <- function(data_name, train_test_ratio, 
-                                  max_treecount = 50, amt_spp, seed = NULL,
-                                  drop_NA, bounds_and_levels, output_var,
-                                  loss_function, cand_select, reg_par,
-                                  spp_cand, drop_columns = NULL,
-                                  datasources = NULL) {
+ds.train_boosted_tree <- function(data_name, bounds_and_levels, output_var,
+                                  loss_function, train_test_ratio, amt_spp,
+                                  cand_select, drop_columns = NULL,
+                                  drop_NA = TRUE, reg_par = c(5, 5),
+                                  max_treecount = 10, max_splits = 5,
+                                  seed = NULL, datasources = NULL) {
 
   # We first check all the inputs for appropriate class and set defaults if
   # no input is given.
@@ -37,37 +37,51 @@ ds.train_boosted_tree <- function(data_name, train_test_ratio,
   else if (!all(sapply(datasources, DSI:::.isDSConnection))) {
     stop("'datasources' needs to be a an object of the 'DSConnection' class.")
   }
-
+  
+  if (!is.character(data_name) || !identical(length(data_name), 1)) {
+    stop("'data_name' needs to be an atomic 'character' vector.")
+  }
+  
+  if (!is.list(bounds_and_levels)) {
+    stop("'bounds_and_levels' needs be an object of type 'list'.")
+  }
+  
+  if (length(bounds_and_levels) <= 1) {
+    stop("We need at least one output column and one feature to analyse.")
+  }
+  
+  if (!is.character(output_var) || !identical(length(output_var), 1)) {
+    stop("'output_var' needs to be an atomic 'character' vector.")
+  }
+  
+  if (!is.character(loss_function) || !identical(length(loss_function), 1)) {
+    stop("'loss_function' needs to be an atomic 'character' vector.")
+  }
+  
+  if (!is.numeric(train_test_ratio) || (train_test_ratio < 0) ||
+      (train_test_ratio > 1)) {
+    stop("'train_test_ratio' needs to have data type 'numeric' and lie between 0 and 1.")
+  }
+  
+  if (!is.null(drop_columns) && !is.character(drop_columns)) {
+    stop("'drop_columns' needs to have data type 'character'.")
+  }
+  
+  if (!is.logical(drop_NA) || length(drop_NA) != 1) {
+    stop("'drop_NA' needs to be an atomic 'logical' vector.")
+  }
+  
   if (!is.integer(max_treecount)) {
     stop("'max_treecount' needs to have data type 'integer'.")
   }
 
-  if (is.null(seed)) {
-    set.seed()
-  }
-  else {
-    if (!is.integer(seed)) {
-      stop("'seed' needs to have data type 'integer'.")
+  if (!is.null(seed)) {
+    if (!is.integer(seed) || length(seed) != 1) {
+      stop("'seed' needs to be an atomic 'integer' vector.")
     }
     else {
       set.seed(seed)
     }
-  }
-
-  if (!is.character(data_name)) {
-    stop("'data_name' needs to have data type 'character'.")
-  }
-
-  if (!is.list(bounds_and_levels)) {
-    stop("'bounds_and_levels' needs be an object of type 'list'.")
-  }
-
-  if (!is.character(output_var)) {
-    stop("'output_var' needs to have data type 'character'.")
-  }
-
-  if (!is.logical(drop_NA)) {
-    stop("'drop_NA' needs to have data type 'logical'.")
   }
   
   # We do some basic checks about the saved data
@@ -96,11 +110,12 @@ ds.train_boosted_tree <- function(data_name, train_test_ratio,
   
   for (i in 1:max_treecount){
     
+    last_tr_tree <- tree_list[[length(tree_list)]]
+    
     # We train the next tree.
-    tree <- ds.train_tree(data_name, tree_list[[length(tree_list)]], loss_function, 
-                          max_splits = 5, amt_spp, output_var,
-                          bounds_and_levels, data_classes, cand_select, reg_par,
-                          spp_cand, datasources)
+    tree <- ds.train_tree(data_name, last_tr_tree, bounds_and_levels,
+                          data_classes, output_var, loss_function, amt_spp,
+                          cand_select, reg_par, max_splits, datasources)
     
     # Depending on the outcome we add the tree or end the model training.
     if (is.character(tree)){

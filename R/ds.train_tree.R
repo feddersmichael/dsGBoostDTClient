@@ -3,25 +3,24 @@
 #'
 #' @param data_name The name under which the data is saved on the server.
 #' @param last_tr_tree The last trained tree.
-#' @param loss_function The type of loss function under which we optimise the
-#' tree.
-#' @param max_splits The maximum amount of splits in the trained tree.
-#' @param amt_spp The amount of splitting point candidates per feature.
-#' @param output_var Name of the output variable.
 #' @param bounds_and_levels The maximum and minimum values for numeric features
 #' and levels for factor features.
 #' @param data_classes Data class for all features.
+#' @param output_var Name of the output variable.
+#' @param loss_function The type of loss function under which we optimise the
+#' tree.
+#' @param amt_spp The amount of splitting point candidates per feature.
 #' @param cand_select Splitting-point selection for numeric and factor features.
 #' @param reg_par Regularisation parameter which prevent overfitting.
-#' @param spp_cand The splitting point candidates for each feature.
+#' @param max_splits The maximum amount of splits in the trained tree.
 #' @param datasources DATASHIELD server connection.
 #'
 #' @return The trained tree.
 #' @export
-ds.train_tree <- function(data_name, last_tr_tree, loss_function, 
-                          max_splits = 5, amt_spp, output_var,
-                          bounds_and_levels, data_classes, cand_select, reg_par,
-                          spp_cand, datasources = NULL){
+ds.train_tree <- function(data_name, last_tr_tree, bounds_and_levels,
+                          data_classes, output_var, loss_function, amt_spp,
+                          cand_select, reg_par = c(5, 5), max_splits = 5, 
+                          datasources = NULL){
   
   # We first check all the inputs for appropriate class and set defaults if
   # no input is given.
@@ -32,18 +31,17 @@ ds.train_tree <- function(data_name, last_tr_tree, loss_function,
     stop("'datasources' needs to be a an object of the 'DSConnection' class.")
   }
   
-  if (!is.character(data_name)){
-    stop("'data_name' needs to have data type 'character'.")
+  if (!is.null(last_tr_tree) && !is.data.frame(last_tr_tree)){
+    stop("'last_tr_tree' needs to be an object of type 'data frame'.")
   }
   
-  if (!is.data.frame(last_tr_tree) && !is.null(last_tr_tree)){
-    stop("'last_tr_tree' needs to be an object of type 'data frame'.")
+  if (!is.integer(max_splits) || length(max_splits) != 1) {
+    stop("'max_splits' needs to be an atomic 'integer' vector.")
   }
   
   # We first update the histogram values, which are based on the previously
   # trained trees.
-  
-  ds.calc_hist(data_name, last_tr_tree, loss_function, data_classes, output_var,
+  ds.calc_hist(data_name, last_tr_tree, data_classes, output_var, loss_function, 
                datasources)
   
   spp_cand <- ds.gen_spp_cand(bounds_and_levels, data_classes, cand_select,

@@ -7,15 +7,14 @@
 ds.train_tree(
   data_name,
   last_tr_tree,
-  loss_function,
-  max_splits = 5,
-  amt_spp,
-  output_var,
   bounds_and_levels,
   data_classes,
+  output_var,
+  loss_function,
+  amt_spp,
   cand_select,
-  reg_par,
-  spp_cand,
+  reg_par = c(5, 5),
+  max_splits = 5,
   datasources = NULL
 )
 }
@@ -24,25 +23,23 @@ ds.train_tree(
 
 \item{last_tr_tree}{The last trained tree.}
 
-\item{loss_function}{The type of loss function under which we optimise the
-tree.}
-
-\item{max_splits}{The maximum amount of splits in the trained tree.}
-
-\item{amt_spp}{The amount of splitting point candidates per feature.}
-
-\item{output_var}{Name of the output variable.}
-
 \item{bounds_and_levels}{The maximum and minimum values for numeric features
 and levels for factor features.}
 
 \item{data_classes}{Data class for all features.}
 
+\item{output_var}{Name of the output variable.}
+
+\item{loss_function}{The type of loss function under which we optimise the
+tree.}
+
+\item{amt_spp}{The amount of splitting point candidates per feature.}
+
 \item{cand_select}{Splitting-point selection for numeric and factor features.}
 
 \item{reg_par}{Regularisation parameter which prevent overfitting.}
 
-\item{spp_cand}{The splitting point candidates for each feature.}
+\item{max_splits}{The maximum amount of splits in the trained tree.}
 
 \item{datasources}{DATASHIELD server connection.}
 }

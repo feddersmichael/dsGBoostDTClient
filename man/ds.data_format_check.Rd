@@ -9,8 +9,8 @@ ds.data_format_check(
   bounds_and_levels,
   output_var,
   loss_function,
-  drop_NA = FALSE,
-  drop_columns,
+  drop_columns = NULL,
+  drop_NA = TRUE,
   datasources = NULL
 )
 }
@@ -25,9 +25,9 @@ level sets for all variables.}
 \item{loss_function}{The loss function which we use to optimize our boosted
 tree.}
 
-\item{drop_NA}{If NA-values should be deleted.}
-
 \item{drop_columns}{Remove unnecessary columns from the data_check}
+
+\item{drop_NA}{If NA-values should be deleted.}
 
 \item{datasources}{DATASHIELD server connection.}
 }

@@ -6,35 +6,23 @@
 \usage{
 ds.train_boosted_tree(
   data_name,
-  train_test_ratio,
-  max_treecount = 50,
-  amt_spp,
-  seed = NULL,
-  drop_NA,
   bounds_and_levels,
   output_var,
   loss_function,
+  train_test_ratio,
+  amt_spp,
   cand_select,
-  reg_par,
-  spp_cand,
   drop_columns = NULL,
+  drop_NA = TRUE,
+  reg_par = c(5, 5),
+  max_treecount = 10,
+  max_splits = 5,
+  seed = NULL,
   datasources = NULL
 )
 }
 \arguments{
 \item{data_name}{The name under which the data is saved on the server.}
-
-\item{train_test_ratio}{Percentage of the data which should be used for
-Training.}
-
-\item{max_treecount}{Maximum amount of trees to build our boosted decision
-tree.}
-
-\item{amt_spp}{The amount of split-points per feature.}
-
-\item{seed}{If we want to choose a specific random behavior client side.}
-
-\item{drop_NA}{If NA data in the output variable should be removed.}
 
 \item{bounds_and_levels}{Bounds for numeric columns and levels for factors.}
 
@@ -43,13 +31,25 @@ tree.}
 \item{loss_function}{The name of the loss function we want to use for our
 boosted tree.}
 
+\item{train_test_ratio}{Percentage of the data which should be used for
+Training.}
+
+\item{amt_spp}{The amount of split-points per feature.}
+
 \item{cand_select}{Splitting-point selection for numeric and factor features.}
+
+\item{drop_columns}{Vector of data columns which shall be removed.}
+
+\item{drop_NA}{If NA data in the output variable should be removed.}
 
 \item{reg_par}{Regularisation parameter which prevent overfitting.}
 
-\item{spp_cand}{The splitting point candidates for each feature.}
+\item{max_treecount}{Maximum amount of trees to build our boosted decision
+tree.}
 
-\item{drop_columns}{Vector of data columns which shall be removed.}
+\item{max_splits}{The maximum amount of splits in the trained tree.}
+
+\item{seed}{If we want to choose a specific random behavior client side.}
 
 \item{datasources}{DATASHIELD server connection.}
 }
