@@ -12,7 +12,6 @@ ds.select_split <- function(leaves, spp_cand, reg_par){
   
   # TODO: Structure which variables should be mentioned explicitly and which
   # ones only under a general variable-list
-  # TODO: Add gamma at the end.
   
   split_sums <- ds.summed_bins(leaves)
   

@@ -42,12 +42,8 @@ ds.train_boosted_tree <- function(data_name, bounds_and_levels, output_var,
     stop("'data_name' needs to be an atomic 'character' vector.")
   }
   
-  if (!is.list(bounds_and_levels)) {
-    stop("'bounds_and_levels' needs be an object of type 'list'.")
-  }
-  
-  if (length(bounds_and_levels) <= 1) {
-    stop("We need at least one output column and one feature to analyse.")
+  if (!is.list(bounds_and_levels || length(bounds_and_levels) <= 1)) {
+    stop("'bounds_and_levels' needs be a list with at least two elements.")
   }
   
   if (!is.character(output_var) || !identical(length(output_var), 1)) {
@@ -58,21 +54,34 @@ ds.train_boosted_tree <- function(data_name, bounds_and_levels, output_var,
     stop("'loss_function' needs to be an atomic 'character' vector.")
   }
   
-  if (!is.numeric(train_test_ratio) || (train_test_ratio < 0) ||
-      (train_test_ratio > 1)) {
-    stop("'train_test_ratio' needs to have data type 'numeric' and lie between 0 and 1.")
+  if (!is.numeric(train_test_ratio) || length(train_test_ratio) != 1 ||
+      (train_test_ratio < 0) || (train_test_ratio > 1)) {
+    stop("'train_test_ratio' needs to be an atomic 'numeric' vector which lies between 0 and 1.")
+  }
+  
+  if (!is.integer(amt_spp) || any(amt_spp < 1)) {
+    stop("'amt_spp' needs to be a vector of data type 'integer' with each element greater than 0.")
+  }
+  
+  if (!is.character(cand_select) || length(cand_select) != 2 ||
+      !identical(names(cand_select), c("numeric", "factor"))) {
+    stop("'cand_select' needs to be a vector of data type 'character' with length 2 and named elements 'numeric' and 'factor'.")
   }
   
   if (!is.null(drop_columns) && !is.character(drop_columns)) {
-    stop("'drop_columns' needs to have data type 'character'.")
+    stop("'drop_columns' needs to be a vector of data type 'character'.")
   }
   
   if (!is.logical(drop_NA) || length(drop_NA) != 1) {
     stop("'drop_NA' needs to be an atomic 'logical' vector.")
   }
   
-  if (!is.integer(max_treecount)) {
-    stop("'max_treecount' needs to have data type 'integer'.")
+  if (!is.integer(max_treecount) || length(max_treecount) != 1) {
+    stop("'max_treecount' needs to be an atomic 'integer' vector.")
+  }
+  
+  if (!is.integer(max_splits) || length(max_splits) != 1) {
+    stop("'max_splits' needs to be an atomic 'integer' vector.")
   }
 
   if (!is.null(seed)) {
