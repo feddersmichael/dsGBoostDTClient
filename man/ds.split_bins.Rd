@@ -6,9 +6,9 @@
 \usage{
 ds.split_bins(
   data_name,
-  bounds_and_levels,
-  spp_cand,
   current_tree,
+  spp_cand,
+  bounds_and_levels,
   data_classes,
   datasources = NULL
 )
@@ -16,13 +16,13 @@ ds.split_bins(
 \arguments{
 \item{data_name}{The name under which the data is saved on the server.}
 
-\item{bounds_and_levels}{The maximum and minimum values for numeric features
-and levels for factor features.}
+\item{current_tree}{The tree which gets currently trained.}
 
 \item{spp_cand}{The candidates for a possible further split of the current
 tree.}
 
-\item{current_tree}{The tree which gets currently trained.}
+\item{bounds_and_levels}{The maximum and minimum values for numeric features
+and levels for factor features.}
 
 \item{data_classes}{Denotes for each feature if it is numeric or a factor.}
 

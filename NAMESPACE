@@ -3,6 +3,8 @@
 export(ds.calc_hist)
 export(ds.create_data_split)
 export(ds.data_format_check)
+export(ds.gen_factor_spp_cand)
+export(ds.gen_numeric_spp_cand)
 export(ds.gen_spp_cand)
 export(ds.ithess_spp_cand)
 export(ds.save_boosted_tree)

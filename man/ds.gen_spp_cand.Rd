@@ -4,7 +4,7 @@
 \alias{ds.gen_spp_cand}
 \title{Generate Splitting point candidates}
 \usage{
-ds.gen_spp_cand(bounds_and_levels, data_classes, cand_select, amt_spp)
+ds.gen_spp_cand(bounds_and_levels, data_classes, amt_spp, cand_select)
 }
 \arguments{
 \item{bounds_and_levels}{Bounds for numeric variables and level sets for
@@ -12,10 +12,10 @@ factor variables.}
 
 \item{data_classes}{List of data class per column.}
 
+\item{amt_spp}{Amount of splitting points per feature.}
+
 \item{cand_select}{Which splitting-point candidate selection is used for
 numeric and factor data.}
-
-\item{amt_spp}{Amount of splitting points per feature.}
 }
 \value{
 The created splitting points.
