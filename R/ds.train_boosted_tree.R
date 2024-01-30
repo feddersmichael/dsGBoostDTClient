@@ -38,19 +38,19 @@ ds.train_boosted_tree <- function(data_name, bounds_and_levels, output_var,
     stop("'datasources' needs to be a an object of the 'DSConnection' class.")
   }
   
-  if (!is.character(data_name) || !identical(length(data_name), 1)) {
+  if (!is.character(data_name) || length(data_name) != 1) {
     stop("'data_name' needs to be an atomic 'character' vector.")
   }
   
-  if (!is.list(bounds_and_levels || length(bounds_and_levels) <= 1)) {
+  if (!is.list(bounds_and_levels) || length(bounds_and_levels) <= 1) {
     stop("'bounds_and_levels' needs be a list with at least two elements.")
   }
   
-  if (!is.character(output_var) || !identical(length(output_var), 1)) {
+  if (!is.character(output_var) || length(output_var) != 1) {
     stop("'output_var' needs to be an atomic 'character' vector.")
   }
   
-  if (!is.character(loss_function) || !identical(length(loss_function), 1)) {
+  if (!is.character(loss_function) || length(loss_function) != 1) {
     stop("'loss_function' needs to be an atomic 'character' vector.")
   }
   
@@ -95,7 +95,7 @@ ds.train_boosted_tree <- function(data_name, bounds_and_levels, output_var,
   
   # We do some basic checks about the saved data
   data_classes <- ds.data_format_check(data_name, bounds_and_levels, output_var,
-                                       loss_function, drop_NA, drop_columns,
+                                       loss_function, drop_columns, drop_NA,
                                        datasources)
   
   # Before we start training our model we split up the data set into a training

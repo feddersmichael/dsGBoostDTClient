@@ -9,7 +9,7 @@
 #'
 #' @return The split with the best split score.
 ds.calc_spsc <- function(split_sums, spp_cand, reg_par, cont_NA) {
-  # TODO: What does lambda + hessian = 0 mean?
+  # TODO: What if highest spsc is 0?
   
   lambda <- reg_par[[1]]
   gamma <- reg_par[[2]]
