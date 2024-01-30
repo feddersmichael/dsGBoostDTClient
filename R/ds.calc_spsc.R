@@ -93,12 +93,12 @@ ds.calc_spsc <- function(split_sums, spp_cand, reg_par, cont_NA) {
       }
     }
     
-    split_cont_NA <- NULL
-    split_feature <- NULL
-    split_pt <- NULL
+    split_cont_NA <- 0
+    split_feature <- ""
+    split_pt <- 0
     spsc <- 0
-    weight_l <- NULL
-    weight_r <- NULL
+    weight_l <- 0
+    weight_r <- 0
     
     for (feature in names(split_val)){
       
