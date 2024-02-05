@@ -8,20 +8,20 @@
 #'
 #' @return The best possible split under the possible ones.
 #' @export
-ds.select_split <- function(leaves, spp_cand, reg_par){
-  
+ds.select_split <- function(leaves, spp_cand, reg_par) {
+
   # TODO: Structure which variables should be mentioned explicitly and which
   # ones only under a general variable-list
-  
+
   split_sums <- ds.summed_bins(leaves)
-  
+
   cont_NA <- list()
-  for (i in 1:length(leaves)) {
+  for (i in seq_along(leaves)) {
     cont_NA[[i]] <- leaves[[i]]$cont_NA
   }
-  
+
   best_split <- ds.calc_spsc(split_sums, spp_cand, reg_par, cont_NA)
-  
+
   # Finally we return our choice.
   return(best_split)
 }

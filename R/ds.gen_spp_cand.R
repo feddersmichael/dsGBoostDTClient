@@ -18,22 +18,21 @@ ds.gen_spp_cand <- function(bounds_and_levels, data_classes, amt_spp,
 
   supported_modes <- list(numeric = c("uniform", "loguniform", "ithess"),
                           factor = c("exact"))
-  
+
   if (!cand_select[["numeric"]] %in% supported_modes[["numeric"]]) {
     stop(paste0("The mode '", cand_select[["numeric"]], "' is currently not supported to create split points for numeric features."))
   }
-  
+
   if (!cand_select[["factor"]] %in% supported_modes[["factor"]]) {
     stop(paste0("The mode '", cand_select[["factor"]], "' is currently not supported to create split points for factor features."))
   }
-  
+
   spp_cand <- list()
   for (feature in names(data_classes)) {
     if (data_classes[[feature]] == "numeric") {
       spp_cand[[feature]] <- ds.gen_numeric_spp_cand(bounds_and_levels[[feature]],
                                                      amt_spp[[feature]], cand_select[["numeric"]])
-    }
-    else {
+    } else {
       spp_cand[[feature]] <- ds.gen_factor_spp_cand(length(bounds_and_levels[[feature]]),
                                                     amt_spp[[feature]], cand_select[["factor"]])
     }

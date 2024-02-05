@@ -19,8 +19,7 @@ ds.split_bins <- function(data_name, current_tree, spp_cand, bounds_and_levels,
   # no input is given.
   if (is.null(datasources)) {
     datasources <- DSI::datashield.connections_find()
-  }
-  else if (!all(sapply(datasources, DSI:::.isDSConnection))) {
+  } else if (!all(sapply(datasources, DSI:::.isDSConnection))) {
     stop("'datasources' needs to be a an object of the 'DSConnection' class.")
   }
 
@@ -28,7 +27,7 @@ ds.split_bins <- function(data_name, current_tree, spp_cand, bounds_and_levels,
                 current_tree, data_classes)
   histogram_per_server <- DSI::datashield.aggregate(datasources, cally)
 
-  histograms_per_leave <- list()
+  histograms_per_leaf <- list()
   amt_leaves <- length(histogram_per_server[[1]])
 
   reduce_hist <- function(S_1, S_2) {
@@ -42,9 +41,9 @@ ds.split_bins <- function(data_name, current_tree, spp_cand, bounds_and_levels,
 
       for (feature in names(data_classes)) {
         comb_histograms[["grad"]][[feature]] <- mapply(sum, S_1[[i]][["grad"]][[feature]],
-                                                  S_2[[i]][["grad"]][[feature]])
+                                                       S_2[[i]][["grad"]][[feature]])
         comb_histograms[["hess"]][[feature]] <- mapply(sum, S_1[[i]][["hess"]][[feature]],
-                                                  S_2[[i]][["hess"]][[feature]])
+                                                       S_2[[i]][["hess"]][[feature]])
       }
       leaves[[i]] <- comb_histograms
     }
@@ -53,20 +52,19 @@ ds.split_bins <- function(data_name, current_tree, spp_cand, bounds_and_levels,
   }
 
   histograms_per_leaf <- Reduce(reduce_hist, histogram_per_server)
-  
+
   for (i in 1:amt_leaves) {
-    
+
     cont_NA <- logical()
     for (feature in names(spp_cand)) {
       categories <- histograms_per_leaf[[i]][["grad"]][[feature]]
       if ("NA" %in% names(categories) && (categories["NA"] != 0)) {
         cont_NA[[feature]] <- TRUE
-      }
-      else {
+      } else {
         cont_NA[[feature]] <- FALSE
       }
     }
-    
+
     histograms_per_leaf[[i]][["cont_NA"]] <- cont_NA
   }
 

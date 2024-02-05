@@ -18,16 +18,14 @@ ds.create_data_split <- function(data_name, output_var, drop_columns,
   # no input is given.
   if (is.null(datasources)) {
     datasources <- DSI::datashield.connections_find()
-  }
-  else if (!all(sapply(datasources, DSI:::.isDSConnection))) {
+  } else if (!all(sapply(datasources, DSI:::.isDSConnection))) {
     stop("'datasources' needs to be a an object of the 'DSConnection' class.")
   }
 
   # We split up the data set in a training and test part.
   cally <- call("create_data_splitDS", data_name, output_var, drop_columns,
                 train_test_ratio)
-  result <- DSI::datashield.assign.expr(datasources,
-                                        paste0(data_name,
-                                               "_training_test_split"), cally)
+  DSI::datashield.assign.expr(datasources,
+                              paste0(data_name, "_training_test_split"), cally)
 
 }

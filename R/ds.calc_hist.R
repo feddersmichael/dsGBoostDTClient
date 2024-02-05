@@ -18,8 +18,7 @@ ds.calc_hist <- function(data_name, last_tr_tree, data_classes, output_var,
   # no input is given.
   if (is.null(datasources)) {
     datasources <- DSI::datashield.connections_find()
-  }
-  else if (!all(sapply(datasources, DSI:::.isDSConnection))) {
+  } else if (!all(sapply(datasources, DSI:::.isDSConnection))) {
     stop("'datasources' needs to be a an object of the 'DSConnection' class.")
   }
 
@@ -29,8 +28,8 @@ ds.calc_hist <- function(data_name, last_tr_tree, data_classes, output_var,
   # If 'last_tr_tree' is NULL we initialise the predicted output with 0's.
   if (is.null(last_tr_tree)) {
     cally <- call("calc_hist_initDS", data_name, output_var, loss_function)
-    output <- DSI::datashield.assign.expr(datasources,
-                                          paste0(data_name, "_training"), cally)
+    DSI::datashield.assign.expr(datasources,
+                                paste0(data_name, "_training"), cally)
   }
   # if we already trained a tree before we just add up the predicted value from
   # the last trained tree
@@ -41,8 +40,8 @@ ds.calc_hist <- function(data_name, last_tr_tree, data_classes, output_var,
 
     cally <- call("calc_histDS", data_name, last_tr_tree, data_classes,
                   output_var, loss_function)
-    output <- DSI::datashield.assign.expr(datasources,
-                                          paste0(data_name, "_training"), cally)
+    DSI::datashield.assign.expr(datasources,
+                                paste0(data_name, "_training"), cally)
   }
 
 }

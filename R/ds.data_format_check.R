@@ -21,19 +21,18 @@ ds.data_format_check <- function(data_name, bounds_and_levels, output_var,
 
   if (is.null(datasources)) {
     datasources <- DSI::datashield.connections_find()
-  }
-  else if (!all(sapply(datasources, DSI:::.isDSConnection))) {
+  } else if (!all(sapply(datasources, DSI:::.isDSConnection))) {
     stop("'datasources' needs to be a an object of the 'DSConnection' class.")
   }
 
   if (!output_var %in% names(bounds_and_levels)) {
     stop("'output_var' needs to be an element of 'bounds_and_levels'.")
   }
-  
+
   if (any(drop_columns %in% names(bounds_and_levels))) {
     stop("The variables for which we specified bounds and levels can't be dropped.")
   }
-  
+
   cally <- call("data_format_checkDS", data_name, bounds_and_levels, output_var,
                 loss_function, drop_columns, drop_NA)
   data_classes <- DSI::datashield.aggregate(datasources, cally)
