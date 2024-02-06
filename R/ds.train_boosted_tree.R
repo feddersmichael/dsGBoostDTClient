@@ -14,6 +14,7 @@
 #' @param drop_columns Vector of data columns which shall be removed.
 #' @param drop_NA If NA data in the output variable should be removed.
 #' @param reg_par Regularisation parameter which prevent overfitting.
+#' @param shrinkage How high the newly trained tree effects the boosted tree.
 #' @param max_treecount Maximum amount of trees to build our boosted decision
 #' tree.
 #' @param max_splits The maximum amount of splits in the trained tree.
@@ -26,8 +27,9 @@ ds.train_boosted_tree <- function(data_name, bounds_and_levels, output_var,
                                   loss_function, train_test_ratio, amt_spp,
                                   cand_select, drop_columns = NULL,
                                   drop_NA = TRUE, reg_par = c(5, 5),
-                                  max_treecount = 10, max_splits = 5,
-                                  seed = NULL, datasources = NULL) {
+                                  shrinkage = 0.1, max_treecount = 10,
+                                  max_splits = 5, seed = NULL,
+                                  datasources = NULL) {
 
   # We first check all the inputs for appropriate class and set defaults if
   # no input is given.
@@ -123,13 +125,10 @@ ds.train_boosted_tree <- function(data_name, bounds_and_levels, output_var,
     tree <- ds.train_tree(data_name, last_tr_tree, bounds_and_levels,
                           data_classes, output_var, loss_function, amt_spp,
                           cand_select, reg_par, max_splits, datasources)
+    
+    tree <- ds.add_shrinkage(tree, shrinkage)
 
-    # Depending on the outcome we add the tree or end the model training.
-    if (is.character(tree)) {
-      break
-    } else {
-      tree_list[[i]] <- tree
-    }
+    tree_list[[i]] <- tree
   }
 
   # After the training we can save our model locally.
