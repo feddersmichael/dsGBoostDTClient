@@ -19,8 +19,10 @@ ds.split_bins <- function(data_name, current_tree, spp_cand, bounds_and_levels,
   # no input is given.
   if (is.null(datasources)) {
     datasources <- DSI::datashield.connections_find()
-  } else if (!all(sapply(datasources, DSI:::.isDSConnection))) {
-    stop("'datasources' needs to be a an object of the 'DSConnection' class.")
+  }
+  if (!(is.list(datasources) && all(unlist(lapply(datasources,
+                                                  function(d) {methods::is(d, "DSConnection")}))))) {
+    stop("The 'datasources' were expected to be a list of DSConnection-class objects", call. = FALSE)
   }
 
   cally <- call("split_binsDS", data_name, bounds_and_levels, spp_cand,

@@ -35,8 +35,10 @@ ds.train_boosted_tree <- function(data_name, bounds_and_levels, output_var,
   # no input is given.
   if (is.null(datasources)) {
     datasources <- DSI::datashield.connections_find()
-  } else if (!all(sapply(datasources, DSI:::.isDSConnection))) {
-    stop("'datasources' needs to be a an object of the 'DSConnection' class.")
+  }
+  if (!(is.list(datasources) && all(unlist(lapply(datasources,
+                                                  function(d) {methods::is(d, "DSConnection")}))))) {
+    stop("The 'datasources' were expected to be a list of DSConnection-class objects", call. = FALSE)
   }
 
   if (!is.character(data_name) || length(data_name) != 1) {
@@ -75,6 +77,11 @@ ds.train_boosted_tree <- function(data_name, bounds_and_levels, output_var,
 
   if (!is.logical(drop_NA) || length(drop_NA) != 1) {
     stop("'drop_NA' needs to be an atomic 'logical' vector.")
+  }
+  
+  if (!is.numeric(shrinkage) || length(shrinkage) != 1 ||
+      (shrinkage <= 0) || (shrinkage > 1)) {
+    stop("'shrinkage' needs to be an atomic 'numeric' vector which lies between 0 and 1.")
   }
 
   if (!is.integer(max_treecount) || length(max_treecount) != 1) {

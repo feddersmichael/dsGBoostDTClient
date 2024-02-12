@@ -26,8 +26,10 @@ ds.train_tree <- function(data_name, last_tr_tree, bounds_and_levels,
   # no input is given.
   if (is.null(datasources)) {
     datasources <- DSI::datashield.connections_find()
-  } else if (!all(sapply(datasources, DSI:::.isDSConnection))) {
-    stop("'datasources' needs to be a an object of the 'DSConnection' class.")
+  }
+  if (!(is.list(datasources) && all(unlist(lapply(datasources,
+                                                  function(d) {methods::is(d, "DSConnection")}))))) {
+    stop("The 'datasources' were expected to be a list of DSConnection-class objects", call. = FALSE)
   }
 
   if (!is.null(last_tr_tree) && !is.data.frame(last_tr_tree)) {

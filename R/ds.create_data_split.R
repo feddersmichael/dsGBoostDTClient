@@ -18,8 +18,10 @@ ds.create_data_split <- function(data_name, output_var, drop_columns,
   # no input is given.
   if (is.null(datasources)) {
     datasources <- DSI::datashield.connections_find()
-  } else if (!all(sapply(datasources, DSI:::.isDSConnection))) {
-    stop("'datasources' needs to be a an object of the 'DSConnection' class.")
+  }
+  if (!(is.list(datasources) && all(unlist(lapply(datasources,
+                                                  function(d) {methods::is(d, "DSConnection")}))))) {
+    stop("The 'datasources' were expected to be a list of DSConnection-class objects", call. = FALSE)
   }
 
   # We split up the data set in a training and test part.

@@ -52,8 +52,8 @@ ds.calc_spsc <- function(split_sums, spp_cand, reg_par, cont_NA) {
             left_split_NA <- grad[[feature]]$sum_L_NA[[j]]^2 / denom_check_l
             right_split <- grad[[feature]]$sum_R[[j]]^2 / denom_check_r
           } else {
-            left_split_NA <- 0
-            right_split <- 0
+            left_split_NA <- NA
+            right_split <- NA
           }
 
           denom_check_l <- hess[[feature]]$sum_L[[j]] + lambda
@@ -62,8 +62,8 @@ ds.calc_spsc <- function(split_sums, spp_cand, reg_par, cont_NA) {
             left_split <- grad[[feature]]$sum_L[[j]]^2 / denom_check_l
             right_split_NA <- grad[[feature]]$sum_R_NA[[j]]^2 / denom_check_r
           } else {
-            left_split <- 0
-            right_split_NA <- 0
+            left_split <- NA
+            right_split_NA <- NA
           }
           split_val[[feature]][j, ] <- c(left_split_NA + right_split,
                                          left_split + right_split_NA)
@@ -79,8 +79,8 @@ ds.calc_spsc <- function(split_sums, spp_cand, reg_par, cont_NA) {
             left_split <- grad[[feature]]$sum_L[[j]]^2 / denom_check_l
             right_split <- grad[[feature]]$sum_R[[j]]^2 / denom_check_r
           } else {
-            left_split <- 0
-            right_split <- 0
+            left_split <- NA
+            right_split <- NA
           }
           split_val[[feature]][j, ] <- c(left_split + right_split)
         }
@@ -90,7 +90,7 @@ ds.calc_spsc <- function(split_sums, spp_cand, reg_par, cont_NA) {
     split_cont_NA <- 0
     split_feature <- ""
     split_pt <- 0
-    spsc <- 0
+    spsc <- prev_sc
     weight_l <- 0
     weight_r <- 0
 
@@ -99,7 +99,8 @@ ds.calc_spsc <- function(split_sums, spp_cand, reg_par, cont_NA) {
       cur_split <- split_val[[feature]]
       if (cont_NA[[i]][[feature]]) {
         for (j in seq_len(nrow(cur_split))) {
-          if (cur_split$spsc_NA_l[[j]] > spsc) {
+          if (!is.na(cur_split$spsc_NA_l[[j]]) &&
+              cur_split$spsc_NA_l[[j]] > spsc) {
             spsc <- cur_split$spsc_NA_l[[j]]
             split_feature <- feature
             split_cont_NA <- 1
@@ -109,7 +110,8 @@ ds.calc_spsc <- function(split_sums, spp_cand, reg_par, cont_NA) {
             weight_r <- -sums[["grad"]][[feature]]$sum_R[[j]] /
               (sums[["hess"]][[feature]]$sum_R[[j]] + lambda)
           }
-          if (cur_split$spsc_NA_r[[j]] > spsc) {
+          if (!is.na(cur_split$spsc_NA_r[[j]]) &&
+              cur_split$spsc_NA_r[[j]] > spsc) {
             spsc <- cur_split$spsc_NA_r[[j]]
             split_feature <- feature
             split_cont_NA <- 2
@@ -122,7 +124,7 @@ ds.calc_spsc <- function(split_sums, spp_cand, reg_par, cont_NA) {
         }
       } else {
         for (j in seq_len(nrow(cur_split))) {
-          if (cur_split$spsc[[j]] > spsc) {
+          if (!is.na(cur_split$spsc[[j]]) && cur_split$spsc[[j]] > spsc) {
             spsc <- cur_split$spsc[[j]]
             split_feature <- feature
             split_cont_NA <- 0

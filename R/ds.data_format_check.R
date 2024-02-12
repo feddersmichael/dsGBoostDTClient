@@ -21,8 +21,10 @@ ds.data_format_check <- function(data_name, bounds_and_levels, output_var,
 
   if (is.null(datasources)) {
     datasources <- DSI::datashield.connections_find()
-  } else if (!all(sapply(datasources, DSI:::.isDSConnection))) {
-    stop("'datasources' needs to be a an object of the 'DSConnection' class.")
+  }
+  if (!(is.list(datasources) && all(unlist(lapply(datasources,
+                                                  function(d) {methods::is(d, "DSConnection")}))))) {
+    stop("The 'datasources' were expected to be a list of DSConnection-class objects", call. = FALSE)
   }
 
   if (!output_var %in% names(bounds_and_levels)) {
