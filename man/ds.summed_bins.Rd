@@ -4,10 +4,12 @@
 \alias{ds.summed_bins}
 \title{Sum up bins over all split-point candidates.}
 \usage{
-ds.summed_bins(leaves)
+ds.summed_bins(leaves, data_classes)
 }
 \arguments{
 \item{leaves}{The histogram bins per leaf.}
+
+\item{data_classes}{Data class for all features.}
 }
 \value{
 The summed up bins.

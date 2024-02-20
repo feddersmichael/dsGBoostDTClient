@@ -2,9 +2,10 @@
 #' Sum up bins over all split-point candidates.
 #'
 #' @param leaves The histogram bins per leaf.
+#' @param data_classes Data class for all features.
 #'
 #' @return The summed up bins.
-ds.summed_bins <- function(leaves) {
+ds.summed_bins <- function(leaves, data_classes) {
 
   split_sums <- list()
 
@@ -22,18 +23,31 @@ ds.summed_bins <- function(leaves) {
 
         bins <- histogram[[feature]]
         amt_bins <- length(bins)
-        if (cont_NA[[feature]]) {
-
-          bin_sums <- data.frame(sum_L_NA = numeric(), sum_R = numeric(),
-                                 sum_L = numeric(), sum_R_NA = numeric())
-          NA_elem <- histogram[[feature]][["NA"]]
-          sum_L <- bins[[1]]
-          sum_R <- sum(bins[2:(amt_bins - 1)])
-          bin_sums[1, ] <- c(sum_L + NA_elem, sum_R, sum_L, sum_R + NA_elem)
-          for (j in 2:(amt_bins - 1)) {
-            sum_L <- sum_L + bins[[j]]
-            sum_R <- sum_R - bins[[j]]
-            bin_sums[j, ] <- c(sum_L + NA_elem, sum_R, sum_L, sum_R + NA_elem)
+        if (data_classes[[feature]] == "numeric") {
+          if (cont_NA[[feature]]) {
+            
+            bin_sums <- data.frame(sum_L_NA = numeric(), sum_R = numeric(),
+                                   sum_L = numeric(), sum_R_NA = numeric())
+            NA_elem <- histogram[[feature]][["NA"]]
+            sum_L <- bins[[1]]
+            sum_R <- sum(bins[2:(amt_bins - 1)])
+            bin_sums[1, ] <- c(sum_L + NA_elem, sum_R, sum_L, sum_R + NA_elem)
+            for (j in 2:(amt_bins - 2)) {
+              sum_L <- sum_L + bins[[j]]
+              sum_R <- sum_R - bins[[j]]
+              bin_sums[j, ] <- c(sum_L + NA_elem, sum_R, sum_L, sum_R + NA_elem)
+            }
+          } else {
+            
+            bin_sums <- data.frame(sum_L = numeric(), sum_R = numeric())
+            sum_L <- bins[[1]]
+            sum_R <- sum(bins[2:(amt_bins - 1)])
+            bin_sums[1, ] <- c(sum_L, sum_R)
+            for (j in 2:(amt_bins - 2)) {
+              sum_L <- sum_L + bins[[j]]
+              sum_R <- sum_R - bins[[j]]
+              bin_sums[j, ] <- c(sum_L, sum_R)
+            }
           }
         } else {
 

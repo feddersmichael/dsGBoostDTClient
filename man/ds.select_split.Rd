@@ -4,13 +4,15 @@
 \alias{ds.select_split}
 \title{Choose the best split}
 \usage{
-ds.select_split(leaves, spp_cand, reg_par)
+ds.select_split(leaves, spp_cand, data_classes, reg_par)
 }
 \arguments{
 \item{leaves}{Histogram-sums for all features and split-bins for each leaf.}
 
 \item{spp_cand}{The candidates for a possible further split of the current
 tree.}
+
+\item{data_classes}{Data class for all features.}
 
 \item{reg_par}{Regularisation parameters which specify the loss function.}
 }

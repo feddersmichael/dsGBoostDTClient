@@ -85,7 +85,8 @@ ds.train_tree <- function(data_name, last_tr_tree, bounds_and_levels,
                                           datasources)
 
     # We search for the best possible split(s) in the newly added branch.
-    best_split <- ds.select_split(histograms_per_leave, spp_cand, reg_par)
+    best_split <- ds.select_split(histograms_per_leave, spp_cand, data_classes,
+                                  reg_par)
 
     amt_splits <- nrow(current_tree)
 

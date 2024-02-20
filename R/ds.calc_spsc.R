@@ -25,7 +25,7 @@ ds.calc_spsc <- function(split_sums, spp_cand, reg_par, cont_NA) {
     sums <- split_sums[[i]]
 
     if ((sums[["compl"]][["hess"]] + lambda) == 0) {
-      opt_sp_per_leaf[i, ] <- list(0, NULL, NULL, NULL, NULL, NULL)
+      opt_sp_per_leaf[i, ] <- list(0, "", 0, 0, 0, 0)
       next
     } else {
       prev_sc <- sums[["compl"]][["grad"]]^2 / (sums[["compl"]][["hess"]] + lambda)
@@ -128,7 +128,7 @@ ds.calc_spsc <- function(split_sums, spp_cand, reg_par, cont_NA) {
             spsc <- cur_split$spsc[[j]]
             split_feature <- feature
             split_cont_NA <- 0
-            split_pt <- spp_cand[[feature]][j]
+            split_pt <- spp_cand[[feature]][[j]]
             weight_l <- -sums[["grad"]][[feature]]$sum_L[[j]] /
               (sums[["hess"]][[feature]]$sum_L[[j]] + lambda)
             weight_r <- -sums[["grad"]][[feature]]$sum_R[[j]] /

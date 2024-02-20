@@ -4,16 +4,17 @@
 #' @param leaves Histogram-sums for all features and split-bins for each leaf.
 #' @param spp_cand The candidates for a possible further split of the current
 #' tree.
+#' @param data_classes Data class for all features.
 #' @param reg_par Regularisation parameters which specify the loss function.
 #'
 #' @return The best possible split under the possible ones.
 #' @export
-ds.select_split <- function(leaves, spp_cand, reg_par) {
+ds.select_split <- function(leaves, spp_cand, data_classes, reg_par) {
 
   # TODO: Structure which variables should be mentioned explicitly and which
   # ones only under a general variable-list
 
-  split_sums <- ds.summed_bins(leaves)
+  split_sums <- ds.summed_bins(leaves, data_classes)
 
   cont_NA <- list()
   for (i in seq_along(leaves)) {
