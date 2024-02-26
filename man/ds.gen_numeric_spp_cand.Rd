@@ -4,7 +4,7 @@
 \alias{ds.gen_numeric_spp_cand}
 \title{Creation of splitting-points for the numeric features}
 \usage{
-ds.gen_numeric_spp_cand(bounds, amt_spp, selection_method)
+ds.gen_numeric_spp_cand(bounds, amt_spp, selection_method, add_par)
 }
 \arguments{
 \item{bounds}{The bounds in which the splitting-points have to be.}
@@ -12,6 +12,8 @@ ds.gen_numeric_spp_cand(bounds, amt_spp, selection_method)
 \item{amt_spp}{The amount of splitting-points which shall be created.}
 
 \item{selection_method}{By which method the splitting-points shall be chosen.}
+
+\item{add_par}{Additional parameters for the iterative hessian mode.}
 }
 \value{
 The created splitting-points.
