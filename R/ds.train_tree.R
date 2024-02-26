@@ -43,10 +43,13 @@ ds.train_tree <- function(data_name, last_tr_tree, bounds_and_levels,
                datasources)
   
   if (is.null(last_tr_tree) && cand_select[["numeric"]] == "ithess") {
-    cand_select[["numeric"]] <- "uniform"
+    spp_cand <- ds.gen_spp_cand(bounds_and_levels, data_classes, amt_spp,
+                                list(numeric = "uniform", factor = cand_select[["factor"]]),
+                                add_par)
+  } else {
+    spp_cand <- ds.gen_spp_cand(bounds_and_levels, data_classes, amt_spp,
+                                cand_select, add_par)
   }
-  spp_cand <- ds.gen_spp_cand(bounds_and_levels, data_classes, amt_spp,
-                              cand_select, add_par)
 
   # We save our tree in a (amount of splits)x8 data frame. Each row represents
   # one split point.
@@ -143,5 +146,5 @@ ds.train_tree <- function(data_name, last_tr_tree, bounds_and_levels,
     }
   }
 
-  return(current_tree, add_par)
+  return(list(current_tree, add_par))
 }

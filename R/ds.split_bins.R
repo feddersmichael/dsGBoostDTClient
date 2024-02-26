@@ -60,7 +60,8 @@ ds.split_bins <- function(data_name, current_tree, spp_cand, bounds_and_levels,
     cont_NA <- logical()
     for (feature in names(spp_cand)) {
       categories <- histograms_per_leaf[[i]][["grad"]][[feature]]
-      if ("NA" %in% names(categories) && (categories["NA"] != 0)) {
+      if ("NA" %in% names(categories) && data_classes[[feature]] == "numeric" &&
+          (categories["NA"] != 0)) {
         cont_NA[[feature]] <- TRUE
       } else {
         cont_NA[[feature]] <- FALSE

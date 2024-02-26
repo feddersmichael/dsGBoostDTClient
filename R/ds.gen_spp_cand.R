@@ -32,7 +32,8 @@ ds.gen_spp_cand <- function(bounds_and_levels, data_classes, amt_spp,
       spp_cand[[feature]] <- ds.gen_numeric_spp_cand(bounds_and_levels[[feature]],
                                                      amt_spp[[feature]],
                                                      cand_select[["numeric"]],
-                                                     add_par)
+                                                     list(add_par[[1]][[feature]],
+                                                          add_par[[2]][[feature]]))
     } else {
       spp_cand[[feature]] <- ds.gen_factor_spp_cand(length(bounds_and_levels[[feature]]),
                                                     amt_spp[[feature]], cand_select[["factor"]])

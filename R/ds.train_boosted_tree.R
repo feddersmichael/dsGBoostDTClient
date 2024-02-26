@@ -130,14 +130,14 @@ ds.train_boosted_tree <- function(data_name, bounds_and_levels, output_var,
     last_tr_tree <- tree_list[[length(tree_list)]]
 
     # We train the next tree.
-    tree <- ds.train_tree(data_name, last_tr_tree, bounds_and_levels,
+    tree_return <- ds.train_tree(data_name, last_tr_tree, bounds_and_levels,
                           data_classes, output_var, loss_function, amt_spp,
                           cand_select, reg_par, max_splits, add_par,
                           datasources)
 
-    tree_return <- ds.add_shrinkage(tree, shrinkage)
+    tree <- ds.add_shrinkage(tree_return[[1]], shrinkage)
 
-    tree_list[[i]] <- tree_return[[1]]
+    tree_list[[i]] <- tree
     add_par <- tree_return[[2]]
   }
 
