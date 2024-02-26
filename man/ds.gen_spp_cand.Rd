@@ -4,7 +4,13 @@
 \alias{ds.gen_spp_cand}
 \title{Generate Splitting point candidates}
 \usage{
-ds.gen_spp_cand(bounds_and_levels, data_classes, amt_spp, cand_select)
+ds.gen_spp_cand(
+  bounds_and_levels,
+  data_classes,
+  amt_spp,
+  cand_select,
+  add_par = NULL
+)
 }
 \arguments{
 \item{bounds_and_levels}{Bounds for numeric variables and level sets for
@@ -16,6 +22,8 @@ factor variables.}
 
 \item{cand_select}{Which splitting-point candidate selection is used for
 numeric and factor data.}
+
+\item{add_par}{Additional parameters for the iterative hessian mode.}
 }
 \value{
 The created splitting points.

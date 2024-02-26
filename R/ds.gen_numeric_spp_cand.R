@@ -52,10 +52,12 @@ ds.gen_numeric_spp_cand <- function(bounds, amt_spp, selection_method, add_par) 
     cur_amt_spp <- length(spp_cand)
     if (amt_spp > cur_amt_spp) {
       bounds <- c(bounds[[1]], spp_cand, bounds[[2]])
-      new_spp <- sample.int((cur_amt_spp + 1), (amt_spp - cur_amt_spp), replace = TRUE)
+      new_spp <- sample.int((cur_amt_spp + 1), (amt_spp - cur_amt_spp),
+                            replace = TRUE)
       fill_point <- c()
       for (i in new_spp) {
-        fill_point <- c(fill_point, stats::runif(1, bounds[[i]], bounds[[i + 1]]))
+        fill_point <- c(fill_point, stats::runif(1, bounds[[i]],
+                                                 bounds[[i + 1]]))
       }
       spp_cand <- sort(c(spp_cand, fill_point))
     }

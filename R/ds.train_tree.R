@@ -98,6 +98,7 @@ ds.train_tree <- function(data_name, last_tr_tree, bounds_and_levels,
                           best_split$cont_NA[[1]], TRUE, best_split$weight_l[[1]],
                           TRUE, best_split$weight_r[[1]], 0, TRUE)
       current_tree[1, ] <- first_split
+      add_par <- list(histograms_per_leave[[1]]$hess, spp_cand)
     } else {
       # TODO: Fix rownames for copying rows into df
       split_scores_left[amt_splits, ] <- best_split[1, ]
