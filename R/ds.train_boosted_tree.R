@@ -123,7 +123,8 @@ ds.train_boosted_tree <- function(data_name, bounds_and_levels, output_var,
   # In this loop we train up to 'max_treecount' amount of trees.
   # If the function 'ds.train_tree' returns a break criteria instead of a tree
   # we stop the loop and return the trained boosted tree.
-
+  
+  add_par <- NULL
   for (i in 1:max_treecount) {
 
     last_tr_tree <- tree_list[[length(tree_list)]]
@@ -131,11 +132,13 @@ ds.train_boosted_tree <- function(data_name, bounds_and_levels, output_var,
     # We train the next tree.
     tree <- ds.train_tree(data_name, last_tr_tree, bounds_and_levels,
                           data_classes, output_var, loss_function, amt_spp,
-                          cand_select, reg_par, max_splits, datasources)
-    
-    tree <- ds.add_shrinkage(tree, shrinkage)
+                          cand_select, reg_par, max_splits, add_par,
+                          datasources)
 
-    tree_list[[i]] <- tree
+    tree_return <- ds.add_shrinkage(tree, shrinkage)
+
+    tree_list[[i]] <- tree_return[[1]]
+    add_par <- tree_return[[2]]
   }
 
   # After the training we can save our model locally.

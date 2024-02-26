@@ -13,6 +13,7 @@
 #' @param cand_select Splitting-point selection for numeric and factor features.
 #' @param reg_par Regularisation parameter which prevent overfitting.
 #' @param max_splits The maximum amount of splits in the trained tree.
+#' @param add_par Additional parameters for the iterative hessian mode.
 #' @param datasources DATASHIELD server connection.
 #'
 #' @return The trained tree.
@@ -20,7 +21,7 @@
 ds.train_tree <- function(data_name, last_tr_tree, bounds_and_levels,
                           data_classes, output_var, loss_function, amt_spp,
                           cand_select, reg_par = c(5, 5), max_splits = 5,
-                          datasources = NULL) {
+                          add_par = NULL, datasources = NULL) {
 
   # We first check all the inputs for appropriate class and set defaults if
   # no input is given.
@@ -45,7 +46,7 @@ ds.train_tree <- function(data_name, last_tr_tree, bounds_and_levels,
     cand_select[["numeric"]] <- "uniform"
   }
   spp_cand <- ds.gen_spp_cand(bounds_and_levels, data_classes, amt_spp,
-                              cand_select)
+                              cand_select, add_par)
 
   # We save our tree in a (amount of splits)x8 data frame. Each row represents
   # one split point.
@@ -98,7 +99,9 @@ ds.train_tree <- function(data_name, last_tr_tree, bounds_and_levels,
                           best_split$cont_NA[[1]], TRUE, best_split$weight_l[[1]],
                           TRUE, best_split$weight_r[[1]], 0, TRUE)
       current_tree[1, ] <- first_split
-      add_par <- list(histograms_per_leave[[1]]$hess, spp_cand)
+      if (cand_select[["numeric"]] == "ithess") {
+        add_par <- list(histograms_per_leave[[1]]$hess, spp_cand)
+      }
     } else {
       # TODO: Fix rownames for copying rows into df
       split_scores_left[amt_splits, ] <- best_split[1, ]
@@ -140,5 +143,5 @@ ds.train_tree <- function(data_name, last_tr_tree, bounds_and_levels,
     }
   }
 
-  return(current_tree)
+  return(current_tree, add_par)
 }

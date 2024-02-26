@@ -15,6 +15,7 @@ ds.train_tree(
   cand_select,
   reg_par = c(5, 5),
   max_splits = 5,
+  add_par = NULL,
   datasources = NULL
 )
 }
@@ -40,6 +41,8 @@ tree.}
 \item{reg_par}{Regularisation parameter which prevent overfitting.}
 
 \item{max_splits}{The maximum amount of splits in the trained tree.}
+
+\item{add_par}{Additional parameters for the iterative hessian mode.}
 
 \item{datasources}{DATASHIELD server connection.}
 }
