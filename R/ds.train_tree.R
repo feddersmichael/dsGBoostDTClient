@@ -40,7 +40,10 @@ ds.train_tree <- function(data_name, last_tr_tree, bounds_and_levels,
   # trained trees.
   ds.calc_hist(data_name, last_tr_tree, data_classes, output_var, loss_function,
                datasources)
-
+  
+  if (is.null(last_tr_tree) && cand_select[["numeric"]] == "ithess") {
+    cand_select[["numeric"]] <- "uniform"
+  }
   spp_cand <- ds.gen_spp_cand(bounds_and_levels, data_classes, amt_spp,
                               cand_select)
 

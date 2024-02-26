@@ -4,10 +4,11 @@
 #' @param bounds The bounds in which the splitting-points have to be.
 #' @param amt_spp The amount of splitting-points which shall be created.
 #' @param selection_method By which method the splitting-points shall be chosen.
+#' @param add_par Additional parameters for the iterative hessian mode.
 #'
 #' @return The created splitting-points.
 #' @export
-ds.gen_numeric_spp_cand <- function(bounds, amt_spp, selection_method) {
+ds.gen_numeric_spp_cand <- function(bounds, amt_spp, selection_method, add_par) {
 
   if (selection_method == "uniform") {
     spp_cand <- sort(stats::runif(amt_spp, bounds[[1]], bounds[[2]]))
@@ -19,17 +20,21 @@ ds.gen_numeric_spp_cand <- function(bounds, amt_spp, selection_method) {
     spp_cand <- sort(exp(stats::runif(amt_spp, log_bounds[[1]],
                                       log_bounds[[2]])))
   } else if (selection_method == "ithess") {
-    hess_hist <- list()
-    prev_spp_cand <- list()
-    theta <- 0
+    if (is.null(add_par)) {
+      stop("'add_par' can't be NULL.")
+    }
+    
+    hess_hist <- add_par[[1]]
+    prev_spp_cand <- add_par[[2]]
+    theta <- sum(hess_hist) / amt_spp
     bounds <- c(bounds[[1]], prev_spp_cand, bounds[[2]])
     spp_cand <- c()
     
     low_bnd <- 1
     upp_bnd <- 2
-    for (i in 1:(length(prev_spp_cand) - 1)) {
+    for (i in 1:(length(hess_hist) - 1)) {
       if (hess_hist[[i]] < theta) {
-        upp_bnd <- i + 1
+        upp_bnd <- upp_bnd + 1
         hess_hist[[i + 1]] <- hess_hist[[i]] + hess_hist[[i + 1]]
       } else {
         middle <- (bounds[[low_bnd]] + bounds[[upp_bnd]]) / 2
@@ -39,7 +44,7 @@ ds.gen_numeric_spp_cand <- function(bounds, amt_spp, selection_method) {
       }
     }
     
-    if (hess_hist[[length(prev_spp_cand)]] >= theta) {
+    if (hess_hist[[length(hess_hist)]] >= theta) {
       middle <- (bounds[[low_bnd]] + bounds[[upp_bnd]]) / 2
       spp_cand <- c(spp_cand, middle)
     }
@@ -47,10 +52,10 @@ ds.gen_numeric_spp_cand <- function(bounds, amt_spp, selection_method) {
     cur_amt_spp <- length(spp_cand)
     if (amt_spp > cur_amt_spp) {
       bounds <- c(bounds[[1]], spp_cand, bounds[[2]])
-      new_spp <- sample.int(cur_amt_spp, (amt_spp - cur_amt_spp), replace = TRUE)
+      new_spp <- sample.int((cur_amt_spp + 1), (amt_spp - cur_amt_spp), replace = TRUE)
       fill_point <- c()
       for (i in new_spp) {
-        fill_point <- c(fill_point, stats::runif(1, bounds[[i]], bounds[[i + 2]]))
+        fill_point <- c(fill_point, stats::runif(1, bounds[[i]], bounds[[i + 1]]))
       }
       spp_cand <- sort(c(spp_cand, fill_point))
     }

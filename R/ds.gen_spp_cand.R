@@ -7,14 +7,13 @@
 #' @param amt_spp Amount of splitting points per feature.
 #' @param cand_select Which splitting-point candidate selection is used for
 #' numeric and factor data.
+#' @param add_par Additional parameters for the iterative hessian mode.
 #'
 #' @return The created splitting points.
 #' @export
 
 ds.gen_spp_cand <- function(bounds_and_levels, data_classes, amt_spp,
-                            cand_select) {
-  # TODO: add mode for logarithmic scale e.g. for uniform
-  # TODO: implement iterative hessian
+                            cand_select, add_par = NULL) {
 
   supported_modes <- list(numeric = c("uniform", "loguniform", "ithess"),
                           factor = c("exact"))
@@ -31,7 +30,9 @@ ds.gen_spp_cand <- function(bounds_and_levels, data_classes, amt_spp,
   for (feature in names(data_classes)) {
     if (data_classes[[feature]] == "numeric") {
       spp_cand[[feature]] <- ds.gen_numeric_spp_cand(bounds_and_levels[[feature]],
-                                                     amt_spp[[feature]], cand_select[["numeric"]])
+                                                     amt_spp[[feature]],
+                                                     cand_select[["numeric"]],
+                                                     add_par)
     } else {
       spp_cand[[feature]] <- ds.gen_factor_spp_cand(length(bounds_and_levels[[feature]]),
                                                     amt_spp[[feature]], cand_select[["factor"]])
