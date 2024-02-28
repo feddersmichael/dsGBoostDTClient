@@ -34,9 +34,15 @@ ds.gen_spp_cand <- function(bounds_and_levels, data_classes, amt_spp,
                                                      cand_select[["numeric"]],
                                                      list(add_par[[1]][[feature]],
                                                           add_par[[2]][[feature]]))
-    } else {
-      spp_cand[[feature]] <- ds.gen_factor_spp_cand(length(bounds_and_levels[[feature]]),
-                                                    amt_spp[[feature]], cand_select[["factor"]])
+    } else if (data_classes[[feature]] == "factor_ord"){
+      spp_cand[[feature]] <- ds.gen_factor_ord_spp_cand(length(bounds_and_levels[[feature]]),
+                                                        amt_spp[[feature]],
+                                                        cand_select[["factor_ord"]])
+    }
+    else {
+      spp_cand[[feature]] <- ds.gen_unord_factor_spp_cand(length(bounds_and_levels[[feature]]),
+                                                          amt_spp[[feature]],
+                                                          cand_select[["factor_unord"]])
     }
   }
 

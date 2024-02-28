@@ -37,7 +37,5 @@ ds.data_format_check <- function(data_name, bounds_and_levels, output_var,
 
   cally <- call("data_format_checkDS", data_name, bounds_and_levels, output_var,
                 loss_function, drop_columns, drop_NA)
-  data_classes <- DSI::datashield.aggregate(datasources, cally)
-
-  return(data_classes[[1]])
+  output <- DSI::datashield.aggregate(datasources, cally)
 }

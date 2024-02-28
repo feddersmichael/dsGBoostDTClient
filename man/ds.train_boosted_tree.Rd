@@ -11,6 +11,7 @@ ds.train_boosted_tree(
   loss_function,
   train_test_ratio,
   amt_spp,
+  data_classes,
   cand_select,
   drop_columns = NULL,
   drop_NA = TRUE,
@@ -36,6 +37,8 @@ boosted tree.}
 Training.}
 
 \item{amt_spp}{The amount of split-points per feature.}
+
+\item{data_classes}{Data class for all features.}
 
 \item{cand_select}{Splitting-point selection for numeric and factor features.}
 

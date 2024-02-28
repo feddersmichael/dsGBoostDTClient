@@ -10,6 +10,7 @@
 #' @param train_test_ratio Percentage of the data which should be used for
 #' Training.
 #' @param amt_spp The amount of split-points per feature.
+#' @param data_classes Data class for all features.
 #' @param cand_select Splitting-point selection for numeric and factor features.
 #' @param drop_columns Vector of data columns which shall be removed.
 #' @param drop_NA If NA data in the output variable should be removed.
@@ -25,11 +26,11 @@
 #' @export
 ds.train_boosted_tree <- function(data_name, bounds_and_levels, output_var,
                                   loss_function, train_test_ratio, amt_spp,
-                                  cand_select, drop_columns = NULL,
-                                  drop_NA = TRUE, reg_par = c(5, 5),
-                                  shrinkage = 0.1, max_treecount = 10,
-                                  max_splits = 5, seed = NULL,
-                                  datasources = NULL) {
+                                  data_classes, cand_select,
+                                  drop_columns = NULL, drop_NA = TRUE,
+                                  reg_par = c(5, 5), shrinkage = 0.1,
+                                  max_treecount = 10, max_splits = 5,
+                                  seed = NULL, datasources = NULL) {
 
   # We first check all the inputs for appropriate class and set defaults if
   # no input is given.
@@ -101,20 +102,18 @@ ds.train_boosted_tree <- function(data_name, bounds_and_levels, output_var,
   }
 
   # We do some basic checks about the saved data
-  data_classes <- ds.data_format_check(data_name, bounds_and_levels, output_var,
-                                       loss_function, drop_columns, drop_NA,
-                                       datasources)
+  ds.data_format_check(data_name, bounds_and_levels, output_var, loss_function,
+                       drop_columns, drop_NA, datasources)
 
   # Before we start training our model we split up the data set into a training
   # and test part.
   ds.create_data_split(data_name, output_var, drop_columns, train_test_ratio,
                        datasources)
 
-  # We can now remove the output variable from the data_classes and the boundary.
+  # We can now remove the output variable from the boundary.
   # list
-  available_columns <- names(data_classes)
+  available_columns <- names(bounds_and_levels)
   var_no <- which(output_var == available_columns)[1]
-  data_classes <- data_classes[-var_no]
   bounds_and_levels <- bounds_and_levels[-var_no]
 
   # We initiate our list of trees with 'NULL' which symbolizes an empty tree
