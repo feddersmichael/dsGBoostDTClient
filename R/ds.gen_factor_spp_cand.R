@@ -45,7 +45,6 @@ ds.gen_factor_spp_cand <- function(amt_levels, amt_spp, selection_method) {
     } else {
       spp_cand <- sort(c(sample(highest_poss_spp, amt_spp) + 0.5, spp_cand))
     }
-    
   }
 
   return(list(spp_cand = spp_cand, pivot_points = pivot_points))
