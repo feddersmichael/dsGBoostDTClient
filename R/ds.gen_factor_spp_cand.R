@@ -11,7 +11,6 @@ ds.gen_factor_spp_cand <- function(amt_levels, amt_spp, selection_method) {
 
   if (selection_method == "exact") {
     
-    pivot_points <- c(0)
     highest_poss_spp <- amt_levels - 1
     if (amt_spp > highest_poss_spp) {
       warning("'amt_spp' can't be higher than the available amount of levels minus one. It has been reduced to that number.")
