@@ -15,6 +15,7 @@
 #' @param drop_NA If NA data in the output variable should be removed.
 #' @param reg_par Regularisation parameter which prevent overfitting.
 #' @param shrinkage How high the newly trained tree effects the boosted tree.
+#' @param delay_reg For how many trees the regularisation shall be omitted.
 #' @param max_treecount Maximum amount of trees to build our boosted decision
 #' tree.
 #' @param max_splits The maximum amount of splits in the trained tree.
@@ -27,9 +28,9 @@ ds.train_boosted_tree <- function(data_name, bounds_and_levels, output_var,
                                   loss_function, train_test_ratio, amt_spp,
                                   cand_select, drop_columns = NULL,
                                   drop_NA = TRUE, reg_par = c(5, 5),
-                                  shrinkage = 0.1, max_treecount = 10,
-                                  max_splits = 5, seed = NULL,
-                                  datasources = NULL) {
+                                  shrinkage = 0.1, delay_reg = 4,
+                                  max_treecount = 10, max_splits = 5,
+                                  seed = NULL, datasources = NULL) {
 
   # We first check all the inputs for appropriate class and set defaults if
   # no input is given.
@@ -87,7 +88,7 @@ ds.train_boosted_tree <- function(data_name, bounds_and_levels, output_var,
       (shrinkage <= 0) || (shrinkage > 1)) {
     stop("'shrinkage' needs to be an atomic 'numeric' vector which lies between 0 and 1.")
   }
-
+  
   if (!is.integer(max_treecount) || length(max_treecount) != 1) {
     stop("'max_treecount' needs to be an atomic 'integer' vector.")
   }
@@ -138,10 +139,13 @@ ds.train_boosted_tree <- function(data_name, bounds_and_levels, output_var,
                           data_classes, output_var, loss_function, amt_spp,
                           cand_select, reg_par, max_splits, add_par,
                           datasources)
-
-    tree <- ds.add_shrinkage(tree_return[[1]], shrinkage)
-
-    tree_list[[i]] <- tree
+    
+    if (i > delay_reg) {
+      tree_return[[1]] <- ds.add_shrinkage(tree_return[[1]], shrinkage)
+    }
+    
+    tree_list[[i]] <- tree_return[[1]]
+    
     add_par <- tree_return[[2]]
   }
 

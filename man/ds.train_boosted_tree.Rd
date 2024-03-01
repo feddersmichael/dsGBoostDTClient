@@ -16,6 +16,7 @@ ds.train_boosted_tree(
   drop_NA = TRUE,
   reg_par = c(5, 5),
   shrinkage = 0.1,
+  delay_reg = 4,
   max_treecount = 10,
   max_splits = 5,
   seed = NULL,
@@ -46,6 +47,8 @@ Training.}
 \item{reg_par}{Regularisation parameter which prevent overfitting.}
 
 \item{shrinkage}{How high the newly trained tree effects the boosted tree.}
+
+\item{delay_reg}{For how many trees the regularisation shall be omitted.}
 
 \item{max_treecount}{Maximum amount of trees to build our boosted decision
 tree.}
