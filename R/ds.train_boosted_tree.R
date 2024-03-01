@@ -79,6 +79,10 @@ ds.train_boosted_tree <- function(data_name, bounds_and_levels, output_var,
     stop("'drop_NA' needs to be an atomic 'logical' vector.")
   }
   
+  if (!is.numeric(reg_par) || length(reg_par) != 2 || any(reg_par < 0)) {
+    stop("'reg_par' needs to be a numeric vector of length 2 with positive entries.")
+  }
+  
   if (!is.numeric(shrinkage) || length(shrinkage) != 1 ||
       (shrinkage <= 0) || (shrinkage > 1)) {
     stop("'shrinkage' needs to be an atomic 'numeric' vector which lies between 0 and 1.")
