@@ -15,7 +15,8 @@
 ds.gen_spp_cand <- function(bounds_and_levels, data_classes, amt_spp,
                             cand_select, add_par = NULL) {
 
-  supported_modes <- list(numeric = c("uniform", "loguniform", "ithess"),
+  supported_modes <- list(numeric = c("uniform", "loguniform", "uniform_rand",
+                                      "ithess"),
                           factor = c("exact"))
 
   if (!cand_select[["numeric"]] %in% supported_modes[["numeric"]]) {

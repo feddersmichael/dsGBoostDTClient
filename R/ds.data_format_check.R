@@ -38,6 +38,13 @@ ds.data_format_check <- function(data_name, bounds_and_levels, output_var,
   cally <- call("data_format_checkDS", data_name, bounds_and_levels, output_var,
                 loss_function, drop_columns, drop_NA)
   data_classes <- DSI::datashield.aggregate(datasources, cally)
+  
+  # We can now remove the output variable from the data_classes and the boundary.
+  # list
+  available_columns <- names(data_classes)
+  var_no <- which(output_var == available_columns)[1]
+  data_classes <- data_classes[-var_no]
+  bounds_and_levels <- bounds_and_levels[-var_no]
 
-  return(data_classes[[1]])
+  return(list(data_classes[[1]], bounds_and_levels))
 }

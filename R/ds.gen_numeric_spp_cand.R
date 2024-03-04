@@ -11,8 +11,8 @@
 ds.gen_numeric_spp_cand <- function(bounds, amt_spp, selection_method, add_par) {
 
   if (selection_method == "uniform") {
-    spp_cand <- bounds[[1]] + 0:(amt_spp - 1) * ((bounds[[2]] - bounds[[1]]) /
-                                                   (amt_spp - 1))
+    spp_cand <- bounds[[1]] + 1:amt_spp * ((bounds[[2]] - bounds[[1]]) /
+                                                   (amt_spp + 1))
   } else if (selection_method == "loguniform") {
     if (bounds[[1]] <= 0 || bounds[[2]] <= 0) {
       stop("We can only generate loguniform splitting point candidates for a strictly positive interval.")
