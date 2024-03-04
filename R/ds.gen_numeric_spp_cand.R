@@ -11,14 +11,17 @@
 ds.gen_numeric_spp_cand <- function(bounds, amt_spp, selection_method, add_par) {
 
   if (selection_method == "uniform") {
-    spp_cand <- sort(stats::runif(amt_spp, bounds[[1]], bounds[[2]]))
+    spp_cand <- bounds[[1]] + 0:(amt_spp - 1) * ((bounds[[2]] - bounds[[1]]) /
+                                                   (amt_spp - 1))
   } else if (selection_method == "loguniform") {
     if (bounds[[1]] <= 0 || bounds[[2]] <= 0) {
       stop("We can only generate loguniform splitting point candidates for a strictly positive interval.")
     }
     log_bounds <- c(log(bounds))
-    spp_cand <- sort(exp(stats::runif(amt_spp, log_bounds[[1]],
-                                      log_bounds[[2]])))
+    spp_cand <- exp(spp_cand <- log_bounds[[1]] + 0:(amt_spp - 1) *
+                                ((log_bounds[[2]] - log_bounds[[1]]) / (amt_spp - 1)))
+  } else if (selection_method == "uniform_rand") {
+    spp_cand <- sort(stats::runif(amt_spp, bounds[[1]], bounds[[2]]))
   } else if (selection_method == "ithess") {
     if (is.null(add_par)) {
       stop("'add_par' can't be NULL.")

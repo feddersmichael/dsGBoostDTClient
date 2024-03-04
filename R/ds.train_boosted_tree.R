@@ -127,7 +127,6 @@ ds.train_boosted_tree <- function(data_name, bounds_and_levels, output_var,
   # In this loop we train up to 'max_treecount' amount of trees.
   # If the function 'ds.train_tree' returns a break criteria instead of a tree
   # we stop the loop and return the trained boosted tree.
-  
   add_par <- NULL
   for (i in 1:max_treecount) {
 
