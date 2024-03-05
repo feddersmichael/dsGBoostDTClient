@@ -87,63 +87,109 @@ ds.train_tree <- function(data_name, last_tr_tree, bounds_and_levels,
 
   # In this loop we build a tree with up to 'max_splits' many splits.
   for (i in 1:max_splits) {
-    histograms_per_leave <- ds.split_bins(data_name, current_tree, spp_cand,
-                                          bounds_and_levels, data_classes,
-                                          datasources)
-
-    # We search for the best possible split(s) in the newly added branch.
-    best_split <- ds.select_split(histograms_per_leave, spp_cand, data_classes,
-                                  reg_par)
-
-    amt_splits <- nrow(current_tree)
-
-    if (amt_splits == 0) {
-      first_split <- list(best_split$feature[[1]], best_split$split_val[[1]],
-                          best_split$cont_NA[[1]], TRUE, best_split$weight_l[[1]],
-                          TRUE, best_split$weight_r[[1]], 0, TRUE)
-      current_tree[1, ] <- first_split
-      if (cand_select[["numeric"]] == "ithess") {
-        add_par <- list(histograms_per_leave[[1]]$hess, spp_cand)
-      }
-    } else {
-      # TODO: Fix rownames for copying rows into df
-      split_scores_left[amt_splits, ] <- best_split[1, ]
-      split_scores_right[amt_splits, ] <- best_split[2, ]
-
-      max_l_index <- which.max(split_scores_left$sp_sc)
-      max_r_index <- which.max(split_scores_right$sp_sc)
-
-      max_l <- split_scores_left$sp_sc[[max_l_index]]
-      max_r <- split_scores_right$sp_sc[[max_r_index]]
-
-      if (max_l > 0 || max_r > 0) {
-        if (max_l > max_r) {
-          next_split <- split_scores_left[max_l_index, ]
-          current_tree[amt_splits + 1, ] <- list(next_split$feature[[1]],
-                                                 next_split$split_val[[1]],
-                                                 next_split$cont_NA[[1]], TRUE,
-                                                 next_split$weight_l[[1]], TRUE,
-                                                 next_split$weight_r[[1]],
-                                                 max_l_index, TRUE)
-          current_tree$w_s_left[[max_l_index]] <- FALSE
-          current_tree$w_s_left_value[[max_l_index]] <- amt_splits + 1
-          split_scores_left$sp_sc[[max_l_index]] <- 0
-        } else {
-          next_split <- split_scores_right[max_r_index, ]
-          current_tree[amt_splits + 1, ] <- list(next_split$feature[[1]],
-                                                 next_split$split_val[[1]],
-                                                 next_split$cont_NA[[1]], TRUE,
-                                                 next_split$weight_l[[1]], TRUE,
-                                                 next_split$weight_r[[1]],
-                                                 max_r_index, FALSE)
-          current_tree$w_s_right[[max_r_index]] <- FALSE
-          current_tree$w_s_right_value[[max_r_index]] <- amt_splits + 1
-          split_scores_right$sp_sc[[max_r_index]] <- 0
+    
+    if (split_method == "histograms") {
+      histograms_per_leave <- ds.split_bins(data_name, current_tree, spp_cand,
+                                            bounds_and_levels, data_classes,
+                                            datasources)
+      
+      # We search for the best possible split(s) in the newly added branch.
+      best_split <- ds.select_split(histograms_per_leave, spp_cand, data_classes,
+                                    reg_par)
+      
+      amt_splits <- nrow(current_tree)
+      
+      if (amt_splits == 0) {
+        first_split <- list(best_split$feature[[1]], best_split$split_val[[1]],
+                            best_split$cont_NA[[1]], TRUE, best_split$weight_l[[1]],
+                            TRUE, best_split$weight_r[[1]], 0, TRUE)
+        current_tree[1, ] <- first_split
+        if (cand_select[["numeric"]] == "ithess") {
+          add_par <- list(histograms_per_leave[[1]]$hess, spp_cand)
         }
       } else {
-        break
+        # TODO: Fix rownames for copying rows into df
+        split_scores_left[amt_splits, ] <- best_split[1, ]
+        split_scores_right[amt_splits, ] <- best_split[2, ]
+        
+        max_l_index <- which.max(split_scores_left$sp_sc)
+        max_r_index <- which.max(split_scores_right$sp_sc)
+        
+        max_l <- split_scores_left$sp_sc[[max_l_index]]
+        max_r <- split_scores_right$sp_sc[[max_r_index]]
+        
+        if (max_l > 0 || max_r > 0) {
+          if (max_l > max_r) {
+            next_split <- split_scores_left[max_l_index, ]
+            current_tree[amt_splits + 1, ] <- list(next_split$feature[[1]],
+                                                   next_split$split_val[[1]],
+                                                   next_split$cont_NA[[1]], TRUE,
+                                                   next_split$weight_l[[1]], TRUE,
+                                                   next_split$weight_r[[1]],
+                                                   max_l_index, TRUE)
+            current_tree$w_s_left[[max_l_index]] <- FALSE
+            current_tree$w_s_left_value[[max_l_index]] <- amt_splits + 1
+            split_scores_left$sp_sc[[max_l_index]] <- 0
+          } else {
+            next_split <- split_scores_right[max_r_index, ]
+            current_tree[amt_splits + 1, ] <- list(next_split$feature[[1]],
+                                                   next_split$split_val[[1]],
+                                                   next_split$cont_NA[[1]], TRUE,
+                                                   next_split$weight_l[[1]], TRUE,
+                                                   next_split$weight_r[[1]],
+                                                   max_r_index, FALSE)
+            current_tree$w_s_right[[max_r_index]] <- FALSE
+            current_tree$w_s_right_value[[max_r_index]] <- amt_splits + 1
+            split_scores_right$sp_sc[[max_r_index]] <- 0
+          }
+        } else {
+          break
+        }
       }
+    } else if (split_method == "partially_random") {
+      # choose split point per feature
+      # calculate split score + weight for each split-point in all leaves
+      # save best one for each leaf and continue with the best split over all available ones.
+    } else if (split_method == "totally_random") {
+      
+      # choose one feature and split point
+      feature <- sample(names(spp_cand), 1)
+      split_val <- sample(spp_cand[[feature]], 1)
+      if (data_classes[[feature]] == "numeric") {
+        cont_NA <- sample(1:2, 1)
+      } else {
+        cont_Na <- 0
+      }
+      
+      if (weight_update == "average") {
+        
+      } else if (weight_update == "Hessian") {
+        
+      }
+      
+      amt_splits <- nrow(current_tree)
+      if (amt_splits == 0) {
+        first_split <- list(feature, split_val, cont_Na, TRUE, best_split$weight_l[[1]],
+                            TRUE, best_split$weight_r[[1]], 0, TRUE)
+        current_tree[1, ] <- first_split
+        if (cand_select[["numeric"]] == "ithess") {
+          add_par <- list(histograms_per_leave[[1]]$hess, spp_cand)
+        }
+      }
+      
+      if (weight_update == "Hessian" && amt_splits != 0) {
+        feature <- sample(names(spp_cand), 2)
+        split_point <- c(sample(spp_cand[[feature[[1]]]], 1),
+                         sample(spp_cand[[feature[[2]]]], 1))
+      } else {
+        feature <- sample(names(spp_cand), 1)
+        split_point <- sample(spp_cand[[feature]], 1)
+      }
+      # if we update the weight with Newton we can calculate the split score and choose the better one
+      # otherwise we choose the leaf random as well -> maybe just use 2^3 tree
+      # finally calculate the weight update
     }
+    
   }
 
   return(list(current_tree, add_par))
