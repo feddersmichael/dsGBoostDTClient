@@ -158,38 +158,38 @@ ds.train_tree <- function(data_name, last_tr_tree, bounds_and_levels,
       if (data_classes[[feature]] == "numeric") {
         cont_NA <- sample(1:2, 1)
       } else {
-        cont_Na <- 0
+        cont_NA <- 0
       }
       
-      if (weight_update == "average") {
-        
-      } else if (weight_update == "Hessian") {
-        
-      }
-      
-      amt_splits <- nrow(current_tree)
-      if (amt_splits == 0) {
-        first_split <- list(feature, split_val, cont_Na, TRUE, best_split$weight_l[[1]],
-                            TRUE, best_split$weight_r[[1]], 0, TRUE)
+      # TODO: weights
+      if (nrow(current_tree) == 0) {
+        first_split <- list(feature, split_val, cont_NA, TRUE, 0, TRUE, 0, 0,
+                            TRUE)
         current_tree[1, ] <- first_split
-        if (cand_select[["numeric"]] == "ithess") {
-          add_par <- list(histograms_per_leave[[1]]$hess, spp_cand)
+      } else {
+        for (j in 1:2^(i - 1)) {
+          
+          parent_index <- 2^(i -2) + ceiling(j / 2)
+          if (j %% 2 == 1) {
+            parent_dir <- TRUE
+            current_tree$w_s_left[[parent_index]] <- FALSE
+            current_tree$w_s_left_value[[parent_index]] <- 2^(i - 1) + j - 1
+          } else {
+            parent_dir <- FALSE
+            current_tree$w_s_right[[parent_index]] <- FALSE
+            current_tree$w_s_right_value[[parent_index]] <- 2^(i - 1) + j - 1
+          }
+          new_split <- list(feature, split_val, cont_NA, TRUE, 0, TRUE, 0,
+                            parent_index, parent_dir)
+          current_tree[j, ] <- new_split
         }
       }
-      
-      if (weight_update == "Hessian" && amt_splits != 0) {
-        feature <- sample(names(spp_cand), 2)
-        split_point <- c(sample(spp_cand[[feature[[1]]]], 1),
-                         sample(spp_cand[[feature[[2]]]], 1))
-      } else {
-        feature <- sample(names(spp_cand), 1)
-        split_point <- sample(spp_cand[[feature]], 1)
-      }
-      # if we update the weight with Newton we can calculate the split score and choose the better one
-      # otherwise we choose the leaf random as well -> maybe just use 2^3 tree
-      # finally calculate the weight update
     }
     
+  }
+  
+  if (split_method == "totally_random") {
+    weights <- ds.update_weight(weight_update, max_splits)
   }
 
   return(list(current_tree, add_par))
