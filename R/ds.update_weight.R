@@ -1,5 +1,5 @@
 
-ds.update_weight <- function(data_name, current_tree, max_splits, weight_update,
+ds.update_weight <- function(data_name, current_tree, max_splits, reg_par, weight_update,
                              datasources) {
   
   # We first check all the inputs for appropriate class and set defaults if
@@ -13,5 +13,38 @@ ds.update_weight <- function(data_name, current_tree, max_splits, weight_update,
   }
   
   cally <- call("update_weightDS", data_name, current_tree, max_splits, weight_update)
-  weights <- DSI::datashield.aggregate(datasources, cally)
+  weight_list <- DSI::datashield.aggregate(datasources, cally)
+  
+  amt_weights <- 2^max_splits
+  tree_weights <- numeric()
+  if (weight_update == "average") {
+    reduce_average <- function(S_1, S_2) {
+      for (i in 1:amt_weights) {
+        S_1[[i]][["output_sum"]] <- S_1[[i]][["output_sum"]] + S_2[[i]][["output_sum"]]
+        S_1[[i]][["amt_data"]] <- S_1[[i]][["amt_data"]] + S_2[[i]][["amt_data"]]
+      }
+      
+      return(S_1)
+    }
+    
+    tree_weights <- Reduce(reduce_average, weight_list)
+    tree_weights <- lapply(tree_weights, function(weight)
+      {return(tree_weights[["output_sum"]] / tree_weights[["amt_data"]])})
+  } else if (weight_update == "hessian") {
+    reduce_hessian <- function(S_1, S_2) {
+      for (i in 1:amt_weights) {
+        S_1[[i]][["gradient"]] <- S_1[[i]][["gradient"]] + S_2[[i]][["gradient"]]
+        S_1[[i]][["hessian"]] <- S_1[[i]][["hessian"]] + S_2[[i]][["hessian"]]
+      }
+      
+      return(S_1)
+    }
+    
+    tree_weights <- Reduce(reduce_hessian, weight_list)
+    tree_weights <- lapply(tree_weights, function(weight)
+      {return(weight[["gradient"]] / (weight[["hessian"]] + reg_par[[1]]))})
+    
+  }
+  
+  return(tree_weights)
 }
