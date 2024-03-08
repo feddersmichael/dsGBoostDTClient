@@ -16,6 +16,7 @@
 #' @param reg_par Regularisation parameter which prevent overfitting.
 #' @param max_splits The maximum amount of splits in the trained tree.
 #' @param add_par Additional parameters for the iterative hessian mode.
+#' @param amt_trees How many trees have been built already.
 #' @param datasources DATASHIELD server connection.
 #'
 #' @return The trained tree.
@@ -24,7 +25,7 @@ ds.train_tree <- function(data_name, split_method, weight_update, last_tr_tree,
                           bounds_and_levels, data_classes, output_var,
                           loss_function, amt_spp, cand_select,
                           reg_par = c(5, 5), max_splits = 5, add_par = NULL,
-                          datasources = NULL) {
+                          amt_trees, datasources = NULL) {
 
   # We first check all the inputs for appropriate class and set defaults if
   # no input is given.
@@ -42,10 +43,8 @@ ds.train_tree <- function(data_name, split_method, weight_update, last_tr_tree,
 
   # We first update the histogram values, which are based on the previously
   # trained trees.
-  if (weight_update == "hessian"){
-    ds.calc_hist(data_name, last_tr_tree, data_classes, output_var, loss_function,
-                 datasources)
-  }
+  ds.calc_hist(data_name, weight_update, last_tr_tree, data_classes, output_var,
+               loss_function, datasources)
   
   if (is.null(last_tr_tree) && cand_select[["numeric"]] == "ithess") {
     spp_cand <- ds.gen_spp_cand(bounds_and_levels, data_classes, amt_spp,
@@ -168,8 +167,7 @@ ds.train_tree <- function(data_name, split_method, weight_update, last_tr_tree,
       }
       
       if (i == 1) {
-        new_split <- list(feature, split_val, cont_NA, TRUE, 0, TRUE, 0, 0,
-                            TRUE)
+        new_split <- list(feature, split_val, cont_NA, TRUE, 0, TRUE, 0, 0, TRUE)
         current_tree[1, ] <- new_split
       } else {
         for (j in (2^(i - 1)):(2^i - 1)) {
@@ -194,7 +192,10 @@ ds.train_tree <- function(data_name, split_method, weight_update, last_tr_tree,
   }
   
   if (split_method == "totally_random") {
-    leaf_weights <- ds.update_weight(weight_update, max_splits)
+    leaf_weights <- ds.update_weight(data_name, current_tree, bounds_and_levels,
+                                     max_splits, data_classes, reg_par,
+                                     weight_update, loss_function, output_var,
+                                     datasources)
     
     for (j in (2^(i - 1)):(2^i - 1)) {
       current_tree$w_s_left_value[[j]] <- leaf_weights[[2^i + 2 * j - 1]]

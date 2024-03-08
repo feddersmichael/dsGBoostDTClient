@@ -6,6 +6,8 @@
 \usage{
 ds.train_boosted_tree(
   data_name,
+  split_method,
+  weight_update,
   bounds_and_levels,
   output_var,
   loss_function,
@@ -24,6 +26,10 @@ ds.train_boosted_tree(
 }
 \arguments{
 \item{data_name}{The name under which the data is saved on the server.}
+
+\item{split_method}{Through which method we choose the tree-splits.}
+
+\item{weight_update}{Through which method we choose the weights for our tree.}
 
 \item{bounds_and_levels}{Bounds for numeric columns and levels for factors.}
 
