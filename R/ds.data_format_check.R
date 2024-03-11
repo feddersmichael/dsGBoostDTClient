@@ -41,10 +41,10 @@ ds.data_format_check <- function(data_name, bounds_and_levels, output_var,
   
   # We can now remove the output variable from the data_classes and the boundary.
   # list
-  available_columns <- names(data_classes)
+  available_columns <- names(data_classes[[1]])
   var_no <- which(output_var == available_columns)[1]
-  data_classes <- data_classes[-var_no]
+  data_classes <- data_classes[[1]][-var_no]
   bounds_and_levels <- bounds_and_levels[-var_no]
 
-  return(list(data_classes[[1]], bounds_and_levels))
+  return(list(data_classes, bounds_and_levels))
 }

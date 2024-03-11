@@ -11,7 +11,7 @@
 ds.calc_spsc <- function(split_sums, spp_cand, reg_par, cont_NA) {
 
   lambda <- reg_par[[1]]
-  gamma <- reg_par[[2]]
+  gamma_reg <- reg_par[[2]]
 
   # Now we can calculate the split score for all possibilities.
   # From all split scores we can then choose the best split.
@@ -89,7 +89,7 @@ ds.calc_spsc <- function(split_sums, spp_cand, reg_par, cont_NA) {
     split_cont_NA <- 0
     split_feature <- ""
     split_pt <- 0
-    spsc <- prev_sc
+    spsc <- prev_sc + 2 * gamma_reg
     weight_l <- 0
     weight_r <- 0
 
@@ -137,7 +137,7 @@ ds.calc_spsc <- function(split_sums, spp_cand, reg_par, cont_NA) {
       }
     }
 
-    spsc <- (spsc - prev_sc) / 2 - gamma
+    spsc <- (spsc - prev_sc) / 2 - gamma_reg
     best_split <- list(spsc, split_feature, split_pt, split_cont_NA, weight_l,
                        weight_r)
     opt_sp_per_leaf[i, ] <- best_split
