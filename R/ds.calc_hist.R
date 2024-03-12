@@ -45,5 +45,4 @@ ds.calc_hist <- function(data_name, last_tr_tree, data_classes, output_var,
     DSI::datashield.assign.expr(datasources,
                                 paste0(data_name, "_training"), cally)
   }
-
 }
