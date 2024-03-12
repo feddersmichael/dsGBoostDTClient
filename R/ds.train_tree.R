@@ -44,7 +44,7 @@ ds.train_tree <- function(data_name, split_method, weight_update, last_tr_tree,
   # We first update the histogram values, which are based on the previously
   # trained trees.
   ds.calc_hist(data_name, weight_update, last_tr_tree, data_classes, output_var,
-               loss_function, datasources)
+               loss_function, amt_trees, datasources)
   
   if (is.null(last_tr_tree) && cand_select[["numeric"]] == "ithess") {
     spp_cand <- ds.gen_spp_cand(bounds_and_levels, data_classes, amt_spp,
