@@ -20,7 +20,11 @@ ds.select_split <- function(leaves, spp_cand, data_classes, reg_par) {
   for (i in seq_along(leaves)) {
     cont_NA[[i]] <- leaves[[i]]$cont_NA
   }
-
+  
+  if (length(leaves) == 1) {
+    reg_par[["first_leaf"]] <- TRUE
+  }
+  
   best_split <- ds.calc_spsc(split_sums, spp_cand, reg_par, cont_NA)
 
   # Finally we return our choice.

@@ -22,8 +22,10 @@ ds.calc_spsc <- function(split_sums, spp_cand, reg_par, cont_NA) {
   for (i in seq_along(split_sums)) {
 
     sums <- split_sums[[i]]
-
-    if ((sums[["compl"]][["hess"]] + lambda) == 0) {
+    
+    if (!is.null(reg_par[["first_leaf"]])) {
+      prev_sc <- 0
+    } else if ((sums[["compl"]][["hess"]] + lambda) == 0) {
       opt_sp_per_leaf[i, ] <- list(0, "", 0, 0, 0, 0)
       next
     } else {
