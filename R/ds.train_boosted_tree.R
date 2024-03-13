@@ -16,6 +16,8 @@
 #' @param drop_columns Vector of data columns which shall be removed.
 #' @param drop_NA If NA data in the output variable should be removed.
 #' @param reg_par Regularisation parameter which prevent overfitting.
+#' @param ithess_stop Maximum amount of times we update the split-point
+#' candidates if the split-method is "totally_random"
 #' @param shrinkage How high the newly trained tree effects the boosted tree.
 #' @param max_treecount Maximum amount of trees to build our boosted decision
 #' tree.
@@ -29,9 +31,10 @@ ds.train_boosted_tree <- function(data_name, split_method, weight_update,
                                   bounds_and_levels, output_var, loss_function,
                                   train_test_ratio, amt_spp, cand_select,
                                   drop_columns = NULL, drop_NA = TRUE,
-                                  reg_par = c(5, 5), shrinkage = 0.1,
-                                  max_treecount = 10, max_splits = 5,
-                                  seed = NULL, datasources = NULL) {
+                                  reg_par = c(5, 5), ithess_stop = NULL,
+                                  shrinkage = 0.1, max_treecount = 10,
+                                  max_splits = 5, seed = NULL,
+                                  datasources = NULL) {
 
   # We first check all the inputs for appropriate class and set defaults if
   # no input is given.
@@ -135,7 +138,7 @@ ds.train_boosted_tree <- function(data_name, split_method, weight_update,
                                  last_tr_tree, bounds_and_levels, data_classes,
                                  output_var, loss_function, amt_spp,
                                  cand_select, reg_par, max_splits, add_par,
-                                 (i - 1), datasources)
+                                 (i - 1), ithess_stop, datasources)
 
     tree_list[[i]] <- ds.add_shrinkage(tree_return[[1]], shrinkage)
     add_par <- tree_return[[2]]

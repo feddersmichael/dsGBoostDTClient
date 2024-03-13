@@ -19,6 +19,7 @@ ds.train_tree(
   max_splits = 5,
   add_par = NULL,
   amt_trees,
+  ithess_stop,
   datasources = NULL
 )
 }
@@ -52,6 +53,9 @@ tree.}
 \item{add_par}{Additional parameters for the iterative hessian mode.}
 
 \item{amt_trees}{How many trees have been built already.}
+
+\item{ithess_stop}{Maximum amount of times we update the split-point
+candidates if the split-method is "totally_random"}
 
 \item{datasources}{DATASHIELD server connection.}
 }

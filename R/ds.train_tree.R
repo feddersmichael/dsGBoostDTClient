@@ -17,6 +17,8 @@
 #' @param max_splits The maximum amount of splits in the trained tree.
 #' @param add_par Additional parameters for the iterative hessian mode.
 #' @param amt_trees How many trees have been built already.
+#' @param ithess_stop Maximum amount of times we update the split-point
+#' candidates if the split-method is "totally_random"
 #' @param datasources DATASHIELD server connection.
 #'
 #' @return The trained tree.
@@ -25,7 +27,7 @@ ds.train_tree <- function(data_name, split_method, weight_update, last_tr_tree,
                           bounds_and_levels, data_classes, output_var,
                           loss_function, amt_spp, cand_select,
                           reg_par = c(5, 5), max_splits = 5, add_par = NULL,
-                          amt_trees, datasources = NULL) {
+                          amt_trees, ithess_stop, datasources = NULL) {
 
   # We first check all the inputs for appropriate class and set defaults if
   # no input is given.
@@ -47,16 +49,35 @@ ds.train_tree <- function(data_name, split_method, weight_update, last_tr_tree,
                loss_function, amt_trees, datasources)
   
   if (cand_select[["numeric"]] == "ithess") {
-    if (amt_trees == 0 && split_method == "histograms") {
-      cand_select[["numeric"]] <- "uniform"
-    } else if (split_method == "totally_random") {
-      add_par[["datasources"]] <- datasources
+    if (amt_trees == 0) {
+      spp_cand <- ds.gen_spp_cand(data_name, bounds_and_levels, data_classes,
+                                  amt_spp, list(numeric = "uniform",
+                                                factor = cand_select[["factor"]]),
+                                  add_par)
+      add_par[["spp_cand"]] <- spp_cand
+      if (split_method == "totally_random") {
+        add_par[["datasources"]] <- datasources
+      }
+    } else if (split_method == "totally_random" && amt_trees > ithess_stop) {
+      spp_cand <- add_par[["spp_cand"]]
+    } else {
+      spp_cand <- ds.gen_spp_cand(data_name, bounds_and_levels, data_classes,
+                                  amt_spp, cand_select, add_par)
+      add_par[["spp_cand"]] <- spp_cand
     }
+  } else if (cand_select[["numeric"]] %in% c("uniform", "loguniform")){
+    if (amt_trees == 0) {
+      spp_cand <- ds.gen_spp_cand(data_name, bounds_and_levels, data_classes,
+                                  amt_spp, cand_select, add_par)
+      add_par[["spp_cand"]] <- spp_cand
+    } else {
+      spp_cand <- add_par[["spp_cand"]]
+    }
+  } else {
+    spp_cand <- ds.gen_spp_cand(data_name, bounds_and_levels, data_classes,
+                                amt_spp, cand_select, add_par)
   }
   
-  spp_cand <- ds.gen_spp_cand(bounds_and_levels, data_classes, amt_spp,
-                              cand_select, add_par)
-
   # We save our tree in a (amount of splits)x8 data frame. Each row represents
   # one split point.
 
@@ -112,8 +133,7 @@ ds.train_tree <- function(data_name, split_method, weight_update, last_tr_tree,
                             TRUE, best_split$weight_r[[1]], 0, TRUE)
         current_tree[1, ] <- next_split
         if (cand_select[["numeric"]] == "ithess") {
-          add_par <- list(hessians == histograms_per_leave[[1]]$hess,
-                          spp_cand == spp_cand)
+          add_par[["hessians"]] <- histograms_per_leave[[1]]$hess
         }
       } else {
         # TODO: Fix rownames for copying rows into df

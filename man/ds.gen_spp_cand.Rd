@@ -5,6 +5,7 @@
 \title{Generate Splitting point candidates}
 \usage{
 ds.gen_spp_cand(
+  data_name,
   bounds_and_levels,
   data_classes,
   amt_spp,
@@ -13,6 +14,8 @@ ds.gen_spp_cand(
 )
 }
 \arguments{
+\item{data_name}{The name under which the data is saved on the server.}
+
 \item{bounds_and_levels}{Bounds for numeric variables and level sets for
 factor variables.}
 
