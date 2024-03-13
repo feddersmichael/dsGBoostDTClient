@@ -28,6 +28,7 @@ ds.gen_spp_cand <- function(bounds_and_levels, data_classes, amt_spp,
   }
   
   datasources <- add_par[["datasources"]]
+
   if (!is.null(datasources)) {
     
   }
