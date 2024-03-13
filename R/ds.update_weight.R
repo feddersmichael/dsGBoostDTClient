@@ -29,30 +29,32 @@ ds.update_weight <- function(data_name, current_tree, bounds_and_levels,
                                                   function(d) {methods::is(d, "DSConnection")}))))) {
     stop("The 'datasources' were expected to be a list of DSConnection-class objects", call. = FALSE)
   }
-  
   cally <- call("update_weightDS", data_name, current_tree, bounds_and_levels,
                 max_splits, data_classes, weight_update, loss_function,
                 output_var)
   weight_list <- DSI::datashield.aggregate(datasources, cally)
-  
   amt_weights <- 2^max_splits
   tree_weights <- numeric()
   if (weight_update == "average") {
-    
     reduce_average <- function(S_1, S_2) {
       for (i in 1:amt_weights) {
         S_1[[i]][["output_sum"]] <- S_1[[i]][["output_sum"]] + S_2[[i]][["output_sum"]]
         S_1[[i]][["amt_data"]] <- S_1[[i]][["amt_data"]] + S_2[[i]][["amt_data"]]
       }
-      
       return(S_1)
     }
-    
     tree_weights <- Reduce(reduce_average, weight_list)
-    tree_weights <- lapply(tree_weights, function(weight)
-      {return(tree_weights[["output_sum"]] / tree_weights[["amt_data"]])})
-  } else if (weight_update == "hessian") {
     
+    calculate_weight <- function(weight) {
+      if (tree_weights[["amt_data"]] == 0) {
+        return(0)
+      } else {
+        return(tree_weights[["output_sum"]] / tree_weights[["amt_data"]])
+      }
+    }
+    
+    tree_weights <- lapply(tree_weights, calculate_weight)
+  } else if (weight_update == "hessian") {
     reduce_hessian <- function(S_1, S_2) {
       for (i in 1:amt_weights) {
         S_1[[i]][["gradient"]] <- S_1[[i]][["gradient"]] + S_2[[i]][["gradient"]]
@@ -61,10 +63,17 @@ ds.update_weight <- function(data_name, current_tree, bounds_and_levels,
       
       return(S_1)
     }
-    
     tree_weights <- Reduce(reduce_hessian, weight_list)
-    tree_weights <- lapply(tree_weights, function(weight)
-      {return(weight[["gradient"]] / (weight[["hessian"]] + reg_par[[1]]))})
+    
+    calculate_weight <- function(weight) {
+      if (weight[["hessian"]] + reg_par[[1]] == 0) {
+        return(0)
+      } else {
+        return(-weight[["gradient"]] / (weight[["hessian"]] + reg_par[[1]]))
+      }
+    }
+    
+    tree_weights <- lapply(tree_weights, calculate_weight)
   }
   
   return(tree_weights)

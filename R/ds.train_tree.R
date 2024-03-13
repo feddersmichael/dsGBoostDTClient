@@ -172,7 +172,7 @@ ds.train_tree <- function(data_name, split_method, weight_update, last_tr_tree,
       } else {
         for (j in (2^(i - 1)):(2^i - 1)) {
           
-          parent_index <- 2^(i -2) + ceiling(j / 2)
+          parent_index <- floor(j / 2)
           if (j %% 2 == 0) {
             parent_dir <- TRUE
             current_tree$w_s_left[[parent_index]] <- FALSE
@@ -188,7 +188,6 @@ ds.train_tree <- function(data_name, split_method, weight_update, last_tr_tree,
         }
       }
     }
-    
   }
   
   if (split_method == "totally_random") {
@@ -197,9 +196,10 @@ ds.train_tree <- function(data_name, split_method, weight_update, last_tr_tree,
                                      weight_update, loss_function, output_var,
                                      datasources)
     
-    for (j in (2^(i - 1)):(2^i - 1)) {
-      current_tree$w_s_left_value[[j]] <- leaf_weights[[2^i + 2 * j - 1]]
-      current_tree$w_s_right_value[[j]] <- leaf_weights[[2^i + 2 * j - 2]]
+    for (j in 1:(2^(i - 1))) {
+      tree_row <- 2^(i - 1) - 1 + j
+      current_tree$w_s_left_value[[tree_row]] <- leaf_weights[[2 * j - 1]]
+      current_tree$w_s_right_value[[tree_row]] <- leaf_weights[[2 * j]]
     }
   }
 
