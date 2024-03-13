@@ -26,6 +26,9 @@ ds.gen_spp_cand <- function(bounds_and_levels, data_classes, amt_spp,
   if (!cand_select[["factor"]] %in% supported_modes[["factor"]]) {
     stop(paste0("The mode '", cand_select[["factor"]], "' is currently not supported to create split points for factor features."))
   }
+  
+  datasources <- add_par[["datasources"]]
+  if (!is.null(datasources))
 
   spp_cand <- list()
   for (feature in names(data_classes)) {
