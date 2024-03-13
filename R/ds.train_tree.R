@@ -46,14 +46,16 @@ ds.train_tree <- function(data_name, split_method, weight_update, last_tr_tree,
   ds.calc_hist(data_name, weight_update, last_tr_tree, data_classes, output_var,
                loss_function, amt_trees, datasources)
   
-  if (is.null(last_tr_tree) && cand_select[["numeric"]] == "ithess") {
-    spp_cand <- ds.gen_spp_cand(bounds_and_levels, data_classes, amt_spp,
-                                list(numeric = "uniform", factor = cand_select[["factor"]]),
-                                add_par)
-  } else {
-    spp_cand <- ds.gen_spp_cand(bounds_and_levels, data_classes, amt_spp,
-                                cand_select, add_par)
+  if (cand_select[["numeric"]] == "ithess") {
+    if (amt_trees == 0 && split_method == "histograms") {
+      cand_select[["numeric"]] <- "uniform"
+    } else if (split_method == "totally_random") {
+      add_par[["datasources"]] <- datasources
+    }
   }
+  
+  spp_cand <- ds.gen_spp_cand(bounds_and_levels, data_classes, amt_spp,
+                              cand_select, add_par)
 
   # We save our tree in a (amount of splits)x8 data frame. Each row represents
   # one split point.
@@ -110,7 +112,8 @@ ds.train_tree <- function(data_name, split_method, weight_update, last_tr_tree,
                             TRUE, best_split$weight_r[[1]], 0, TRUE)
         current_tree[1, ] <- next_split
         if (cand_select[["numeric"]] == "ithess") {
-          add_par <- list(histograms_per_leave[[1]]$hess, spp_cand)
+          add_par <- list(hessians == histograms_per_leave[[1]]$hess,
+                          spp_cand == spp_cand)
         }
       } else {
         # TODO: Fix rownames for copying rows into df
