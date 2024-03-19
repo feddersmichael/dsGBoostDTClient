@@ -33,7 +33,7 @@ ds.update_weight <- function(data_name, current_tree, bounds_and_levels,
                 max_splits, data_classes, weight_update, loss_function,
                 output_var)
   weight_list <- DSI::datashield.aggregate(datasources, cally)
-  amt_weights <- 2^max_splits
+  amt_weights <- length(weight_list[[1]])
   tree_weights <- numeric()
   if (weight_update == "average") {
     reduce_average <- function(S_1, S_2) {
@@ -46,10 +46,10 @@ ds.update_weight <- function(data_name, current_tree, bounds_and_levels,
     tree_weights <- Reduce(reduce_average, weight_list)
     
     calculate_weight <- function(weight) {
-      if (tree_weights[["amt_data"]] == 0) {
+      if (weight[["amt_data"]] == 0) {
         return(0)
       } else {
-        return(tree_weights[["output_sum"]] / tree_weights[["amt_data"]])
+        return(weight[["output_sum"]] / weight[["amt_data"]])
       }
     }
     

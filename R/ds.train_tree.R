@@ -181,6 +181,9 @@ ds.train_tree <- function(data_name, split_method, weight_update, last_tr_tree,
     } else if (split_method == "totally_random") {
       
       # choose one feature and split point
+      
+      # spp_cand <- spp_cand[setdiff(names(spp_cand), categorical)]
+      
       feature <- sample(names(spp_cand), 1)
       split_val <- sample(spp_cand[[feature]], 1)
       if (data_classes[[feature]] == "numeric") {

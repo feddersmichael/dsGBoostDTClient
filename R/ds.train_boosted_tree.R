@@ -139,8 +139,13 @@ ds.train_boosted_tree <- function(data_name, split_method, weight_update,
                                  output_var, loss_function, amt_spp,
                                  cand_select, reg_par, max_splits, add_par,
                                  (i - 1), ithess_stop, datasources)
-
-    tree_list[[i]] <- ds.add_shrinkage(tree_return[[1]], shrinkage)
+    
+    if (weight_update == "hessian") {
+      tree_list[[i]] <- ds.add_shrinkage(tree_return[[1]], shrinkage)
+    } else if (weight_update == "average") {
+      tree_list[[i]] <- tree_return[[1]]
+    }
+    
     add_par <- tree_return[[2]]
   }
 
