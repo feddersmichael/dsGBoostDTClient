@@ -6,15 +6,19 @@
 \usage{
 ds.calc_hist(
   data_name,
+  weight_update,
   last_tr_tree,
   data_classes,
   output_var,
   loss_function,
+  amt_trees,
   datasources = NULL
 )
 }
 \arguments{
 \item{data_name}{The name under which the data is saved on the server.}
+
+\item{weight_update}{Through which method we choose the weights for our tree.}
 
 \item{last_tr_tree}{The last tree which was trained under the boosting step.}
 
@@ -24,6 +28,8 @@ ds.calc_hist(
 
 \item{loss_function}{The loss function under which we optimize our boosted
 tree building process.}
+
+\item{amt_trees}{How many trees have been built already.}
 
 \item{datasources}{DATASHIELD server connection.}
 }

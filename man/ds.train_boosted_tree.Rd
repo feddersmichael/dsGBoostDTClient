@@ -6,6 +6,8 @@
 \usage{
 ds.train_boosted_tree(
   data_name,
+  split_method,
+  weight_update,
   bounds_and_levels,
   output_var,
   loss_function,
@@ -15,6 +17,7 @@ ds.train_boosted_tree(
   drop_columns = NULL,
   drop_NA = TRUE,
   reg_par = c(5, 5),
+  ithess_stop = NULL,
   shrinkage = 0.1,
   max_treecount = 10,
   max_splits = 5,
@@ -24,6 +27,10 @@ ds.train_boosted_tree(
 }
 \arguments{
 \item{data_name}{The name under which the data is saved on the server.}
+
+\item{split_method}{Through which method we choose the tree-splits.}
+
+\item{weight_update}{Through which method we choose the weights for our tree.}
 
 \item{bounds_and_levels}{Bounds for numeric columns and levels for factors.}
 
@@ -44,6 +51,9 @@ Training.}
 \item{drop_NA}{If NA data in the output variable should be removed.}
 
 \item{reg_par}{Regularisation parameter which prevent overfitting.}
+
+\item{ithess_stop}{Maximum amount of times we update the split-point
+candidates if the split-method is "totally_random"}
 
 \item{shrinkage}{How high the newly trained tree effects the boosted tree.}
 

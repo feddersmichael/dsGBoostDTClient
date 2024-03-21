@@ -3,6 +3,8 @@
 #' Training of a Gradient Boosted Decision Tree
 #'
 #' @param data_name The name under which the data is saved on the server.
+#' @param split_method Through which method we choose the tree-splits.
+#' @param weight_update Through which method we choose the weights for our tree.
 #' @param bounds_and_levels Bounds for numeric columns and levels for factors.
 #' @param output_var The name of the column containing the output variable.
 #' @param loss_function The name of the loss function we want to use for our
@@ -14,6 +16,8 @@
 #' @param drop_columns Vector of data columns which shall be removed.
 #' @param drop_NA If NA data in the output variable should be removed.
 #' @param reg_par Regularisation parameter which prevent overfitting.
+#' @param ithess_stop Maximum amount of times we update the split-point
+#' candidates if the split-method is "totally_random"
 #' @param shrinkage How high the newly trained tree effects the boosted tree.
 #' @param max_treecount Maximum amount of trees to build our boosted decision
 #' tree.
@@ -23,10 +27,11 @@
 #'
 #' @return The trained decision tree model.
 #' @export
-ds.train_boosted_tree <- function(data_name, bounds_and_levels, output_var,
-                                  loss_function, train_test_ratio, amt_spp,
-                                  cand_select, drop_columns = NULL,
-                                  drop_NA = TRUE, reg_par = c(5, 5),
+ds.train_boosted_tree <- function(data_name, split_method, weight_update,
+                                  bounds_and_levels, output_var, loss_function,
+                                  train_test_ratio, amt_spp, cand_select,
+                                  drop_columns = NULL, drop_NA = TRUE,
+                                  reg_par = c(5, 5), ithess_stop = NULL,
                                   shrinkage = 0.1, max_treecount = 10,
                                   max_splits = 5, seed = NULL,
                                   datasources = NULL) {
@@ -129,14 +134,18 @@ ds.train_boosted_tree <- function(data_name, bounds_and_levels, output_var,
     last_tr_tree <- tree_list[[length(tree_list)]]
 
     # We train the next tree.
-    tree_return <- ds.train_tree(data_name, last_tr_tree, bounds_and_levels,
-                          data_classes, output_var, loss_function, amt_spp,
-                          cand_select, reg_par, max_splits, add_par,
-                          datasources)
-
-    tree <- ds.add_shrinkage(tree_return[[1]], shrinkage)
-
-    tree_list[[i]] <- tree
+    tree_return <- ds.train_tree(data_name, split_method, weight_update,
+                                 last_tr_tree, bounds_and_levels, data_classes,
+                                 output_var, loss_function, amt_spp,
+                                 cand_select, reg_par, max_splits, add_par,
+                                 (i - 1), ithess_stop, datasources)
+    
+    if (weight_update == "hessian") {
+      tree_list[[i]] <- ds.add_shrinkage(tree_return[[1]], shrinkage)
+    } else if (weight_update == "average") {
+      tree_list[[i]] <- tree_return[[1]]
+    }
+    
     add_par <- tree_return[[2]]
   }
 

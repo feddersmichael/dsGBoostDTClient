@@ -29,13 +29,14 @@ ds.gen_numeric_spp_cand <- function(bounds, amt_spp, selection_method, add_par) 
     
     hess_hist <- add_par[[1]]
     prev_spp_cand <- add_par[[2]]
-    theta <- sum(hess_hist) / amt_spp
+    # TODO: adapt amt_spp to NA-share?^
+    amt_hist_bins <- length(hess_hist) - 1
+    theta <- sum(hess_hist[-(amt_hist_bins + 1)]) / (amt_spp + 1)
     bounds_and_spp_cand <- c(bounds[[1]], prev_spp_cand, bounds[[2]])
     spp_cand <- c()
     
     low_bnd <- 1
     upp_bnd <- 2
-    amt_hist_bins <- length(hess_hist) - 1
 
     for (i in 1:(amt_hist_bins - 1)) {
       if (hess_hist[[i]] < theta) {
