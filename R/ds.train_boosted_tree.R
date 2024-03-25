@@ -46,6 +46,27 @@ ds.train_boosted_tree <- function(data_name, split_method, weight_update,
     stop("The 'datasources' were expected to be a list of DSConnection-class objects", call. = FALSE)
   }
 
+  if (!is.character(split_method) || length(split_method) != 1) {
+    stop("'split_method' needs to be an atomic 'character' vector.")
+  } else if (!(split_method %in% c("histograms", "partially_random",
+                                   "totally_random"))) {
+    stop("This split-method is not available.")
+  }
+  
+  if (!is.character(weight_update) || length(weight_update) != 1) {
+    stop("'weight_update' needs to be an atomic 'character' vector.")
+  } else {
+    if (split_method == "totally_random") {
+      if (!(weight_update %in% c("hessian", "average"))) {
+        stop("This weight-update is not available.")
+      }
+    } else {
+      if (weight_update != "hessian") {
+        stop("The weight-update has to be 'hessian'")
+      }
+    }
+  }
+  
   if (!is.character(data_name) || length(data_name) != 1) {
     stop("'data_name' needs to be an atomic 'character' vector.")
   }
@@ -56,10 +77,15 @@ ds.train_boosted_tree <- function(data_name, split_method, weight_update,
 
   if (!is.character(output_var) || length(output_var) != 1) {
     stop("'output_var' needs to be an atomic 'character' vector.")
+  } else if (!output_var %in% names(bounds_and_levels)) {
+    stop("'output_var' needs to be an element of 'bounds_and_levels'.")
   }
 
   if (!is.character(loss_function) || length(loss_function) != 1) {
     stop("'loss_function' needs to be an atomic 'character' vector.")
+  } else if (!(loss_function %in% c("quadratic", "binary_cross_entropy",
+                                    "binary_sigmoid"))) {
+    stop("This loss-function is not available.")
   }
 
   if (!is.numeric(train_test_ratio) || length(train_test_ratio) != 1 ||
@@ -74,10 +100,19 @@ ds.train_boosted_tree <- function(data_name, split_method, weight_update,
   if (!is.character(cand_select) || length(cand_select) != 2 ||
         !identical(names(cand_select), c("numeric", "factor"))) {
     stop("'cand_select' needs to be a vector of data type 'character' with length 2 and named elements 'numeric' and 'factor'.")
+  } else if (!cand_select[["numeric"]] %in% c("uniform", "loguniform",
+                                              "uniform_rand", "ithess")) {
+    stop(paste0("The mode '", cand_select[["numeric"]],
+                "' is currently not supported to create split points for numeric features."))
+  } else if (!cand_select[["factor"]] %in% c("exact")) {
+    stop(paste0("The mode '", cand_select[["factor"]],
+                "' is currently not supported to create split points for factor features."))
   }
 
   if (!is.null(drop_columns) && !is.character(drop_columns)) {
     stop("'drop_columns' needs to be a vector of data type 'character'.")
+  } else if (any(drop_columns %in% names(bounds_and_levels))) {
+    stop("The variables for which we specified bounds and levels can't be dropped.")
   }
 
   if (!is.logical(drop_NA) || length(drop_NA) != 1) {
@@ -86,6 +121,10 @@ ds.train_boosted_tree <- function(data_name, split_method, weight_update,
   
   if (!is.numeric(reg_par) || length(reg_par) != 2 || any(reg_par < 0)) {
     stop("'reg_par' needs to be a numeric vector of length 2 with positive entries.")
+  }
+  
+  if (!is.integer(ithess_stop) || length(ithess_stop) != 1 || ithess_stop < 0) {
+    stop("'ithess_stop' needs to be an atomic 'integer'vector greater or equal than 0.")
   }
   
   if (!is.numeric(shrinkage) || length(shrinkage) != 1 ||
@@ -116,6 +155,10 @@ ds.train_boosted_tree <- function(data_name, split_method, weight_update,
   
   data_classes <- data_checks[[1]]
   bounds_and_levels <- data_checks[[2]]
+  
+  if (!identical(names(amt_spp), names(bounds_and_levels))) {
+    stop("The features in 'bounds_and_levels' and 'amt_spp' don't coincide.")
+  }
 
   # Before we start training our model we split up the data set into a training
   # and test part.

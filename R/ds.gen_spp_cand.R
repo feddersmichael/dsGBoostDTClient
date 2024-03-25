@@ -16,18 +16,6 @@
 ds.gen_spp_cand <- function(data_name, bounds_and_levels, data_classes, amt_spp,
                             cand_select, add_par = NULL) {
 
-  supported_modes <- list(numeric = c("uniform", "loguniform", "uniform_rand",
-                                      "ithess"),
-                          factor = c("exact"))
-
-  if (!cand_select[["numeric"]] %in% supported_modes[["numeric"]]) {
-    stop(paste0("The mode '", cand_select[["numeric"]], "' is currently not supported to create split points for numeric features."))
-  }
-
-  if (!cand_select[["factor"]] %in% supported_modes[["factor"]]) {
-    stop(paste0("The mode '", cand_select[["factor"]], "' is currently not supported to create split points for factor features."))
-  }
-  
   if (!is.null(add_par[["datasources"]])) {
     cally <- call("hessiansDS", data_name, bounds_and_levels,
                   add_par[["spp_cand"]], data_classes)
