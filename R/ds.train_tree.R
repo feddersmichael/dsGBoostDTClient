@@ -50,10 +50,9 @@ ds.train_tree <- function(data_name, split_method, weight_update, last_tr_tree,
   
   if (cand_select[["numeric"]] == "ithess") {
     if (amt_trees == 0) {
-      spp_cand <- ds.gen_spp_cand(data_name, bounds_and_levels, data_classes,
-                                  amt_spp, list(numeric = "uniform",
-                                                factor = cand_select[["factor"]]),
-                                  add_par)
+      # TODO: Possibility to combine uniform and ithess in first round
+      spp_cand <- ds.gen_spp_cand(data_name, bounds_and_levels, data_classes, amt_spp,
+                                  list(numeric = "uniform", factor = cand_select[["factor"]]), add_par)
       add_par[["spp_cand"]] <- spp_cand
       if (split_method == "totally_random") {
         add_par[["datasources"]] <- datasources

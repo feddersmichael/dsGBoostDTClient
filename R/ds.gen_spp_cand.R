@@ -37,7 +37,8 @@ ds.gen_spp_cand <- function(data_name, bounds_and_levels, data_classes, amt_spp,
   for (feature in names(data_classes)) {
     if (data_classes[[feature]] == "numeric") {
       if (cand_select[["numeric"]] == "ithess") {
-        add_par <- list(hessians[[feature]], prev_spp_cand[[feature]])
+        add_par <- list(hessians = hessians[[feature]],
+                        prev_spp_cand = prev_spp_cand[[feature]])
       }
       spp_cand[[feature]] <- ds.gen_numeric_spp_cand(bounds_and_levels[[feature]],
                                                      amt_spp[[feature]],

@@ -29,7 +29,7 @@ ds.calc_hist <- function(data_name, weight_update, last_tr_tree, data_classes,
   # We call the server to generate the new histogram values based on the
   # predicted output, updated through the last trained tree
 
-  # If 'last_tr_tree' is NULL we initialise the predicted output with 0's.
+  # If 'last_tr_tree' is NULL we initialise the predicted output.
   if (is.null(last_tr_tree)) {
     cally <- call("calc_hist_initDS", data_name, weight_update, output_var,
                   loss_function)

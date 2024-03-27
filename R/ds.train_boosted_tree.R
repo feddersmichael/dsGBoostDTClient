@@ -103,10 +103,10 @@ ds.train_boosted_tree <- function(data_name, split_method, weight_update,
   } else if (!cand_select[["numeric"]] %in% c("uniform", "loguniform",
                                               "uniform_rand", "ithess")) {
     stop(paste0("The mode '", cand_select[["numeric"]],
-                "' is currently not supported to create split points for numeric features."))
+                "' is not supported to create split points for numeric features."))
   } else if (!cand_select[["factor"]] %in% c("exact")) {
     stop(paste0("The mode '", cand_select[["factor"]],
-                "' is currently not supported to create split points for factor features."))
+                "' is not supported to create split points for factor features."))
   }
 
   if (!is.null(drop_columns) && !is.character(drop_columns)) {
@@ -166,22 +166,27 @@ ds.train_boosted_tree <- function(data_name, split_method, weight_update,
                        datasources)
 
   # We initiate our list of trees with 'NULL' which symbolizes an empty tree
-  tree_list <- list(NULL)
+  tree_list <- list()
 
   # In this loop we train up to 'max_treecount' amount of trees.
   # If the function 'ds.train_tree' returns a break criteria instead of a tree
   # we stop the loop and return the trained boosted tree.
   add_par <- NULL
   for (i in 1:max_treecount) {
-
-    last_tr_tree <- tree_list[[length(tree_list)]]
-
+    
+    amt_trees <- i - 1
+    if (amt_trees == 0) {
+      last_tr_tree <- NULL
+    } else {
+      last_tr_tree <- tree_list[[length(tree_list)]]
+    }
+    
     # We train the next tree.
     tree_return <- ds.train_tree(data_name, split_method, weight_update,
                                  last_tr_tree, bounds_and_levels, data_classes,
                                  output_var, loss_function, amt_spp,
                                  cand_select, reg_par, max_splits, add_par,
-                                 (i - 1), ithess_stop, datasources)
+                                 amt_trees, ithess_stop, datasources)
     
     if (weight_update == "hessian") {
       tree_list[[i]] <- ds.add_shrinkage(tree_return[[1]], shrinkage)

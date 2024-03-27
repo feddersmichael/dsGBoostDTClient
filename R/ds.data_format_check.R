@@ -31,11 +31,19 @@ ds.data_format_check <- function(data_name, bounds_and_levels, output_var,
                 loss_function, drop_columns, drop_NA)
   data_classes <- DSI::datashield.aggregate(datasources, cally)
   
-  # We can now remove the output variable from the data_classes and the boundary.
+  reduce_classes <- function(S_1, S_2) {
+    if (!identical(S_1, S_2)) {
+      warning("The order of data does not coincide between the server.")
+    }
+    return(S_2)
+  }
+  data_classes <- Reduce(reduce_classes, data_classes)
+  
+  # We can now remove the output variable from the data_classes and the boundary
   # list
-  available_columns <- names(data_classes[[1]])
-  var_no <- which(output_var == available_columns)[1]
-  data_classes <- data_classes[[1]][-var_no]
+  available_columns <- names(data_classes)
+  var_no <- which(output_var == available_columns)
+  data_classes <- data_classes[-var_no]
   bounds_and_levels <- bounds_and_levels[-var_no]
 
   return(list(data_classes, bounds_and_levels))
