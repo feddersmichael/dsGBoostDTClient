@@ -24,9 +24,13 @@ ds.split_bins <- function(data_name, current_tree, spp_cand, bounds_and_levels,
                                                   function(d) {methods::is(d, "DSConnection")}))))) {
     stop("The 'datasources' were expected to be a list of DSConnection-class objects", call. = FALSE)
   }
+  
+  cally <- call("saveleafDS", data_name, bounds_and_levels, data_classes,
+                current_tree)
+  DSI::datashield.assign.expr(datasources, paste0(data_name, "_leaves"),cally)
 
   cally <- call("split_binsDS", data_name, bounds_and_levels, spp_cand,
-                current_tree, data_classes)
+                data_classes)
   histogram_per_server <- DSI::datashield.aggregate(datasources, cally)
 
   histograms_per_leaf <- list()
