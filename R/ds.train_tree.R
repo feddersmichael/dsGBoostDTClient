@@ -45,36 +45,36 @@ ds.train_tree <- function(data_name, split_method, weight_update, last_tr_tree,
 
   # We first update the histogram values, which are based on the previously
   # trained trees.
-  ds.calc_hist(data_name, weight_update, last_tr_tree, data_classes, output_var,
-               loss_function, amt_trees, datasources)
+  ds.calc_hist(data_name, weight_update, last_tr_tree, amt_trees, datasources)
   
   if (cand_select[["numeric"]] == "ithess") {
     if (amt_trees == 0) {
       # TODO: Possibility to combine uniform and ithess in first round
       spp_cand <- ds.gen_spp_cand(data_name, bounds_and_levels, data_classes, amt_spp,
-                                  list(numeric = "uniform", factor = cand_select[["factor"]]), add_par)
+                                  list(numeric = "uniform", factor = cand_select[["factor"]]),
+                                  add_par, datasources)
       add_par[["spp_cand"]] <- spp_cand
       if (split_method == "totally_random") {
-        add_par[["datasources"]] <- datasources
+        add_par[["tot_rand"]] <- TRUE
       }
     } else if (split_method == "totally_random" && amt_trees > ithess_stop) {
       spp_cand <- add_par[["spp_cand"]]
     } else {
       spp_cand <- ds.gen_spp_cand(data_name, bounds_and_levels, data_classes,
-                                  amt_spp, cand_select, add_par)
+                                  amt_spp, cand_select, add_par, datasources)
       add_par[["spp_cand"]] <- spp_cand
     }
   } else if (cand_select[["numeric"]] %in% c("uniform", "loguniform")){
     if (amt_trees == 0) {
       spp_cand <- ds.gen_spp_cand(data_name, bounds_and_levels, data_classes,
-                                  amt_spp, cand_select, add_par)
+                                  amt_spp, cand_select, add_par, datasources)
       add_par[["spp_cand"]] <- spp_cand
     } else {
       spp_cand <- add_par[["spp_cand"]]
     }
   } else {
     spp_cand <- ds.gen_spp_cand(data_name, bounds_and_levels, data_classes,
-                                amt_spp, cand_select, add_par)
+                                amt_spp, cand_select, add_par, datasources)
   }
   
   # We save our tree in a (amount of splits)x8 data frame. Each row represents
@@ -110,9 +110,8 @@ ds.train_tree <- function(data_name, split_method, weight_update, last_tr_tree,
   for (i in 1:max_splits) {
     
     if (split_method == "histograms") {
-      histograms_per_leave <- ds.split_bins(data_name, current_tree, spp_cand,
-                                            bounds_and_levels, data_classes,
-                                            datasources)
+      histograms_per_leave <- ds.split_bins(data_name, current_tree,
+                                            data_classes, datasources)
       
       # We search for the best possible split(s) in the newly added branch.
       best_split <- ds.select_split(histograms_per_leave, spp_cand, data_classes,
@@ -179,10 +178,12 @@ ds.train_tree <- function(data_name, split_method, weight_update, last_tr_tree,
         split_val <- c(split_val, sample(spp_cand[[feature]], 1))
       }
       names(split_val) <- names(bounds_and_levels)
+      # TODO: fix workaround
+      save_list <- list(spp_cand = split_val)
+      ds.save_variables(data_name, save_list, datasources)
       # calculate split score + weight for each split-point in all leaves
-      histograms_per_leave <- ds.split_bins(data_name, current_tree, split_val,
-                                            bounds_and_levels, data_classes,
-                                            datasources)
+      histograms_per_leave <- ds.split_bins(data_name, current_tree,
+                                            data_classes, datasources)
       
       # We search for the best possible split(s) in the newly added branch.
       best_split <- ds.select_split(histograms_per_leave, split_val, data_classes,
@@ -283,10 +284,8 @@ ds.train_tree <- function(data_name, split_method, weight_update, last_tr_tree,
   }
   
   if (split_method == "totally_random") {
-    leaf_weights <- ds.update_weight(data_name, current_tree, bounds_and_levels,
-                                     max_splits, data_classes, reg_par,
-                                     weight_update, loss_function, output_var,
-                                     datasources)
+    leaf_weights <- ds.update_weight(data_name, current_tree, max_splits,
+                                     reg_par, weight_update, datasources)
     
     for (j in 1:(2^(i - 1))) {
       tree_row <- 2^(i - 1) - 1 + j

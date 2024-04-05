@@ -18,6 +18,9 @@ ds.data_format_check <- function(data_name, bounds_and_levels, output_var,
                                  drop_NA = TRUE, datasources = NULL) {
   # We want to check in a generic way if the uploaded data fulfills
   # our requirements to be used in this analysis.
+  
+  save_list <- list(drop_columns = drop_columns)
+  ds.save_variables(data_name, save_list, datasources)
 
   if (is.null(datasources)) {
     datasources <- DSI::datashield.connections_find()
@@ -28,7 +31,7 @@ ds.data_format_check <- function(data_name, bounds_and_levels, output_var,
   }
 
   cally <- call("data_format_checkDS", data_name, bounds_and_levels, output_var,
-                loss_function, drop_columns, drop_NA)
+                loss_function, drop_NA)
   data_classes <- DSI::datashield.aggregate(datasources, cally)
   
   reduce_classes <- function(S_1, S_2) {
@@ -45,6 +48,12 @@ ds.data_format_check <- function(data_name, bounds_and_levels, output_var,
   var_no <- which(output_var == available_columns)
   data_classes <- data_classes[-var_no]
   bounds_and_levels <- bounds_and_levels[-var_no]
+  
+  save_list <- list(output_var = output_var,
+                    loss_function = loss_function,
+                    bounds_and_levels = bounds_and_levels,
+                    data_classes = data_classes)
+  ds.save_variables(data_name, save_list, datasources)
 
   return(list(data_classes, bounds_and_levels))
 }

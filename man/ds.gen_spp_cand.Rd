@@ -10,7 +10,8 @@ ds.gen_spp_cand(
   data_classes,
   amt_spp,
   cand_select,
-  add_par = NULL
+  add_par = NULL,
+  datasources = NULL
 )
 }
 \arguments{
@@ -27,6 +28,8 @@ factor variables.}
 numeric and factor data.}
 
 \item{add_par}{Additional parameters for the iterative hessian mode.}
+
+\item{datasources}{DATASHIELD server connection.}
 }
 \value{
 The created splitting points.

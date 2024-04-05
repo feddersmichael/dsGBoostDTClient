@@ -4,17 +4,13 @@
 #' @param data_name The name under which the data is saved on the server.
 #' @param weight_update Through which method we choose the weights for our tree.
 #' @param last_tr_tree The last tree which was trained under the boosting step.
-#' @param data_classes Data class for all features.
-#' @param output_var The name of the column containing the output.
-#' @param loss_function The loss function under which we optimize our boosted
-#' tree building process.
 #' @param amt_trees How many trees have been built already.
 #' @param datasources DATASHIELD server connection.
 #'
 #' @return None.
 #' @export
-ds.calc_hist <- function(data_name, weight_update, last_tr_tree, data_classes,
-                         output_var, loss_function, amt_trees, datasources = NULL) {
+ds.calc_hist <- function(data_name, weight_update, last_tr_tree, amt_trees,
+                         datasources = NULL) {
 
   # We first check all the inputs for appropriate class and set defaults if
   # no input is given.
@@ -31,8 +27,11 @@ ds.calc_hist <- function(data_name, weight_update, last_tr_tree, data_classes,
 
   # If 'last_tr_tree' is NULL we initialise the predicted output.
   if (is.null(last_tr_tree)) {
-    cally <- call("calc_hist_initDS", data_name, weight_update, output_var,
-                  loss_function)
+    
+    save_list <- list(weight_update = weight_update)
+    ds.save_variables(data_name, save_list, datasources)
+    
+    cally <- call("calc_hist_initDS", data_name)
     DSI::datashield.assign.expr(datasources, paste0(data_name, "_training"), cally)
   }
   # if we already trained a tree before we just add up the predicted value from
@@ -42,8 +41,7 @@ ds.calc_hist <- function(data_name, weight_update, last_tr_tree, data_classes,
       stop("'last_tr_tree' needs to be an object of type 'data frame'.")
     }
 
-    cally <- call("calc_histDS", data_name, weight_update, last_tr_tree,
-                  data_classes, output_var, loss_function, amt_trees)
+    cally <- call("calc_histDS", data_name, last_tr_tree, amt_trees)
     DSI::datashield.assign.expr(datasources, paste0(data_name, "_training"), cally)
   }
 }

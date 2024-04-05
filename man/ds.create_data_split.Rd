@@ -4,20 +4,10 @@
 \alias{ds.create_data_split}
 \title{Split the data into 'Test' and 'Training'}
 \usage{
-ds.create_data_split(
-  data_name,
-  output_var,
-  drop_columns,
-  train_test_ratio = 0.8,
-  datasources = NULL
-)
+ds.create_data_split(data_name, train_test_ratio = 0.8, datasources = NULL)
 }
 \arguments{
 \item{data_name}{The name under which the data is saved on the server.}
-
-\item{output_var}{The name of the column which contains the output variable.}
-
-\item{drop_columns}{Which columns should be excluded from the data analysis.}
 
 \item{train_test_ratio}{Percentage of the data which should be used for
 Training.}

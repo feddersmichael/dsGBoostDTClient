@@ -9,21 +9,30 @@
 #' @param cand_select Which splitting-point candidate selection is used for
 #' numeric and factor data.
 #' @param add_par Additional parameters for the iterative hessian mode.
+#' @param datasources DATASHIELD server connection.
 #'
 #' @return The created splitting points.
 #' @export
 
 ds.gen_spp_cand <- function(data_name, bounds_and_levels, data_classes, amt_spp,
-                            cand_select, add_par = NULL) {
-
-  if (!is.null(add_par[["datasources"]])) {
-    cally <- call("hessiansDS", data_name, bounds_and_levels,
-                  add_par[["spp_cand"]], data_classes)
-    hessians_list <- DSI::datashield.aggregate(add_par[["datasources"]], cally)
+                            cand_select, add_par = NULL, datasources = NULL) {
+  
+  if (is.null(datasources)) {
+    datasources <- DSI::datashield.connections_find()
+  }
+  if (!(is.list(datasources) && all(unlist(lapply(datasources,
+                                                  function(d) {methods::is(d, "DSConnection")}))))) {
+    stop("The 'datasources' were expected to be a list of DSConnection-class objects", call. = FALSE)
+  }
+  
+  # TODO: could have unintended behaviour
+  if (!is.null(add_par[["tot_rand"]])) {
+    cally <- call("hessiansDS", data_name, add_par[["spp_cand"]])
+    hessians_list <- DSI::datashield.aggregate(datasources, cally)
     
     reduce_hessian <- function(S_1, S_2) {
-      return(mapply(function(feature_1, feature_2){return(mapply(sum, feature_1, feature_2))},
-                    S_1, S_2))
+      mapply(function(feature_1, feature_2){mapply(sum, feature_1, feature_2)},
+             S_1, S_2)
     }
     
     add_par[["hessians"]] <- Reduce(reduce_hessian, hessians_list)
@@ -49,6 +58,9 @@ ds.gen_spp_cand <- function(data_name, bounds_and_levels, data_classes, amt_spp,
                                                     amt_spp[[feature]], cand_select[["factor"]])
     }
   }
+  
+  save_list <- list(spp_cand = spp_cand)
+  ds.save_variables(data_name, save_list, datasources)
 
   return(spp_cand)
 }

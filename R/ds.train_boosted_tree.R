@@ -162,8 +162,7 @@ ds.train_boosted_tree <- function(data_name, split_method, weight_update,
 
   # Before we start training our model we split up the data set into a training
   # and test part.
-  ds.create_data_split(data_name, output_var, drop_columns, train_test_ratio,
-                       datasources)
+  ds.create_data_split(data_name, train_test_ratio, datasources)
 
   # We initiate our list of trees with 'NULL' which symbolizes an empty tree
   tree_list <- list()

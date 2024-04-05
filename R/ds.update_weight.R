@@ -3,22 +3,15 @@
 #'
 #' @param data_name The name under which the data is saved on the server.
 #' @param current_tree The fully chosen tree which misses its weights.
-#' @param bounds_and_levels The maximum and minimum values for numeric features
-#' and levels for factor features. 
 #' @param max_splits The maximum amount of splits in the trained tree.
-#' @param data_classes List of data class per column.
 #' @param reg_par Regularisation parameter which prevent overfitting.
 #' @param weight_update Through which method we choose the weights for our tree.
-#' @param loss_function The type of loss function under which we optimise the
-#' tree.
-#' @param output_var Name of the output variable. 
 #' @param datasources DATASHIELD server connection.
 #'
 #' @return The optimal weights for the current tree.
 #' @export
-ds.update_weight <- function(data_name, current_tree, bounds_and_levels,
-                             max_splits, data_classes, reg_par, weight_update,
-                             loss_function, output_var, datasources) {
+ds.update_weight <- function(data_name, current_tree, max_splits, reg_par,
+                             weight_update, datasources) {
   
   # We first check all the inputs for appropriate class and set defaults if
   # no input is given.
@@ -29,9 +22,7 @@ ds.update_weight <- function(data_name, current_tree, bounds_and_levels,
                                                   function(d) {methods::is(d, "DSConnection")}))))) {
     stop("The 'datasources' were expected to be a list of DSConnection-class objects", call. = FALSE)
   }
-  cally <- call("update_weightDS", data_name, current_tree, bounds_and_levels,
-                max_splits, data_classes, weight_update, loss_function,
-                output_var)
+  cally <- call("update_weightDS", data_name, current_tree, max_splits)
   weight_list <- DSI::datashield.aggregate(datasources, cally)
   amt_weights <- length(weight_list[[1]])
   tree_weights <- numeric()

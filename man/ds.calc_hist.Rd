@@ -8,9 +8,6 @@ ds.calc_hist(
   data_name,
   weight_update,
   last_tr_tree,
-  data_classes,
-  output_var,
-  loss_function,
   amt_trees,
   datasources = NULL
 )
@@ -21,13 +18,6 @@ ds.calc_hist(
 \item{weight_update}{Through which method we choose the weights for our tree.}
 
 \item{last_tr_tree}{The last tree which was trained under the boosting step.}
-
-\item{data_classes}{Data class for all features.}
-
-\item{output_var}{The name of the column containing the output.}
-
-\item{loss_function}{The loss function under which we optimize our boosted
-tree building process.}
 
 \item{amt_trees}{How many trees have been built already.}
 

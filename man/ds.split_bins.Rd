@@ -4,25 +4,12 @@
 \alias{ds.split_bins}
 \title{Split the data into bins}
 \usage{
-ds.split_bins(
-  data_name,
-  current_tree,
-  spp_cand,
-  bounds_and_levels,
-  data_classes,
-  datasources = NULL
-)
+ds.split_bins(data_name, current_tree, data_classes, datasources = NULL)
 }
 \arguments{
 \item{data_name}{The name under which the data is saved on the server.}
 
 \item{current_tree}{The tree which gets currently trained.}
-
-\item{spp_cand}{The candidates for a possible further split of the current
-tree.}
-
-\item{bounds_and_levels}{The maximum and minimum values for numeric features
-and levels for factor features.}
 
 \item{data_classes}{Denotes for each feature if it is numeric or a factor.}
 

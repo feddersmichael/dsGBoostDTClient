@@ -7,13 +7,9 @@
 ds.update_weight(
   data_name,
   current_tree,
-  bounds_and_levels,
   max_splits,
-  data_classes,
   reg_par,
   weight_update,
-  loss_function,
-  output_var,
   datasources
 )
 }
@@ -22,21 +18,11 @@ ds.update_weight(
 
 \item{current_tree}{The fully chosen tree which misses its weights.}
 
-\item{bounds_and_levels}{The maximum and minimum values for numeric features
-and levels for factor features.}
-
 \item{max_splits}{The maximum amount of splits in the trained tree.}
-
-\item{data_classes}{List of data class per column.}
 
 \item{reg_par}{Regularisation parameter which prevent overfitting.}
 
 \item{weight_update}{Through which method we choose the weights for our tree.}
-
-\item{loss_function}{The type of loss function under which we optimise the
-tree.}
-
-\item{output_var}{Name of the output variable.}
 
 \item{datasources}{DATASHIELD server connection.}
 }
