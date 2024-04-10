@@ -29,7 +29,8 @@ ds.calc_hist <- function(data_name, weight_update, last_tr_tree, amt_trees,
   if (is.null(last_tr_tree)) {
     
     save_list <- list(weight_update = weight_update)
-    ds.save_variables(data_name, save_list, datasources)
+    exist_check <- c(weight_update = TRUE)
+    ds.save_variables(data_name, save_list, exist_check, datasources)
     
     cally <- call("calc_hist_initDS", data_name)
     DSI::datashield.assign.expr(datasources, paste0(data_name, "_training"), cally)

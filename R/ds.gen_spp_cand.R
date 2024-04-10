@@ -60,7 +60,8 @@ ds.gen_spp_cand <- function(data_name, bounds_and_levels, data_classes, amt_spp,
   }
   
   save_list <- list(spp_cand = spp_cand)
-  ds.save_variables(data_name, save_list, datasources)
+  exist_check <- c(spp_cand = FALSE)
+  ds.save_variables(data_name, save_list, exist_check, datasources)
 
   return(spp_cand)
 }

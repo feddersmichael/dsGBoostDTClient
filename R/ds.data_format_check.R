@@ -20,7 +20,8 @@ ds.data_format_check <- function(data_name, bounds_and_levels, output_var,
   # our requirements to be used in this analysis.
   
   save_list <- list(drop_columns = drop_columns)
-  ds.save_variables(data_name, save_list, datasources)
+  exist_check <- c(drop_columns = TRUE)
+  ds.save_variables(data_name, save_list, exist_check, datasources)
 
   if (is.null(datasources)) {
     datasources <- DSI::datashield.connections_find()
@@ -51,9 +52,13 @@ ds.data_format_check <- function(data_name, bounds_and_levels, output_var,
   
   save_list <- list(output_var = output_var,
                     loss_function = loss_function,
-                    bounds_and_levels = bounds_and_levels,
-                    data_classes = data_classes)
-  ds.save_variables(data_name, save_list, datasources)
+                    data_classes = data_classes,
+                    bounds_and_levels = bounds_and_levels)
+  exist_check <- c(output_var = TRUE,
+                   loss_function = TRUE,
+                   data_classes = TRUE,
+                   bounds_and_levels = TRUE)
+  ds.save_variables(data_name, save_list, exist_check, datasources)
 
   return(list(data_classes, bounds_and_levels))
 }

@@ -4,12 +4,14 @@
 \alias{ds.save_variables}
 \title{Save variables}
 \usage{
-ds.save_variables(data_name, variable_list, datasources)
+ds.save_variables(data_name, variable_list, exist_check, datasources)
 }
 \arguments{
 \item{data_name}{Name of the data.}
 
 \item{variable_list}{Named list of variables which shall be saved.}
+
+\item{exist_check}{If that variable should be checked for existance.}
 
 \item{datasources}{Datasource connections.}
 }
