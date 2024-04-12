@@ -8,7 +8,7 @@
 #'
 #' @return The histogram sums for each bin for all features.
 #' @export
-ds.split_bins <- function(data_name, current_tree, data_classes,
+ds.split_bins <- function(data_name, current_tree, data_classes, amt_trees,
                           datasources = NULL) {
 
   # We first check all the inputs for appropriate class and set defaults if
@@ -23,8 +23,11 @@ ds.split_bins <- function(data_name, current_tree, data_classes,
   
   cally <- call("saveleafDS", data_name, current_tree)
   DSI::datashield.assign.expr(datasources, paste0(data_name, "_leaves"), cally)
-
-  cally <- call("split_binsDS", data_name)
+  
+  if (amt_trees == 40) {
+    test <- TRUE
+  }
+  cally <- call("split_binsDS", data_name, amt_trees)
   histogram_per_server <- DSI::datashield.aggregate(datasources, cally)
 
   histograms_per_leaf <- list()
