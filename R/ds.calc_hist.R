@@ -25,8 +25,8 @@ ds.calc_hist <- function(data_name, weight_update, last_tr_tree, amt_trees,
   # We call the server to generate the new histogram values based on the
   # predicted output, updated through the last trained tree
 
-  # If 'last_tr_tree' is NULL we initialise the predicted output.
-  if (is.null(last_tr_tree)) {
+  # If 'amt_trees' is 0 we initialise the predicted output.
+  if (amt_trees == 0) {
     
     save_list <- list(weight_update = weight_update)
     exist_check <- c(weight_update = TRUE)
