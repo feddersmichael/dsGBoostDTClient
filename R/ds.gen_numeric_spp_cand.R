@@ -9,7 +9,11 @@
 #' @return The created splitting-points.
 #' @export
 ds.gen_numeric_spp_cand <- function(bounds, amt_spp, selection_method, add_par) {
-
+  
+  if (bounds[[2]] - bounds[[1]] < amt_spp * 1e-9) {
+    amt_spp <- floor((bounds[[2]] - bounds[[1]]) * 1e-9)
+  }
+  
   if (selection_method == "uniform") {
     spp_cand <- (1:amt_spp) * ((bounds[[2]] - bounds[[1]]) / (amt_spp + 1)) +
                 bounds[[1]]
@@ -36,26 +40,41 @@ ds.gen_numeric_spp_cand <- function(bounds, amt_spp, selection_method, add_par) 
     
     low_bnd <- 1
     upp_bnd <- 2
-
+    split_cand <- list(middle = c(), hess = c())
     for (i in 1:(amt_hist_bins - 1)) {
       if (hess_hist[[i]] < theta) {
         upp_bnd <- upp_bnd + 1
         hess_hist[[i + 1]] <- hess_hist[[i]] + hess_hist[[i + 1]]
       } else {
-        middle <- (bounds_and_spp_cand[[low_bnd]] +
-                     bounds_and_spp_cand[[upp_bnd]]) / 2
-        spp_cand <- c(spp_cand, middle, bounds_and_spp_cand[[upp_bnd]])
+        split_cand$middle <- c(split_cand$middle,
+                               (bounds_and_spp_cand[[low_bnd]] +
+                                bounds_and_spp_cand[[upp_bnd]]) / 2)
+        split_cand$hess <- c(split_cand$hess, hess_hist[[i]])
+        spp_cand <- c(spp_cand, bounds_and_spp_cand[[upp_bnd]])
         low_bnd <- upp_bnd
         upp_bnd <- upp_bnd + 1
       }
     }
     
     if (hess_hist[[amt_hist_bins]] >= theta) {
-      middle <- (bounds_and_spp_cand[[low_bnd]] +
-                   bounds_and_spp_cand[[upp_bnd]]) / 2
-      spp_cand <- c(spp_cand, middle)
+      split_cand$middle <- c(split_cand$middle,
+                             (bounds_and_spp_cand[[low_bnd]] +
+                                bounds_and_spp_cand[[upp_bnd]]) / 2)
+      split_cand$hess <- c(split_cand$hess, hess_hist[[amt_hist_bins]])
     }
     
+    split_cand$middle <- split_cand$middle[order(split_cand$hess,
+                                                 decreasing = TRUE)]
+    
+    for (i in 1:length(split_cand$hess)) {
+      if (length(spp_cand) >= amt_spp) {
+        break
+      }
+      spp_cand <- c(spp_cand, split_cand$middle[[i]])
+    }
+    
+    spp_cand <- sort(spp_cand)
+
     cur_amt_spp <- length(spp_cand)
     if (amt_spp > cur_amt_spp) {
       bounds_and_spp_cand <- c(bounds[[1]], spp_cand, bounds[[2]])
@@ -67,6 +86,48 @@ ds.gen_numeric_spp_cand <- function(bounds, amt_spp, selection_method, add_par) 
                                                  bounds_and_spp_cand[[i + 1]]))
       }
       spp_cand <- sort(c(spp_cand, fill_point))
+    }
+  }
+  
+  dist_spp_cand <- c(spp_cand[[1]] - bounds[[1]])
+  
+  if (length(spp_cand) > 1) {
+    for (i in 1:(length(spp_cand) - 1)) {
+      dist_spp_cand[[i + 1]] <- spp_cand[[i + 1]] - spp_cand[[i]]
+    }
+  }
+  
+  dist_spp_cand[[length(spp_cand) + 1]] <- bounds[[2]] -  
+    spp_cand[[length(spp_cand)]]
+  
+  i <- 1
+  while (i < length(dist_spp_cand)) {
+    if (dist_spp_cand[[i]] < 1e-9) {
+      if ((dist_spp_cand[[i]] + dist_spp_cand[[i + 1]]) < 2e-9) {
+        spp_cand <- spp_cand[-i]
+        dist_spp_cand[[i]] <- dist_spp_cand[[i]] + dist_spp_cand[[i + 1]]
+        dist_spp_cand <- dist_spp_cand[-(i + 1)]
+      } else {
+        if (length(spp_cand) == 1) {
+          spp_cand[[1]] <- (bounds[[2]] + bounds[[1]]) / 2
+          break
+        } else {
+          if (i == 1) {
+            spp_cand[[1]] <- (spp_cand[[2]] + bounds[[1]]) / 2
+            dist_spp_cand[[2]] <- spp_cand[[2]] - spp_cand[[1]]
+          } else if (i == (length(dist_spp_cand) - 1)) {
+            spp_cand[[i]] <- (spp_cand[[i - 1]] + bounds[[2]]) / 2
+            break
+          } else {
+            spp_cand[[i]] <- (spp_cand[[i - 1]] + spp_cand[[i + 1]]) / 2
+            dist_spp_cand[[i + 1]] <- spp_cand[[i + 1]] - spp_cand[[i]] 
+          }
+        }
+        
+        i <- i + 1
+      }
+    } else {
+      i <- i + 1
     }
   }
 

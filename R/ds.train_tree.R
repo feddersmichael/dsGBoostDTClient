@@ -46,7 +46,7 @@ ds.train_tree <- function(data_name, split_method, weight_update, last_tr_tree,
   # We first update the histogram values, which are based on the previously
   # trained trees.
   ds.calc_hist(data_name, weight_update, last_tr_tree, amt_trees, datasources)
-  
+    
   if (cand_select[["numeric"]] == "ithess") {
     if (amt_trees == 0) {
       # TODO: Possibility to combine uniform and ithess in first round
@@ -105,15 +105,13 @@ ds.train_tree <- function(data_name, split_method, weight_update, last_tr_tree,
                              w_s_left_value = numeric(), w_s_right = logical(),
                              w_s_right_value = numeric(), par_spp = numeric(),
                              par_dir = logical())
-
+  
   # In this loop we build a tree with up to 'max_splits' many splits.
   for (i in 1:max_splits) {
-    
     if (split_method == "histograms") {
       
       histograms_per_leave <- ds.split_bins(data_name, current_tree,
-                                            data_classes, amt_trees,
-                                            datasources)
+                                            data_classes, datasources)
       
       # We search for the best possible split(s) in the newly added branch.
       best_split <- ds.select_split(histograms_per_leave, spp_cand, data_classes,
