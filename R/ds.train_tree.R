@@ -4,7 +4,6 @@
 #' @param data_name The name under which the data is saved on the server.
 #' @param split_method Through which method we choose the tree-splits.
 #' @param weight_update Through which method we choose the weights for our tree.
-#' @param last_tr_tree The last trained tree.
 #' @param bounds_and_levels The maximum and minimum values for numeric features
 #' and levels for factor features.
 #' @param data_classes Data class for all features.
@@ -19,15 +18,18 @@
 #' @param amt_trees How many trees have been built already.
 #' @param ithess_stop Maximum amount of times we update the split-point
 #' candidates if the split-method is "totally_random"
+#' @param dropout_rate Chance that a tree is not used for building the next
+#' tree.
 #' @param datasources DATASHIELD server connection.
 #'
 #' @return The trained tree.
 #' @export
-ds.train_tree <- function(data_name, split_method, weight_update, last_tr_tree,
+ds.train_tree <- function(data_name, split_method, weight_update,
                           bounds_and_levels, data_classes, output_var,
                           loss_function, amt_spp, cand_select,
                           reg_par = c(5, 5), max_splits = 5, add_par = NULL,
-                          amt_trees, ithess_stop, datasources = NULL) {
+                          amt_trees, ithess_stop, dropout_rate = 0.05,
+                          datasources = NULL) {
 
   # We first check all the inputs for appropriate class and set defaults if
   # no input is given.
@@ -39,13 +41,10 @@ ds.train_tree <- function(data_name, split_method, weight_update, last_tr_tree,
     stop("The 'datasources' were expected to be a list of DSConnection-class objects", call. = FALSE)
   }
 
-  if (!is.null(last_tr_tree) && !is.data.frame(last_tr_tree)) {
-    stop("'last_tr_tree' needs to be an object of type 'data frame'.")
-  }
-
   # We first update the histogram values, which are based on the previously
   # trained trees.
-  ds.calc_hist(data_name, weight_update, last_tr_tree, amt_trees, datasources)
+  removed_trees <- ds.calc_hist(data_name, weight_update, amt_trees,
+                                dropout_rate, datasources)
     
   if (cand_select[["numeric"]] == "ithess") {
     if (amt_trees == 0) {
@@ -293,6 +292,12 @@ ds.train_tree <- function(data_name, split_method, weight_update, last_tr_tree,
       current_tree$w_s_left_value[[tree_row]] <- leaf_weights[[2 * j - 1]]
       current_tree$w_s_right_value[[tree_row]] <- leaf_weights[[2 * j]]
     }
+  }
+  
+  ds.save_tree(data_name, current_tree, amt_trees + 1, length(removed_trees),
+               datasources)
+  if (0 < dropout_rate && dropout_rate < 1) {
+    ds.update_trees(data_name, removed_trees, amt_trees + 1, datasources)
   }
 
   return(list(current_tree, add_par))

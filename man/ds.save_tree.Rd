@@ -2,13 +2,24 @@
 % Please edit documentation in R/ds.save_tree.R
 \name{ds.save_tree}
 \alias{ds.save_tree}
-\title{Save a single trained tree}
+\title{Save a single tree}
 \usage{
-ds.save_tree()
+ds.save_tree(data_name, tree, tree_number, amt_drops, datasources)
+}
+\arguments{
+\item{data_name}{The name under which the data is saved on the server.}
+
+\item{tree}{The tree which shall be saved.}
+
+\item{tree_number}{How many trees have been trained.}
+
+\item{amt_drops}{How many tree were dropped to train this tree.}
+
+\item{datasources}{DATASHIELD server connection.}
 }
 \value{
-None
+None.
 }
 \description{
-Save a single trained tree
+Save a single tree
 }

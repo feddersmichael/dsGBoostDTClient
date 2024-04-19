@@ -22,6 +22,8 @@
 #' @param max_treecount Maximum amount of trees to build our boosted decision
 #' tree.
 #' @param max_splits The maximum amount of splits in the trained tree.
+#' @param dropout_rate Chance that a tree is not used for building the next
+#' tree.
 #' @param seed If we want to choose a specific random behavior client side.
 #' @param datasources DATASHIELD server connection.
 #'
@@ -33,8 +35,8 @@ ds.train_boosted_tree <- function(data_name, split_method, weight_update,
                                   drop_columns = NULL, drop_NA = TRUE,
                                   reg_par = c(5, 5), ithess_stop = NULL,
                                   shrinkage = 0.1, max_treecount = 10,
-                                  max_splits = 5, seed = NULL,
-                                  datasources = NULL) {
+                                  max_splits = 5, dropout_rate = 0.05,
+                                  seed = NULL, datasources = NULL) {
 
   # We first check all the inputs for appropriate class and set defaults if
   # no input is given.
@@ -139,6 +141,10 @@ ds.train_boosted_tree <- function(data_name, split_method, weight_update,
   if (!is.integer(max_splits) || length(max_splits) != 1) {
     stop("'max_splits' needs to be an atomic 'integer' vector.")
   }
+  
+  if (!is.numeric(dropout_rate) || length(dropout_rate) != 1) {
+    stop("'dropout_rate' needs to be an atomic 'numeric' vector.")
+  }
 
   if (!is.null(seed)) {
     if (!is.integer(seed) || length(seed) != 1) {
@@ -174,18 +180,12 @@ ds.train_boosted_tree <- function(data_name, split_method, weight_update,
   for (i in 1:max_treecount) {
     
     amt_trees <- i - 1
-    if (amt_trees == 0) {
-      last_tr_tree <- NULL
-    } else {
-      last_tr_tree <- tree_list[[length(tree_list)]]
-    }
-    
     # We train the next tree.
     tree_return <- ds.train_tree(data_name, split_method, weight_update,
-                                 last_tr_tree, bounds_and_levels, data_classes,
-                                 output_var, loss_function, amt_spp,
-                                 cand_select, reg_par, max_splits, add_par,
-                                 amt_trees, ithess_stop, datasources)
+                                 bounds_and_levels, data_classes, output_var,
+                                 loss_function, amt_spp, cand_select, reg_par,
+                                 max_splits, add_par, amt_trees, ithess_stop,
+                                 dropout_rate, datasources)
     
     if (weight_update == "hessian") {
       tree_list[[i]] <- ds.add_shrinkage(tree_return[[1]], shrinkage)

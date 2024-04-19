@@ -7,8 +7,8 @@
 ds.calc_hist(
   data_name,
   weight_update,
-  last_tr_tree,
   amt_trees,
+  dropout_rate,
   datasources = NULL
 )
 }
@@ -17,14 +17,15 @@ ds.calc_hist(
 
 \item{weight_update}{Through which method we choose the weights for our tree.}
 
-\item{last_tr_tree}{The last tree which was trained under the boosting step.}
-
 \item{amt_trees}{How many trees have been built already.}
+
+\item{dropout_rate}{Chance that a tree is not used for building the next
+tree.}
 
 \item{datasources}{DATASHIELD server connection.}
 }
 \value{
-None.
+WHich trees got removed from training.
 }
 \description{
 Calculate the predicted output

@@ -8,7 +8,6 @@ ds.train_tree(
   data_name,
   split_method,
   weight_update,
-  last_tr_tree,
   bounds_and_levels,
   data_classes,
   output_var,
@@ -20,6 +19,7 @@ ds.train_tree(
   add_par = NULL,
   amt_trees,
   ithess_stop,
+  dropout_rate = 0.05,
   datasources = NULL
 )
 }
@@ -29,8 +29,6 @@ ds.train_tree(
 \item{split_method}{Through which method we choose the tree-splits.}
 
 \item{weight_update}{Through which method we choose the weights for our tree.}
-
-\item{last_tr_tree}{The last trained tree.}
 
 \item{bounds_and_levels}{The maximum and minimum values for numeric features
 and levels for factor features.}
@@ -56,6 +54,9 @@ tree.}
 
 \item{ithess_stop}{Maximum amount of times we update the split-point
 candidates if the split-method is "totally_random"}
+
+\item{dropout_rate}{Chance that a tree is not used for building the next
+tree.}
 
 \item{datasources}{DATASHIELD server connection.}
 }

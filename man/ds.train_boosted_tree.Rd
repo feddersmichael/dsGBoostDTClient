@@ -21,6 +21,7 @@ ds.train_boosted_tree(
   shrinkage = 0.1,
   max_treecount = 10,
   max_splits = 5,
+  dropout_rate = 0.05,
   seed = NULL,
   datasources = NULL
 )
@@ -61,6 +62,9 @@ candidates if the split-method is "totally_random"}
 tree.}
 
 \item{max_splits}{The maximum amount of splits in the trained tree.}
+
+\item{dropout_rate}{Chance that a tree is not used for building the next
+tree.}
 
 \item{seed}{If we want to choose a specific random behavior client side.}
 
