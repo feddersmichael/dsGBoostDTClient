@@ -4,7 +4,7 @@
 #' @param tree The input tree.
 #' @param shrinkage The factor by which the weights get multiplied.
 #'
-#' @return Teh changed tree
+#' @return The changed tree
 #' @export
 ds.add_shrinkage <- function(tree, shrinkage) {
   

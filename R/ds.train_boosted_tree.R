@@ -47,7 +47,11 @@ ds.train_boosted_tree <- function(data_name, split_method, weight_update,
                                                   function(d) {methods::is(d, "DSConnection")}))))) {
     stop("The 'datasources' were expected to be a list of DSConnection-class objects", call. = FALSE)
   }
-
+  
+  if (!is.character(data_name) || length(data_name) != 1) {
+    stop("'data_name' needs to be an atomic 'character' vector.")
+  }
+  
   if (!is.character(split_method) || length(split_method) != 1) {
     stop("'split_method' needs to be an atomic 'character' vector.")
   } else if (!(split_method %in% c("histograms", "partially_random",
@@ -69,10 +73,6 @@ ds.train_boosted_tree <- function(data_name, split_method, weight_update,
     }
   }
   
-  if (!is.character(data_name) || length(data_name) != 1) {
-    stop("'data_name' needs to be an atomic 'character' vector.")
-  }
-
   if (!is.list(bounds_and_levels) || length(bounds_and_levels) <= 1) {
     stop("'bounds_and_levels' needs be a list with at least two elements.")
   }
@@ -144,6 +144,19 @@ ds.train_boosted_tree <- function(data_name, split_method, weight_update,
   
   if (!is.numeric(dropout_rate) || length(dropout_rate) != 1) {
     stop("'dropout_rate' needs to be an atomic 'numeric' vector.")
+  } else {
+    if (dropout_rate < 0 || dropout_rate > 1) {
+      stop("'dropout_rate' needs to be a value between 0 and 1.")
+    }
+    if (dropout_rate == 0) {
+      if (weight_update == "average") {
+        stop("If 'dropout_rate' is 0, 'weight_update' can't be 'average'.")  
+      }
+    } else {
+      if (shrinkage != 1) {
+        stop("If 'dropout_rate' is not 0, 'shrinkage' has to be 1.")
+      }
+    }
   }
 
   if (!is.null(seed)) {
@@ -187,12 +200,18 @@ ds.train_boosted_tree <- function(data_name, split_method, weight_update,
                                  max_splits, add_par, amt_trees, ithess_stop,
                                  dropout_rate, datasources)
     
-    if (weight_update == "hessian") {
-      tree_list[[i]] <- ds.add_shrinkage(tree_return[[1]], shrinkage)
-    } else if (weight_update == "average") {
-      tree_list[[i]] <- tree_return[[1]]
-    }
     
+    if (shrinkage != 1) {
+      tree_return[[1]] <- ds.add_shrinkage(tree_return[[1]], shrinkage)
+    }
+    if (length(tree_return[[3]]) != 0) {
+      scale_par <- 1 / (length(tree_return[[3]]) + 1)
+      tree_return[[1]] <- ds.add_shrinkage(tree_return[[1]], scale_par)
+      for (j in tree_return[[3]]) {
+        tree_list[[j]] <- ds.add_shrinkage(tree_list[[j]], length(tree_return[[3]]) * scale_par)
+      }
+    }
+    tree_list[[i]] <- tree_return[[1]]
     add_par <- tree_return[[2]]
   }
 

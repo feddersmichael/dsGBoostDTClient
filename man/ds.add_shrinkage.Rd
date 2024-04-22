@@ -12,7 +12,7 @@ ds.add_shrinkage(tree, shrinkage)
 \item{shrinkage}{The factor by which the weights get multiplied.}
 }
 \value{
-Teh changed tree
+The changed tree
 }
 \description{
 Shrink tree

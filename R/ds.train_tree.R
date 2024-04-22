@@ -299,6 +299,6 @@ ds.train_tree <- function(data_name, split_method, weight_update,
   if (0 < dropout_rate && dropout_rate < 1) {
     ds.update_trees(data_name, removed_trees, amt_trees + 1, datasources)
   }
-
-  return(list(current_tree, add_par))
+  
+  return(list(current_tree, add_par, removed_trees))
 }
