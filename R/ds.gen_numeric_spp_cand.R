@@ -66,6 +66,9 @@ ds.gen_numeric_spp_cand <- function(bounds, amt_spp, selection_method, add_par) 
     split_cand$middle <- split_cand$middle[order(split_cand$hess,
                                                  decreasing = TRUE)]
     
+    # adapt such that the middle point only gets added if the hessian is
+    # double the size of the theta
+    
     for (i in 1:length(split_cand$hess)) {
       if (length(spp_cand) >= amt_spp) {
         break

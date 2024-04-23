@@ -8,7 +8,7 @@
 #'
 #' @return None.
 #' @export
-ds.create_data_split <- function(data_name, train_test_ratio = 0.8,
+ds.create_data_split <- function(data_name, train_test_ratio = 0.9,
                                  datasources = NULL) {
   # TODO: keep certain characteristics similar in train and test
 

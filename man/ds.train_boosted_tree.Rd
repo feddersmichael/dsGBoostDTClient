@@ -6,22 +6,22 @@
 \usage{
 ds.train_boosted_tree(
   data_name,
-  split_method,
-  weight_update,
   bounds_and_levels,
   output_var,
-  loss_function,
-  train_test_ratio,
-  amt_spp,
-  cand_select,
   drop_columns = NULL,
   drop_NA = TRUE,
-  reg_par = c(5, 5),
-  ithess_stop = NULL,
-  shrinkage = 0.1,
+  train_test_ratio = 0.9,
   max_treecount = 10,
   max_splits = 5,
+  split_method,
+  loss_function,
+  amt_spp,
+  cand_select,
+  weight_update,
+  reg_par = c(5, 5),
+  shrinkage = 0.1,
   dropout_rate = 0.05,
+  ithess_stop = max_treecount,
   seed = NULL,
   datasources = NULL
 )
@@ -29,42 +29,42 @@ ds.train_boosted_tree(
 \arguments{
 \item{data_name}{The name under which the data is saved on the server.}
 
-\item{split_method}{Through which method we choose the tree-splits.}
-
-\item{weight_update}{Through which method we choose the weights for our tree.}
-
 \item{bounds_and_levels}{Bounds for numeric columns and levels for factors.}
 
 \item{output_var}{The name of the column containing the output variable.}
-
-\item{loss_function}{The name of the loss function we want to use for our
-boosted tree.}
-
-\item{train_test_ratio}{Percentage of the data which should be used for
-Training.}
-
-\item{amt_spp}{The amount of split-points per feature.}
-
-\item{cand_select}{Splitting-point selection for numeric and factor features.}
 
 \item{drop_columns}{Vector of data columns which shall be removed.}
 
 \item{drop_NA}{If NA data in the output variable should be removed.}
 
-\item{reg_par}{Regularisation parameter which prevent overfitting.}
-
-\item{ithess_stop}{Maximum amount of times we update the split-point
-candidates if the split-method is "totally_random"}
-
-\item{shrinkage}{How high the newly trained tree effects the boosted tree.}
+\item{train_test_ratio}{Percentage of the data which should be used for
+Training.}
 
 \item{max_treecount}{Maximum amount of trees to build our boosted decision
 tree.}
 
 \item{max_splits}{The maximum amount of splits in the trained tree.}
 
+\item{split_method}{Through which method we choose the tree-splits.}
+
+\item{loss_function}{The name of the loss function we want to use for our
+boosted tree.}
+
+\item{amt_spp}{The amount of split-points per feature.}
+
+\item{cand_select}{Splitting-point selection for numeric and factor features.}
+
+\item{weight_update}{Through which method we choose the weights for our tree.}
+
+\item{reg_par}{Regularisation parameter which prevent overfitting.}
+
+\item{shrinkage}{How high the newly trained tree effects the boosted tree.}
+
 \item{dropout_rate}{Chance that a tree is not used for building the next
 tree.}
+
+\item{ithess_stop}{Maximum amount of times we update the split-point
+candidates if the split-method is "totally_random"}
 
 \item{seed}{If we want to choose a specific random behavior client side.}
 

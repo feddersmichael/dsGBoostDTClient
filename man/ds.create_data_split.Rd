@@ -4,7 +4,7 @@
 \alias{ds.create_data_split}
 \title{Split the data into 'Test' and 'Training'}
 \usage{
-ds.create_data_split(data_name, train_test_ratio = 0.8, datasources = NULL)
+ds.create_data_split(data_name, train_test_ratio = 0.9, datasources = NULL)
 }
 \arguments{
 \item{data_name}{The name under which the data is saved on the server.}

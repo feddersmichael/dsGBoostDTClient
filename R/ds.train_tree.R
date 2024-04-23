@@ -2,34 +2,33 @@
 #' Train a single tree
 #'
 #' @param data_name The name under which the data is saved on the server.
-#' @param split_method Through which method we choose the tree-splits.
-#' @param weight_update Through which method we choose the weights for our tree.
 #' @param bounds_and_levels The maximum and minimum values for numeric features
 #' and levels for factor features.
 #' @param data_classes Data class for all features.
 #' @param output_var Name of the output variable.
+#' @param amt_trees How many trees have been built already.
+#' @param max_splits The maximum amount of splits in the trained tree.
+#' @param split_method Through which method we choose the tree-splits.
 #' @param loss_function The type of loss function under which we optimise the
 #' tree.
 #' @param amt_spp The amount of splitting point candidates per feature.
 #' @param cand_select Splitting-point selection for numeric and factor features.
+#' @param weight_update Through which method we choose the weights for our tree.
 #' @param reg_par Regularisation parameter which prevent overfitting.
-#' @param max_splits The maximum amount of splits in the trained tree.
-#' @param add_par Additional parameters for the iterative hessian mode.
-#' @param amt_trees How many trees have been built already.
-#' @param ithess_stop Maximum amount of times we update the split-point
-#' candidates if the split-method is "totally_random"
 #' @param dropout_rate Chance that a tree is not used for building the next
 #' tree.
+#' @param ithess_stop Maximum amount of times we update the split-point
+#' candidates if the split-method is "totally_random"
+#' @param add_par Additional parameters for the iterative hessian mode.
 #' @param datasources DATASHIELD server connection.
 #'
 #' @return The trained tree.
 #' @export
-ds.train_tree <- function(data_name, split_method, weight_update,
-                          bounds_and_levels, data_classes, output_var,
-                          loss_function, amt_spp, cand_select,
-                          reg_par = c(5, 5), max_splits = 5, add_par = NULL,
-                          amt_trees, ithess_stop, dropout_rate = 0.05,
-                          datasources = NULL) {
+ds.train_tree <- function(data_name, bounds_and_levels, data_classes,
+                          output_var, amt_trees, max_splits = 5, split_method,
+                          loss_function, amt_spp, cand_select,  weight_update,
+                          reg_par = c(5, 5), dropout_rate = 0.05, ithess_stop,
+                          add_par = NULL, datasources = NULL) {
 
   # We first check all the inputs for appropriate class and set defaults if
   # no input is given.
