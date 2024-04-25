@@ -30,10 +30,13 @@
 #' @export
 ds.train_boosted_tree <- function(data_name, bounds_and_levels, output_var,
                                   drop_columns = NULL, drop_NA = TRUE,
-                                  train_test_ratio = 0.9, max_treecount = 10,
-                                  max_splits = 5, split_method, loss_function,
-                                  amt_spp, cand_select, weight_update, 
-                                  reg_par = c(5, 5), shrinkage = 0.1,
+                                  train_test_ratio = 0.9, max_treecount = 10L,
+                                  max_splits = 5L, split_method, loss_function,
+                                  amt_spp, cand_select = c(numeric = "ithess",
+                                                           factor = "exact"),
+                                  weight_update, reg_par = c(lambda = 5,
+                                                             gamma = 5),
+                                  shrinkage = 0.1,
                                   dropout_rate = 0.05,
                                   ithess_stop = max_treecount, seed = NULL,
                                   datasources = NULL) {
@@ -99,9 +102,9 @@ ds.train_boosted_tree <- function(data_name, bounds_and_levels, output_var,
     stop("This loss-function is not available.")
   }
   
-  if (!is.integer(amt_spp) || length(amt_spp) == length(bounds_and_levels) - 1
+  if (!is.integer(amt_spp) || length(amt_spp) == length(bounds_and_levels)
       || any(amt_spp < 1)) {
-    stop("'amt_spp' needs to be a vector of data type 'integer' with length of 'bounds_and_levels' inus one and each element greater than 0.")
+    stop("'amt_spp' needs to be a vector of data type 'integer' with length of 'bounds_and_levels' minus one and each element greater than 0.")
   }
   
   if (!is.character(cand_select) || length(cand_select) != 2 ||
@@ -130,8 +133,9 @@ ds.train_boosted_tree <- function(data_name, bounds_and_levels, output_var,
     }
   }
   
-  if (!is.numeric(reg_par) || length(reg_par) != 2 || any(reg_par < 0)) {
-    stop("'reg_par' needs to be a numeric vector of length 2 with positive entries.")
+  if (!is.numeric(reg_par) || length(reg_par) != 2 || any(reg_par < 0) ||
+      !identical(names(reg_par), c("lambda", "gamma"))) {
+    stop("'reg_par' needs to be a numeric vector of length 2 with positive entries 'lambda' and 'gamma'.")
   }
   
   if (!is.numeric(shrinkage) || length(shrinkage) != 1 ||
@@ -139,21 +143,18 @@ ds.train_boosted_tree <- function(data_name, bounds_and_levels, output_var,
     stop("'shrinkage' needs to be an atomic 'numeric' vector which lies between 0 and 1.")
   }
   
-  if (!is.numeric(dropout_rate) || length(dropout_rate) != 1) {
-    stop("'dropout_rate' needs to be an atomic 'numeric' vector.")
-  } else {
-    if (dropout_rate < 0 || dropout_rate > 1) {
-      stop("'dropout_rate' needs to be a value between 0 and 1.")
-    }
-    if (dropout_rate != 0) {
+  if (!is.numeric(dropout_rate) || length(dropout_rate) != 1 ||
+      dropout_rate < 0 || dropout_rate > 1) {
+    stop("'dropout_rate' needs to be an atomic 'numeric' vector which lies between 0 and 1.")
+  } else if (dropout_rate > 0) {
       if (weight_update == "average") {
         stop("If 'dropout_rate' is not 0, 'weight_update' can't be 'average'.")  
       }
       if (shrinkage != 1) {
         stop("If 'dropout_rate' is not 0, 'shrinkage' has to be 1.")
       }
-    }
   }
+  
   
   if (!is.integer(ithess_stop) || length(ithess_stop) != 1 || ithess_stop < 1 ||
       ithess_stop > max_treecount) {
@@ -176,7 +177,7 @@ ds.train_boosted_tree <- function(data_name, bounds_and_levels, output_var,
   data_classes <- data_checks[[1]]
   bounds_and_levels <- data_checks[[2]]
   
-  if (!identical(names(amt_spp), names(bounds_and_levels))) {
+  if (!identical(sort(names(amt_spp)), sort(names(bounds_and_levels)))) {
     stop("The features in 'bounds_and_levels' and 'amt_spp' don't coincide.")
   }
 
@@ -200,7 +201,7 @@ ds.train_boosted_tree <- function(data_name, bounds_and_levels, output_var,
                                  cand_select, weight_update, reg_par,
                                  dropout_rate, ithess_stop, add_par,
                                  datasources)
-    if (shrinkage != 1) {
+    if (shrinkage < 1) {
       tree_return[[1]] <- ds.add_shrinkage(tree_return[[1]], shrinkage)
     }
     if (length(tree_return[[3]]) != 0) {

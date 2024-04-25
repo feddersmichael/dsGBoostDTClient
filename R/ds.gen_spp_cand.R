@@ -9,13 +9,17 @@
 #' @param cand_select Which splitting-point candidate selection is used for
 #' numeric and factor data.
 #' @param add_par Additional parameters for the iterative hessian mode.
+#' @param new_num_spp Whether new numerical spp-point candidates shall be
+#' generated.
+#' @param split_method The used split-method.
 #' @param datasources DATASHIELD server connection.
 #'
 #' @return The created splitting points.
 #' @export
 
 ds.gen_spp_cand <- function(data_name, bounds_and_levels, data_classes, amt_spp,
-                            cand_select, add_par = NULL, datasources = NULL) {
+                            cand_select, add_par = NULL, new_num_spp = TRUE,
+                            split_method = NULL, datasources = NULL) {
   
   if (is.null(datasources)) {
     datasources <- DSI::datashield.connections_find()
@@ -25,8 +29,9 @@ ds.gen_spp_cand <- function(data_name, bounds_and_levels, data_classes, amt_spp,
     stop("The 'datasources' were expected to be a list of DSConnection-class objects", call. = FALSE)
   }
   
-  # TODO: could have unintended behaviour
-  if (!is.null(add_par[["tot_rand"]])) {
+  # TODO: Add after weight update new hessians.
+  if (split_method == "totally_random" && 
+      cand_select[["numeric"]] == "ithess") {
     cally <- call("hessiansDS", data_name, add_par[["spp_cand"]])
     hessians_list <- DSI::datashield.aggregate(datasources, cally)
     
@@ -45,14 +50,18 @@ ds.gen_spp_cand <- function(data_name, bounds_and_levels, data_classes, amt_spp,
   }
   for (feature in names(data_classes)) {
     if (data_classes[[feature]] == "numeric") {
-      if (cand_select[["numeric"]] == "ithess") {
-        add_par <- list(hessians = hessians[[feature]],
-                        prev_spp_cand = prev_spp_cand[[feature]])
+      if (new_num_spp) {
+        if (cand_select[["numeric"]] == "ithess") {
+          add_par <- list(hessians = hessians[[feature]],
+                          prev_spp_cand = prev_spp_cand[[feature]])
+        }
+        spp_cand[[feature]] <- ds.gen_numeric_spp_cand(bounds_and_levels[[feature]],
+                                                       amt_spp[[feature]],
+                                                       cand_select[["numeric"]],
+                                                       add_par)
+      } else {
+        spp_cand[[feature]] <- add_par[["spp_cand"]][[feature]]
       }
-      spp_cand[[feature]] <- ds.gen_numeric_spp_cand(bounds_and_levels[[feature]],
-                                                     amt_spp[[feature]],
-                                                     cand_select[["numeric"]],
-                                                     add_par)
     } else {
       spp_cand[[feature]] <- ds.gen_factor_spp_cand(length(bounds_and_levels[[feature]]),
                                                     amt_spp[[feature]], cand_select[["factor"]])

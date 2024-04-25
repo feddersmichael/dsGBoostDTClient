@@ -57,10 +57,10 @@ ds.update_weight <- function(data_name, current_tree, max_splits, reg_par,
     tree_weights <- Reduce(reduce_hessian, weight_list)
     
     calculate_weight <- function(weight) {
-      if (weight[["hessian"]] + reg_par[[1]] == 0) {
+      if (weight[["hessian"]] + reg_par[["lambda"]] == 0) {
         return(0)
       } else {
-        return(-weight[["gradient"]] / (weight[["hessian"]] + reg_par[[1]]))
+        return(-weight[["gradient"]] / (weight[["hessian"]] + reg_par[["lambda"]]))
       }
     }
     

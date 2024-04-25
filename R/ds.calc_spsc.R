@@ -6,11 +6,13 @@
 #' calculated.
 #' @param reg_par The regularisation parameters.
 #' @param cont_NA Vector which numeric feature has additional NA values.
+#' @param first_leaf Whether we are calculating the split-score for the first
+#' leaf.
 #'
 #' @return The split with the best split score.
-ds.calc_spsc <- function(split_sums, spp_cand, reg_par, cont_NA) {
+ds.calc_spsc <- function(split_sums, spp_cand, reg_par, cont_NA, first_leaf = NULL) {
 
-  lambda <- reg_par[[1]]
+  lambda_reg <- reg_par[[1]]
   gamma_reg <- reg_par[[2]]
 
   # Now we can calculate the split score for all possibilities.
@@ -23,13 +25,13 @@ ds.calc_spsc <- function(split_sums, spp_cand, reg_par, cont_NA) {
 
     sums <- split_sums[[i]]
     
-    if (!is.null(reg_par[["first_leaf"]])) {
+    if (!is.null(first_leaf)) {
       prev_sc <- 0
-    } else if ((sums[["compl"]][["hess"]] + lambda) == 0) {
+    } else if ((sums[["compl"]][["hess"]] + lambda_reg) == 0) {
       opt_sp_per_leaf[i, ] <- list(0, "", 0, 0, 0, 0)
       next
     } else {
-      prev_sc <- sums[["compl"]][["grad"]]^2 / (sums[["compl"]][["hess"]] + lambda)
+      prev_sc <- sums[["compl"]][["grad"]]^2 / (sums[["compl"]][["hess"]] + lambda_reg)
     }
 
     # We write it saving based to check correctness first
@@ -51,8 +53,8 @@ ds.calc_spsc <- function(split_sums, spp_cand, reg_par, cont_NA) {
 
         for (j in seq_len(nrow(grad[[feature]]))) {
 
-          denom_check_l <- hess[[feature]]$sum_L_NA[[j]] + lambda
-          denom_check_r <- hess[[feature]]$sum_R[[j]] + lambda
+          denom_check_l <- hess[[feature]]$sum_L_NA[[j]] + lambda_reg
+          denom_check_r <- hess[[feature]]$sum_R[[j]] + lambda_reg
           if (denom_check_l != 0 && denom_check_r != 0) {
             cur_weight_l <- grad[[feature]]$sum_L_NA[[j]] / denom_check_l
             cur_weight_r <- grad[[feature]]$sum_R[[j]] / denom_check_r
@@ -69,8 +71,8 @@ ds.calc_spsc <- function(split_sums, spp_cand, reg_par, cont_NA) {
             }
           }
 
-          denom_check_l <- hess[[feature]]$sum_L[[j]] + lambda
-          denom_check_r <- hess[[feature]]$sum_R_NA[[j]] + lambda
+          denom_check_l <- hess[[feature]]$sum_L[[j]] + lambda_reg
+          denom_check_r <- hess[[feature]]$sum_R_NA[[j]] + lambda_reg
           if (denom_check_l != 0 && denom_check_r != 0) {
             cur_weight_l <- grad[[feature]]$sum_L[[j]] / denom_check_l
             cur_weight_r <- grad[[feature]]$sum_R_NA[[j]] / denom_check_r
@@ -91,8 +93,8 @@ ds.calc_spsc <- function(split_sums, spp_cand, reg_par, cont_NA) {
 
         for (j in seq_len(nrow(grad[[feature]]))) {
 
-          denom_check_l <- hess[[feature]]$sum_L[[j]] + lambda
-          denom_check_r <- hess[[feature]]$sum_R[[j]] + lambda
+          denom_check_l <- hess[[feature]]$sum_L[[j]] + lambda_reg
+          denom_check_r <- hess[[feature]]$sum_R[[j]] + lambda_reg
           if (denom_check_l != 0 && denom_check_r != 0) {
             cur_weight_l <- grad[[feature]]$sum_L[[j]] / denom_check_l
             cur_weight_r <- grad[[feature]]$sum_R[[j]] / denom_check_r

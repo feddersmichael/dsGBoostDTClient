@@ -4,7 +4,7 @@
 \alias{ds.calc_spsc}
 \title{Calculate the split score and choose the best one}
 \usage{
-ds.calc_spsc(split_sums, spp_cand, reg_par, cont_NA)
+ds.calc_spsc(split_sums, spp_cand, reg_par, cont_NA, first_leaf = NULL)
 }
 \arguments{
 \item{split_sums}{The histogram sums for all split bins.}
@@ -15,6 +15,9 @@ calculated.}
 \item{reg_par}{The regularisation parameters.}
 
 \item{cont_NA}{Vector which numeric feature has additional NA values.}
+
+\item{first_leaf}{Whether we are calculating the split-score for the first
+leaf.}
 }
 \value{
 The split with the best split score.

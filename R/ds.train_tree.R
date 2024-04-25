@@ -25,10 +25,11 @@
 #' @return The trained tree.
 #' @export
 ds.train_tree <- function(data_name, bounds_and_levels, data_classes,
-                          output_var, amt_trees, max_splits = 5, split_method,
+                          output_var, amt_trees, max_splits = 5L, split_method,
                           loss_function, amt_spp, cand_select,  weight_update,
-                          reg_par = c(5, 5), dropout_rate = 0.05, ithess_stop,
-                          add_par = NULL, datasources = NULL) {
+                          reg_par = c(lambda = 5, gamma = 5),
+                          dropout_rate = 0.05, ithess_stop, add_par = NULL,
+                          datasources = NULL) {
 
   # We first check all the inputs for appropriate class and set defaults if
   # no input is given.
@@ -48,31 +49,33 @@ ds.train_tree <- function(data_name, bounds_and_levels, data_classes,
   if (cand_select[["numeric"]] == "ithess") {
     if (amt_trees == 0) {
       # TODO: Possibility to combine uniform and ithess in first round
-      spp_cand <- ds.gen_spp_cand(data_name, bounds_and_levels, data_classes, amt_spp,
-                                  list(numeric = "uniform", factor = cand_select[["factor"]]),
-                                  add_par, datasources)
-      add_par[["spp_cand"]] <- spp_cand
-      if (split_method == "totally_random") {
-        add_par[["tot_rand"]] <- TRUE
-      }
-    } else if (split_method == "totally_random" && amt_trees > ithess_stop) {
-      spp_cand <- add_par[["spp_cand"]]
+      spp_cand <- ds.gen_spp_cand(data_name, bounds_and_levels, data_classes,
+                                  amt_spp, list(numeric = "uniform",
+                                                factor = cand_select[["factor"]]),
+                                  add_par, TRUE, split_method,
+                                  datasources)
     } else {
       spp_cand <- ds.gen_spp_cand(data_name, bounds_and_levels, data_classes,
-                                  amt_spp, cand_select, add_par, datasources)
-      add_par[["spp_cand"]] <- spp_cand
+                                  amt_spp, cand_select, add_par,
+                                  amt_trees <= ithess_stop, split_method,
+                                  datasources)
     }
+    add_par[["spp_cand"]] <- spp_cand
   } else if (cand_select[["numeric"]] %in% c("uniform", "loguniform")){
     if (amt_trees == 0) {
       spp_cand <- ds.gen_spp_cand(data_name, bounds_and_levels, data_classes,
-                                  amt_spp, cand_select, add_par, datasources)
-      add_par[["spp_cand"]] <- spp_cand
+                                  amt_spp, cand_select, add_par, TRUE, NULL,
+                                  datasources)
     } else {
-      spp_cand <- add_par[["spp_cand"]]
+      spp_cand <- ds.gen_spp_cand(data_name, bounds_and_levels, data_classes,
+                                  amt_spp, cand_select, add_par, FALSE, NULL,
+                                  datasources)
     }
+    add_par[["spp_cand"]] <- spp_cand
   } else {
     spp_cand <- ds.gen_spp_cand(data_name, bounds_and_levels, data_classes,
-                                amt_spp, cand_select, add_par, datasources)
+                                amt_spp, cand_select, add_par, TRUE, NULL,
+                                datasources)
   }
   
   # We save our tree in a (amount of splits)x8 data frame. Each row represents
@@ -246,10 +249,8 @@ ds.train_tree <- function(data_name, bounds_and_levels, data_classes,
       # save best one for each leaf and continue with the best split over all available ones.
     } else if (split_method == "totally_random") {
       
-      # choose one feature and split point
-      
       # spp_cand <- spp_cand[setdiff(names(spp_cand), categorical)]
-      
+      # choose one feature and split point
       feature <- sample(names(spp_cand), 1)
       split_val <- sample(spp_cand[[feature]], 1)
       if (data_classes[[feature]] == "numeric") {

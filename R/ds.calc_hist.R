@@ -23,7 +23,7 @@ ds.calc_hist <- function(data_name, weight_update, amt_trees, dropout_rate,
     stop("The 'datasources' were expected to be a list of DSConnection-class objects", call. = FALSE)
   }
 
-  removed_trees <- list()
+  removed_trees <- c()
   # We call the server to generate the new histogram values based on the
   # predicted output, updated through the last trained tree
 
@@ -45,21 +45,16 @@ ds.calc_hist <- function(data_name, weight_update, amt_trees, dropout_rate,
   # if we already trained a tree before we just add up the predicted value from
   # the last trained tree
   else {
-    if (dropout_rate %in% c(0, 1)) {
-      cally <- call("calc_histDS", data_name, amt_trees)
-      DSI::datashield.assign.expr(datasources, paste0(data_name, "_training"), cally)
-    } else {
+    if (0 < dropout_rate && dropout_rate < 1) {
       amt_removed_trees <- stats::rbinom(1, amt_trees, dropout_rate)
-      
       if (amt_removed_trees == 0) {
         amt_removed_trees <- 1
       }
-      
       removed_trees <- sample.int(amt_trees, amt_removed_trees)
-      
-      cally <- call("calc_histDS", data_name, amt_trees, removed_trees)
-      DSI::datashield.assign(datasources, paste0(data_name, "_training"), cally)
     }
+    
+    cally <- call("calc_histDS", data_name, amt_trees, removed_trees)
+    DSI::datashield.assign.expr(datasources, paste0(data_name, "_training"), cally)
   }
   
   return(removed_trees)

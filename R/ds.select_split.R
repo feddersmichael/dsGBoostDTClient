@@ -22,13 +22,11 @@ ds.select_split <- function(leaves, spp_cand, data_classes, reg_par) {
   }
   
   if (length(leaves) == 1) {
-    reg_par[["first_leaf"]] <- 1
+    best_split <- ds.calc_spsc(split_sums, spp_cand, reg_par, cont_NA, TRUE)
   } else {
-    reg_par[["first_leaf"]] <- 0
+    best_split <- ds.calc_spsc(split_sums, spp_cand, reg_par, cont_NA)
   }
   
-  best_split <- ds.calc_spsc(split_sums, spp_cand, reg_par, cont_NA)
-
   # Finally we return our choice.
   return(best_split)
 }

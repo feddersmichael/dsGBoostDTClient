@@ -11,6 +11,8 @@ ds.gen_spp_cand(
   amt_spp,
   cand_select,
   add_par = NULL,
+  new_num_spp = TRUE,
+  split_method = NULL,
   datasources = NULL
 )
 }
@@ -28,6 +30,11 @@ factor variables.}
 numeric and factor data.}
 
 \item{add_par}{Additional parameters for the iterative hessian mode.}
+
+\item{new_num_spp}{Whether new numerical spp-point candidates shall be
+generated.}
+
+\item{split_method}{The used split-method.}
 
 \item{datasources}{DATASHIELD server connection.}
 }
