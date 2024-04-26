@@ -153,6 +153,9 @@ ds.train_boosted_tree <- function(data_name, bounds_and_levels, output_var,
       if (shrinkage != 1) {
         stop("If 'dropout_rate' is not 0, 'shrinkage' has to be 1.")
       }
+      if (dropout_rate == 1 && split_method != "totally_random") {
+        stop("If 'dropout_rate' is 1, 'split_method' has to be 'totally_random'.")
+      }
   }
   
   
@@ -204,7 +207,7 @@ ds.train_boosted_tree <- function(data_name, bounds_and_levels, output_var,
     if (shrinkage < 1) {
       tree_return[[1]] <- ds.add_shrinkage(tree_return[[1]], shrinkage)
     }
-    if (length(tree_return[[3]]) != 0) {
+    if (dropout_rate > 0) {
       scale_par <- 1 / (length(tree_return[[3]]) + 1)
       tree_return[[1]] <- ds.add_shrinkage(tree_return[[1]], scale_par)
       for (j in tree_return[[3]]) {

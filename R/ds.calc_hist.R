@@ -37,24 +37,22 @@ ds.calc_hist <- function(data_name, weight_update, amt_trees, dropout_rate,
     
     cally <- call("calc_hist_initDS", data_name)
     DSI::datashield.assign.expr(datasources, paste0(data_name, "_training"), cally)
-    
-    cally <- call("update_full_treeDS", data_name, NULL, 0)
-    DSI::datashield.assign.expr(datasources, paste0(data_name, "_full_tree"),
-                                cally)
   }
   # if we already trained a tree before we just add up the predicted value from
   # the last trained tree
   else {
-    if (0 < dropout_rate && dropout_rate < 1) {
-      amt_removed_trees <- stats::rbinom(1, amt_trees, dropout_rate)
-      if (amt_removed_trees == 0) {
-        amt_removed_trees <- 1
+    if (dropout_rate < 1) {
+      if (dropout_rate > 0) {
+        amt_removed_trees <- stats::rbinom(1, amt_trees, dropout_rate)
+        if (amt_removed_trees == 0) {
+          amt_removed_trees <- 1
+        }
+        removed_trees <- sample.int(amt_trees, amt_removed_trees)
       }
-      removed_trees <- sample.int(amt_trees, amt_removed_trees)
+      
+      cally <- call("calc_histDS", data_name, amt_trees, removed_trees)
+      DSI::datashield.assign.expr(datasources, paste0(data_name, "_training"), cally)
     }
-    
-    cally <- call("calc_histDS", data_name, amt_trees, removed_trees)
-    DSI::datashield.assign.expr(datasources, paste0(data_name, "_training"), cally)
   }
   
   return(removed_trees)

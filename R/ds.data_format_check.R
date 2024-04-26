@@ -19,10 +19,6 @@ ds.data_format_check <- function(data_name, bounds_and_levels, output_var,
   # We want to check in a generic way if the uploaded data fulfills
   # our requirements to be used in this analysis.
   
-  save_list <- list(drop_columns = drop_columns)
-  exist_check <- c(drop_columns = TRUE)
-  ds.save_variables(data_name, save_list, exist_check, datasources)
-
   if (is.null(datasources)) {
     datasources <- DSI::datashield.connections_find()
   }
@@ -30,6 +26,10 @@ ds.data_format_check <- function(data_name, bounds_and_levels, output_var,
                                                   function(d) {methods::is(d, "DSConnection")}))))) {
     stop("The 'datasources' were expected to be a list of DSConnection-class objects", call. = FALSE)
   }
+  
+  save_list <- list(drop_columns = drop_columns)
+  exist_check <- c(drop_columns = TRUE)
+  ds.save_variables(data_name, save_list, exist_check, datasources)
 
   cally <- call("data_format_checkDS", data_name, bounds_and_levels, output_var,
                 loss_function, drop_NA)
