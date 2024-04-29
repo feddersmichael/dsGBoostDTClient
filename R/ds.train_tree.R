@@ -182,7 +182,7 @@ ds.train_tree <- function(data_name, bounds_and_levels, data_classes,
       # TODO: fix workaround
       save_list <- list(spp_cand = split_val)
       exist_check <- c(spp_cand = FALSE)
-      ds.save_variables(data_name, save_list, datasources)
+      ds.save_variables(data_name, save_list, exist_check, datasources)
       # calculate split score + weight for each split-point in all leaves
       histograms_per_leave <- ds.split_bins(data_name, current_tree,
                                             data_classes, datasources)
