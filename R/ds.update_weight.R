@@ -22,7 +22,7 @@ ds.update_weight <- function(data_name, current_tree, max_splits, reg_par,
                                                   function(d) {methods::is(d, "DSConnection")}))))) {
     stop("The 'datasources' were expected to be a list of DSConnection-class objects", call. = FALSE)
   }
-  cally <- call("update_weightDS", data_name, current_tree, max_splits)
+  cally <- call("update_weightDS", data_name, current_tree)
   weight_list <- DSI::datashield.aggregate(datasources, cally)
   amt_weights <- length(weight_list[[1]])
   tree_weights <- numeric()

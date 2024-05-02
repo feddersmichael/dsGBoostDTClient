@@ -36,11 +36,11 @@ ds.gen_numeric_spp_cand <- function(bounds, amt_spp, selection_method, add_par) 
     amt_hist_bins <- length(hess_hist) - 1
     theta <- sum(hess_hist[-(amt_hist_bins + 1)]) / (amt_spp + 1)
     bounds_and_spp_cand <- c(bounds[[1]], prev_spp_cand, bounds[[2]])
-    spp_cand <- c()
+    spp_cand <- numeric()
     
     low_bnd <- 1
     upp_bnd <- 2
-    split_cand <- list(middle = c(), hess = c())
+    split_cand <- list(middle = numeric(), hess = numeric())
     for (i in 1:(amt_hist_bins - 1)) {
       if (hess_hist[[i]] < theta) {
         upp_bnd <- upp_bnd + 1
@@ -83,7 +83,7 @@ ds.gen_numeric_spp_cand <- function(bounds, amt_spp, selection_method, add_par) 
       bounds_and_spp_cand <- c(bounds[[1]], spp_cand, bounds[[2]])
       new_spp <- sample.int((cur_amt_spp + 1), (amt_spp - cur_amt_spp),
                             replace = TRUE)
-      fill_point <- c()
+      fill_point <- numeric()
       for (i in new_spp) {
         fill_point <- c(fill_point, stats::runif(1, bounds_and_spp_cand[[i]],
                                                  bounds_and_spp_cand[[i + 1]]))

@@ -32,7 +32,7 @@ ds.gen_spp_cand <- function(data_name, bounds_and_levels, data_classes, amt_spp,
   # TODO: Add after weight update new hessians.
   if (split_method == "totally_random" && 
       cand_select[["numeric"]] == "ithess") {
-    cally <- call("hessiansDS", data_name, add_par[["spp_cand"]])
+    cally <- call("hessiansDS", data_name)
     hessians_list <- DSI::datashield.aggregate(datasources, cally)
     
     reduce_hessian <- function(S_1, S_2) {

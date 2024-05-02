@@ -52,6 +52,8 @@ ds.calc_hist <- function(data_name, weight_update, amt_trees, dropout_rate,
       
       cally <- call("calc_histDS", data_name, amt_trees, removed_trees)
       DSI::datashield.assign.expr(datasources, paste0(data_name, "_training"), cally)
+    } else {
+      removed_trees <- 1:amt_trees
     }
   }
   

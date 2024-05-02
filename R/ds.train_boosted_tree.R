@@ -87,6 +87,11 @@ ds.train_boosted_tree <- function(data_name, bounds_and_levels, output_var,
   if (!is.integer(max_splits) || length(max_splits) != 1 || max_splits < 1.) {
     stop("'max_splits' needs to be an atomic 'integer' vector greater than 0.")
   }
+  if (split_method == "totally_random") {
+    save_list <- list(max_splits = max_splits)
+    exist_check <- c(max_splits = TRUE)
+    ds.save_variables(data_name, save_list, exist_check, datasources)
+  }
   
   if (!is.character(split_method) || length(split_method) != 1) {
     stop("'split_method' needs to be an atomic 'character' vector.")

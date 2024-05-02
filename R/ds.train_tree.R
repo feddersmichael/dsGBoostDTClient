@@ -174,7 +174,7 @@ ds.train_tree <- function(data_name, bounds_and_levels, data_classes,
         }
       }
     } else if (split_method == "partially_random") {
-      split_val <- c()
+      split_val <- numeric()
       for (feature in names(bounds_and_levels)) {
         split_val <- c(split_val, sample(spp_cand[[feature]], 1))
       }
