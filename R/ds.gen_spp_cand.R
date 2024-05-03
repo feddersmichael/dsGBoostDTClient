@@ -19,7 +19,8 @@
 
 ds.gen_spp_cand <- function(data_name, bounds_and_levels, data_classes, amt_spp,
                             cand_select, add_par = NULL, new_num_spp = TRUE,
-                            split_method = NULL, datasources = NULL) {
+                            split_method = NULL, sel_feat = NULL,
+                            datasources = NULL) {
   
   if (is.null(datasources)) {
     datasources <- DSI::datashield.connections_find()
@@ -48,7 +49,11 @@ ds.gen_spp_cand <- function(data_name, bounds_and_levels, data_classes, amt_spp,
     hessians <- add_par[["hessians"]]
     prev_spp_cand <- add_par[["spp_cand"]]
   }
-  for (feature in names(data_classes)) {
+  
+  if (is.null(sel_feat)) {
+    sel_feat <- names(data_classes)
+  }
+  for (feature in sel_feat) {
     if (data_classes[[feature]] == "numeric") {
       if (new_num_spp) {
         if (cand_select[["numeric"]] == "ithess") {
