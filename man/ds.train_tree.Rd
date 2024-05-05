@@ -14,6 +14,7 @@ ds.train_tree(
   split_method,
   loss_function,
   amt_spp,
+  selected_feat,
   cand_select,
   weight_update,
   reg_par = c(lambda = 5, gamma = 5),
@@ -43,6 +44,9 @@ and levels for factor features.}
 tree.}
 
 \item{amt_spp}{The amount of splitting point candidates per feature.}
+
+\item{selected_feat}{Which part of the feature space we use to build
+the tree.}
 
 \item{cand_select}{Splitting-point selection for numeric and factor features.}
 

@@ -15,6 +15,8 @@
 #' @param loss_function The name of the loss function we want to use for our
 #' boosted tree.
 #' @param amt_spp The amount of split-points per feature.
+#' @param feature_subsampling Which part of the feature space we use to build
+#' the trees.
 #' @param cand_select Splitting-point selection for numeric and factor features.
 #' @param weight_update Through which method we choose the weights for our tree.
 #' @param reg_par Regularisation parameter which prevent overfitting.
@@ -32,12 +34,12 @@ ds.train_boosted_tree <- function(data_name, bounds_and_levels, output_var,
                                   drop_columns = NULL, drop_NA = TRUE,
                                   train_test_ratio = 0.9, max_treecount = 10L,
                                   max_splits = 5L, split_method, loss_function,
-                                  amt_spp, cand_select = c(numeric = "ithess",
-                                                           factor = "exact"),
+                                  amt_spp, feature_subsampling = NULL,
+                                  cand_select = c(numeric = "ithess",
+                                                  factor = "exact"),
                                   weight_update, reg_par = c(lambda = 5,
                                                              gamma = 5),
-                                  shrinkage = 0.1,
-                                  dropout_rate = 0.05,
+                                  shrinkage = 0.1, dropout_rate = 0.05,
                                   ithess_stop = max_treecount, seed = NULL,
                                   datasources = NULL) {
 
@@ -51,7 +53,7 @@ ds.train_boosted_tree <- function(data_name, bounds_and_levels, output_var,
     stop("The 'datasources' were expected to be a list of DSConnection-class objects", call. = FALSE)
   }
   
-  if (!is.character(data_name) || length(data_name) != 1) {
+  if (!is.character(data_name) || !is.atomic(data_name)) {
     stop("'data_name' needs to be an atomic 'character' vector.")
   }
   
@@ -59,7 +61,7 @@ ds.train_boosted_tree <- function(data_name, bounds_and_levels, output_var,
     stop("'bounds_and_levels' needs be a list with at least two elements.")
   }
   
-  if (!is.character(output_var) || length(output_var) != 1) {
+  if (!is.character(output_var) || !is.atomic(output_var)) {
     stop("'output_var' needs to be an atomic 'character' vector.")
   } else if (!output_var %in% names(bounds_and_levels)) {
     stop("'output_var' needs to be an element of 'bounds_and_levels'.")
@@ -71,20 +73,20 @@ ds.train_boosted_tree <- function(data_name, bounds_and_levels, output_var,
     stop("The variables for which we specified bounds and levels can't be dropped.")
   }
   
-  if (!is.logical(drop_NA) || length(drop_NA) != 1) {
+  if (!is.logical(drop_NA) || !is.atomic(drop_NA)) {
     stop("'drop_NA' needs to be an atomic 'logical' vector.")
   }
   
-  if (!is.numeric(train_test_ratio) || length(train_test_ratio) != 1 ||
+  if (!is.numeric(train_test_ratio) || !is.atomic(train_test_ratio) ||
       (train_test_ratio <= 0) || (train_test_ratio > 1)) {
     stop("'train_test_ratio' needs to be an atomic 'numeric' vector which is greater than 0 and at most 1.")
   }
   
-  if (!is.integer(max_treecount) || length(max_treecount) != 1 || max_treecount < 1.) {
+  if (!is.integer(max_treecount) || !is.atomic(max_treecount) || max_treecount < 1.) {
     stop("'max_treecount' needs to be an atomic 'integer' vector greater than 0.")
   }
   
-  if (!is.integer(max_splits) || length(max_splits) != 1 || max_splits < 1.) {
+  if (!is.integer(max_splits) || !is.atomic(max_splits) || max_splits < 1.) {
     stop("'max_splits' needs to be an atomic 'integer' vector greater than 0.")
   }
   if (split_method == "totally_random") {
@@ -93,14 +95,14 @@ ds.train_boosted_tree <- function(data_name, bounds_and_levels, output_var,
     ds.save_variables(data_name, save_list, exist_check, datasources)
   }
   
-  if (!is.character(split_method) || length(split_method) != 1) {
+  if (!is.character(split_method) || !is.atomic(split_method)) {
     stop("'split_method' needs to be an atomic 'character' vector.")
   } else if (!(split_method %in% c("histograms", "partially_random",
                                    "totally_random"))) {
     stop("This split-method is not available.")
   }
   
-  if (!is.character(loss_function) || length(loss_function) != 1) {
+  if (!is.character(loss_function) || !is.atomic(loss_function)) {
     stop("'loss_function' needs to be an atomic 'character' vector.")
   } else if (!(loss_function %in% c("quadratic", "binary_cross_entropy",
                                     "binary_sigmoid"))) {
@@ -110,6 +112,34 @@ ds.train_boosted_tree <- function(data_name, bounds_and_levels, output_var,
   if (!is.integer(amt_spp) || length(amt_spp) == length(bounds_and_levels)
       || any(amt_spp < 1)) {
     stop("'amt_spp' needs to be a vector of data type 'integer' with length of 'bounds_and_levels' minus one and each element greater than 0.")
+  }
+  
+  if(!is.null(feature_subsampling)) {
+    if (!is.list(feature_subsampling) || length(feature_subsampling) != 2) {
+      stop("'feature_subsampling' needs to be a list with two elements.")
+    } else {
+      if (!is.character(feature_subsampling[["mode"]]) || !is.atomic(feature_subsampling[["mode"]])) {
+        stop("'feature_subsampling$mode' needs to be an atomic 'character' vector.")
+      } else if (!(feature_subsampling[["mode"]] %in% c("cyclical", "random"))) {
+        stop("This feature-subsampling mode is not available.")
+      }
+      if (!is.numeric(feature_subsampling[["selection"]]) || !is.atomic(feature_subsampling[["selection"]]) ||
+          feature_subsampling[["selection"]] <= 0) {
+        stop("'feature_subsampling$selection' needs to be an atomic 'numeric' vector greater than 0.")
+      }
+      if (feature_subsampling[["selection"]] >= 1 && !is.integer(feature_subsampling[["selection"]])) {
+        stop("'feature_subsampling$selection' needs to be an atomic 'integer' vector if it is greater than 1.")
+      }
+      if (feature_subsampling[["selection"]] > length(bounds_and_levels)) {
+        stop("'feature_subsampling$selection' can't be greater than the amount of features.")
+      }
+      if (feature_subsampling[["selection"]] == length(bounds_and_levels)) {
+        stop("'feature_subsampling$selection' can't be 'length(bounds_and_levels', use 'feature_subsampling == NULL' instead.")
+      }
+      if (feature_subsampling[["mode"]] == "cyclical" && feature_subsampling[["selection"]] < 1) {
+        stop("If 'feature_subsampling$mode' is 'cyclical', 'feature_subsampling$selection' has to be at least 1.")
+      }
+    }
   }
   
   if (!is.character(cand_select) || length(cand_select) != 2 ||
@@ -124,7 +154,7 @@ ds.train_boosted_tree <- function(data_name, bounds_and_levels, output_var,
                 "' is not supported to create split points for factor features."))
   }
   
-  if (!is.character(weight_update) || length(weight_update) != 1) {
+  if (!is.character(weight_update) || !is.atomic(weight_update)) {
     stop("'weight_update' needs to be an atomic 'character' vector.")
   } else {
     if (split_method == "totally_random") {
@@ -143,12 +173,12 @@ ds.train_boosted_tree <- function(data_name, bounds_and_levels, output_var,
     stop("'reg_par' needs to be a numeric vector of length 2 with positive entries 'lambda' and 'gamma'.")
   }
   
-  if (!is.numeric(shrinkage) || length(shrinkage) != 1 ||
+  if (!is.numeric(shrinkage) || !is.atomic(shrinkage) ||
       shrinkage <= 0 || shrinkage > 1) {
     stop("'shrinkage' needs to be an atomic 'numeric' vector which lies between 0 and 1.")
   }
   
-  if (!is.numeric(dropout_rate) || length(dropout_rate) != 1 ||
+  if (!is.numeric(dropout_rate) || !is.atomic(dropout_rate) ||
       dropout_rate < 0 || dropout_rate > 1) {
     stop("'dropout_rate' needs to be an atomic 'numeric' vector which lies between 0 and 1.")
   } else if (dropout_rate > 0) {
@@ -164,13 +194,13 @@ ds.train_boosted_tree <- function(data_name, bounds_and_levels, output_var,
   }
   
   
-  if (!is.integer(ithess_stop) || length(ithess_stop) != 1 || ithess_stop < 1 ||
+  if (!is.integer(ithess_stop) || !is.atomic(ithess_stop) || ithess_stop < 1 ||
       ithess_stop > max_treecount) {
-    stop("'ithess_stop' needs to be an atomic 'integer'vector between 1 and 'max_treecount'.")
+    stop("'ithess_stop' needs to be an atomic 'integer' vector between 1 and 'max_treecount'.")
   }
   
   if (!is.null(seed)) {
-    if (!is.integer(seed) || length(seed) != 1) {
+    if (!is.integer(seed) || !is.atomic(seed)) {
       stop("'seed' needs to be an atomic 'integer' vector.")
     } else {
       set.seed(seed)
@@ -199,15 +229,40 @@ ds.train_boosted_tree <- function(data_name, bounds_and_levels, output_var,
   # In this loop we train up to 'max_treecount' amount of trees.
   # If the function 'ds.train_tree' returns a break criteria instead of a tree
   # we stop the loop and return the trained boosted tree.
-  add_par <- NULL
+  add_par <- list(spp_cand = list())
   for (i in 1:max_treecount) {
     amt_trees <- i - 1
+    if (amt_trees == 77) {
+      test <- 0
+    }
+    if (is.null(feature_subsampling)) {
+      selected_feat <- NULL
+    } else {
+      if (feature_subsampling[["mode"]] == "cyclical") {
+        selected_feat <- names(data_classes)[((((i - 1) * feature_subsampling[["selection"]]) %% length(data_classes)) + 1):
+                                             (((i * feature_subsampling[["selection"]] - 1) %% length(data_classes)) + 1)]
+      } else if (feature_subsampling[["mode"]] == "random") {
+        if (feature_subsampling[["selection"]] < 1) {
+          amt_feat <- stats::rbinom(1, length(data_classes), feature_subsampling[["selection"]])
+          if (amt_feat == 0) {
+            amt_feat <- 1L
+          }
+          selected_feat <- sample(names(data_classes), amt_feat)
+        } else {
+          selected_feat <- sample(names(data_classes), feature_subsampling[["selection"]])
+        }
+      }
+    }
+    save_list <- list(selected_feat = selected_feat)
+    exist_check <- c(selected_feat = FALSE)
+    ds.save_variables(data_name, save_list, exist_check, datasources)
+    
     # We train the next tree.
     tree_return <- ds.train_tree(data_name, bounds_and_levels, data_classes,
                                  output_var, amt_trees, max_splits,
                                  split_method, loss_function, amt_spp,
-                                 cand_select, weight_update, reg_par,
-                                 dropout_rate, ithess_stop, add_par,
+                                 selected_feat, cand_select, weight_update,
+                                 reg_par, dropout_rate, ithess_stop, add_par,
                                  datasources)
     if (shrinkage < 1) {
       tree_return[[1]] <- ds.add_shrinkage(tree_return[[1]], shrinkage)

@@ -16,6 +16,7 @@ ds.train_boosted_tree(
   split_method,
   loss_function,
   amt_spp,
+  feature_subsampling = NULL,
   cand_select = c(numeric = "ithess", factor = "exact"),
   weight_update,
   reg_par = c(lambda = 5, gamma = 5),
@@ -51,6 +52,9 @@ tree.}
 boosted tree.}
 
 \item{amt_spp}{The amount of split-points per feature.}
+
+\item{feature_subsampling}{Which part of the feature space we use to build
+the trees.}
 
 \item{cand_select}{Splitting-point selection for numeric and factor features.}
 

@@ -12,6 +12,7 @@
 #' @param new_num_spp Whether new numerical spp-point candidates shall be
 #' generated.
 #' @param split_method The used split-method.
+#' @param selected_feat For which features we create splitting points.
 #' @param datasources DATASHIELD server connection.
 #'
 #' @return The created splitting points.
@@ -19,7 +20,7 @@
 
 ds.gen_spp_cand <- function(data_name, bounds_and_levels, data_classes, amt_spp,
                             cand_select, add_par = NULL, new_num_spp = TRUE,
-                            split_method = NULL, sel_feat = NULL,
+                            split_method = NULL, selected_feat = NULL,
                             datasources = NULL) {
   
   if (is.null(datasources)) {
@@ -31,29 +32,34 @@ ds.gen_spp_cand <- function(data_name, bounds_and_levels, data_classes, amt_spp,
   }
   
   # TODO: Add after weight update new hessians.
-  if (split_method == "totally_random" && 
-      cand_select[["numeric"]] == "ithess") {
+  if (cand_select[["numeric"]] == "ithess" && new_num_spp &&
+      (split_method == "totally_random" || (split_method == "histograms" &&
+                                            !is.null(selected_feat)))) {
     cally <- call("hessiansDS", data_name)
     hessians_list <- DSI::datashield.aggregate(datasources, cally)
     
     reduce_hessian <- function(S_1, S_2) {
       mapply(function(feature_1, feature_2){mapply(sum, feature_1, feature_2)},
-             S_1, S_2)
+             S_1, S_2, SIMPLIFY = FALSE)
     }
     
     add_par[["hessians"]] <- Reduce(reduce_hessian, hessians_list)
   }
 
-  spp_cand <- list()
+  spp_cand <- add_par[["spp_cand"]]
   if (cand_select[["numeric"]] == "ithess") {
     hessians <- add_par[["hessians"]]
     prev_spp_cand <- add_par[["spp_cand"]]
   }
   
-  if (is.null(sel_feat)) {
-    sel_feat <- names(data_classes)
+  if (is.null(selected_feat)) {
+    feature_choices <- names(data_classes)
+  } else {
+    feature_choices <- selected_feat
   }
-  for (feature in sel_feat) {
+  
+  # TODO: only create necessary spp_cand for selected features
+  for (feature in feature_choices) {
     if (data_classes[[feature]] == "numeric") {
       if (new_num_spp) {
         if (cand_select[["numeric"]] == "ithess") {

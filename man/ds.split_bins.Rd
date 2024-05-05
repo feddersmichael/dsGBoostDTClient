@@ -4,7 +4,13 @@
 \alias{ds.split_bins}
 \title{Split the data into bins}
 \usage{
-ds.split_bins(data_name, current_tree, data_classes, datasources = NULL)
+ds.split_bins(
+  data_name,
+  current_tree,
+  data_classes,
+  selected_feat,
+  datasources = NULL
+)
 }
 \arguments{
 \item{data_name}{The name under which the data is saved on the server.}
@@ -12,6 +18,9 @@ ds.split_bins(data_name, current_tree, data_classes, datasources = NULL)
 \item{current_tree}{The tree which gets currently trained.}
 
 \item{data_classes}{Denotes for each feature if it is numeric or a factor.}
+
+\item{selected_feat}{Which part of the feature space we use to build
+the tree.}
 
 \item{datasources}{DATASHIELD server connection.}
 }

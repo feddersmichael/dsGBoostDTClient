@@ -12,6 +12,8 @@
 #' @param loss_function The type of loss function under which we optimise the
 #' tree.
 #' @param amt_spp The amount of splitting point candidates per feature.
+#' @param selected_feat Which part of the feature space we use to build
+#' the tree.
 #' @param cand_select Splitting-point selection for numeric and factor features.
 #' @param weight_update Through which method we choose the weights for our tree.
 #' @param reg_par Regularisation parameter which prevent overfitting.
@@ -26,8 +28,8 @@
 #' @export
 ds.train_tree <- function(data_name, bounds_and_levels, data_classes,
                           output_var, amt_trees, max_splits = 5L, split_method,
-                          loss_function, amt_spp, cand_select,  weight_update,
-                          reg_par = c(lambda = 5, gamma = 5),
+                          loss_function, amt_spp, selected_feat, cand_select,
+                          weight_update, reg_par = c(lambda = 5, gamma = 5),
                           dropout_rate = 0.05, ithess_stop, add_par = NULL,
                           datasources = NULL) {
 
@@ -45,38 +47,30 @@ ds.train_tree <- function(data_name, bounds_and_levels, data_classes,
   # trained trees.
   removed_trees <- ds.calc_hist(data_name, weight_update, amt_trees,
                                 dropout_rate, datasources)
-    
   if (cand_select[["numeric"]] == "ithess") {
     if (amt_trees == 0) {
       # TODO: Possibility to combine uniform and ithess in first round
       spp_cand <- ds.gen_spp_cand(data_name, bounds_and_levels, data_classes,
                                   amt_spp, list(numeric = "uniform",
                                                 factor = cand_select[["factor"]]),
-                                  add_par, TRUE, split_method,
+                                  add_par, TRUE, NULL, NULL,
                                   datasources)
     } else {
       spp_cand <- ds.gen_spp_cand(data_name, bounds_and_levels, data_classes,
                                   amt_spp, cand_select, add_par,
                                   amt_trees <= ithess_stop, split_method,
-                                  datasources)
+                                  selected_feat, datasources)
     }
-    add_par[["spp_cand"]] <- spp_cand
   } else if (cand_select[["numeric"]] %in% c("uniform", "loguniform")){
-    if (amt_trees == 0) {
-      spp_cand <- ds.gen_spp_cand(data_name, bounds_and_levels, data_classes,
-                                  amt_spp, cand_select, add_par, TRUE, NULL,
-                                  datasources)
-    } else {
-      spp_cand <- ds.gen_spp_cand(data_name, bounds_and_levels, data_classes,
-                                  amt_spp, cand_select, add_par, FALSE, NULL,
-                                  datasources)
-    }
-    add_par[["spp_cand"]] <- spp_cand
+    spp_cand <- ds.gen_spp_cand(data_name, bounds_and_levels, data_classes,
+                                amt_spp, cand_select, add_par, amt_trees == 0,
+                                NULL, selected_feat, datasources)
   } else {
     spp_cand <- ds.gen_spp_cand(data_name, bounds_and_levels, data_classes,
                                 amt_spp, cand_select, add_par, TRUE, NULL,
-                                datasources)
+                                selected_feat, datasources)
   }
+  add_par[["spp_cand"]] <- spp_cand
   
   # We save our tree in a (amount of splits)x8 data frame. Each row represents
   # one split point.
@@ -112,7 +106,8 @@ ds.train_tree <- function(data_name, bounds_and_levels, data_classes,
     if (split_method == "histograms") {
       
       histograms_per_leave <- ds.split_bins(data_name, current_tree,
-                                            data_classes, datasources)
+                                            data_classes, selected_feat,
+                                            datasources)
       
       # We search for the best possible split(s) in the newly added branch.
       best_split <- ds.select_split(histograms_per_leave, spp_cand, data_classes,
@@ -131,7 +126,7 @@ ds.train_tree <- function(data_name, bounds_and_levels, data_classes,
                             best_split$cont_NA[[1]], TRUE, best_split$weight_l[[1]],
                             TRUE, best_split$weight_r[[1]], 0, TRUE)
         current_tree[1, ] <- next_split
-        if (cand_select[["numeric"]] == "ithess") {
+        if (cand_select[["numeric"]] == "ithess" && is.null(selected_feat)) {
           add_par[["hessians"]] <- histograms_per_leave[[1]]$hess
         }
       } else {
@@ -293,9 +288,9 @@ ds.train_tree <- function(data_name, bounds_and_levels, data_classes,
       current_tree$w_s_right_value[[tree_row]] <- leaf_weights[[2 * j]]
     }
   }
-  
   ds.save_tree(data_name, current_tree, amt_trees + 1, length(removed_trees),
                datasources)
+  
   if (dropout_rate < 1) {
     ds.update_trees(data_name, removed_trees, amt_trees + 1, datasources)
   }

@@ -13,6 +13,7 @@ ds.gen_spp_cand(
   add_par = NULL,
   new_num_spp = TRUE,
   split_method = NULL,
+  selected_feat = NULL,
   datasources = NULL
 )
 }
@@ -35,6 +36,8 @@ numeric and factor data.}
 generated.}
 
 \item{split_method}{The used split-method.}
+
+\item{selected_feat}{For which features we create splitting points.}
 
 \item{datasources}{DATASHIELD server connection.}
 }

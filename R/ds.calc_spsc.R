@@ -43,11 +43,11 @@ ds.calc_spsc <- function(split_sums, spp_cand, reg_par, cont_NA, first_leaf = NU
     split_cont_NA <- 0
     split_feature <- ""
     split_pt <- 0
-    spsc <- prev_sc + 2 * gamma_reg
+    spsc <- prev_sc
     weight_l <- 0
     weight_r <- 0
 
-    for (feature in names(spp_cand)) {
+    for (feature in names(grad)) {
 
       if (cont_NA[[i]][feature]) {
 
@@ -115,6 +115,9 @@ ds.calc_spsc <- function(split_sums, spp_cand, reg_par, cont_NA, first_leaf = NU
     }
 
     spsc <- (spsc - prev_sc) / 2 - gamma_reg
+    if (spsc < 0) {
+      spsc <- 0
+    }
     best_split <- list(spsc, split_feature, split_pt, split_cont_NA, weight_l,
                        weight_r)
     opt_sp_per_leaf[i, ] <- best_split

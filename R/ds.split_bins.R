@@ -4,12 +4,14 @@
 #' @param data_name The name under which the data is saved on the server.
 #' @param current_tree The tree which gets currently trained.
 #' @param data_classes Denotes for each feature if it is numeric or a factor.
+#' @param selected_feat Which part of the feature space we use to build
+#' the tree.
 #' @param datasources DATASHIELD server connection.
 #'
 #' @return The histogram sums for each bin for all features.
 #' @export
 ds.split_bins <- function(data_name, current_tree, data_classes,
-                          datasources = NULL) {
+                          selected_feat, datasources = NULL) {
 
   # We first check all the inputs for appropriate class and set defaults if
   # no input is given.
@@ -39,7 +41,7 @@ ds.split_bins <- function(data_name, current_tree, data_classes,
       comb_histograms[["grad"]] <- list()
       comb_histograms[["hess"]] <- list()
 
-      for (feature in names(data_classes)) {
+      for (feature in selected_feat) {
         comb_histograms[["grad"]][[feature]] <- mapply(sum, S_1[[i]][["grad"]][[feature]],
                                                        S_2[[i]][["grad"]][[feature]])
         comb_histograms[["hess"]][[feature]] <- mapply(sum, S_1[[i]][["hess"]][[feature]],
@@ -56,7 +58,7 @@ ds.split_bins <- function(data_name, current_tree, data_classes,
   for (i in 1:amt_leaves) {
 
     cont_NA <- logical()
-    for (feature in names(data_classes)) {
+    for (feature in selected_feat) {
       categories <- histograms_per_leaf[[i]][["grad"]][[feature]]
       if ("NA" %in% names(categories) && data_classes[[feature]] == "numeric" &&
           (categories["NA"] != 0)) {
