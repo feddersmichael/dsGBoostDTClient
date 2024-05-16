@@ -58,18 +58,19 @@ ds.gen_spp_cand <- function(data_name, bounds_and_levels, data_classes, amt_spp,
     feature_choices <- selected_feat
   }
   
-  # TODO: only create necessary spp_cand for selected features
   for (feature in feature_choices) {
     if (data_classes[[feature]] == "numeric") {
       if (new_num_spp) {
         if (cand_select[["numeric"]] == "ithess") {
-          add_par <- list(hessians = hessians[[feature]],
+          add_par_feat <- list(hessians = hessians[[feature]],
                           prev_spp_cand = prev_spp_cand[[feature]])
+        } else {
+          add_par_feat <- NULL
         }
         spp_cand[[feature]] <- ds.gen_numeric_spp_cand(bounds_and_levels[[feature]],
                                                        amt_spp[[feature]],
                                                        cand_select[["numeric"]],
-                                                       add_par)
+                                                       add_par_feat)
       } else {
         spp_cand[[feature]] <- add_par[["spp_cand"]][[feature]]
       }

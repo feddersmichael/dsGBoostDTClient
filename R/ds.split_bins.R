@@ -56,7 +56,6 @@ ds.split_bins <- function(data_name, current_tree, data_classes,
   histograms_per_leaf <- Reduce(reduce_hist, histogram_per_server)
 
   for (i in 1:amt_leaves) {
-
     cont_NA <- logical()
     for (feature in selected_feat) {
       categories <- histograms_per_leaf[[i]][["grad"]][[feature]]
@@ -67,7 +66,6 @@ ds.split_bins <- function(data_name, current_tree, data_classes,
         cont_NA[[feature]] <- FALSE
       }
     }
-
     histograms_per_leaf[[i]][["cont_NA"]] <- cont_NA
   }
 

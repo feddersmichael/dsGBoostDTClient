@@ -8,6 +8,8 @@
 #' @param drop_NA If NA data in the output variable should be removed.
 #' @param train_test_ratio Percentage of the data which should be used for
 #' Training.
+#' @param federation Through which method we share the data between client and
+#' the servers.
 #' @param max_treecount Maximum amount of trees to build our boosted decision
 #' tree.
 #' @param max_splits The maximum amount of splits in the trained tree.
@@ -32,7 +34,8 @@
 #' @export
 ds.train_boosted_tree <- function(data_name, bounds_and_levels, output_var,
                                   drop_columns = NULL, drop_NA = TRUE,
-                                  train_test_ratio = 0.9, max_treecount = 10L,
+                                  train_test_ratio = 0.9, federation,
+                                  max_treecount = 10L,
                                   max_splits = 5L, split_method, loss_function,
                                   amt_spp, feature_subsampling = NULL,
                                   cand_select = c(numeric = "ithess",
@@ -193,7 +196,6 @@ ds.train_boosted_tree <- function(data_name, bounds_and_levels, output_var,
       }
   }
   
-  
   if (!is.integer(ithess_stop) || !is.atomic(ithess_stop) || ithess_stop < 1 ||
       ithess_stop > max_treecount) {
     stop("'ithess_stop' needs to be an atomic 'integer' vector between 1 and 'max_treecount'.")
@@ -230,52 +232,70 @@ ds.train_boosted_tree <- function(data_name, bounds_and_levels, output_var,
   # If the function 'ds.train_tree' returns a break criteria instead of a tree
   # we stop the loop and return the trained boosted tree.
   add_par <- list(spp_cand = list())
-  for (i in 1:max_treecount) {
-    amt_trees <- i - 1
-    if (amt_trees == 77) {
-      test <- 0
-    }
-    if (is.null(feature_subsampling)) {
-      selected_feat <- NULL
-    } else {
-      if (feature_subsampling[["mode"]] == "cyclical") {
-        selected_feat <- names(data_classes)[((((i - 1) * feature_subsampling[["selection"]]) %% length(data_classes)) + 1):
-                                             (((i * feature_subsampling[["selection"]] - 1) %% length(data_classes)) + 1)]
-      } else if (feature_subsampling[["mode"]] == "random") {
-        if (feature_subsampling[["selection"]] < 1) {
-          amt_feat <- stats::rbinom(1, length(data_classes), feature_subsampling[["selection"]])
-          if (amt_feat == 0) {
-            amt_feat <- 1L
+  
+  if (federation[["mode"]] == "histograms") {
+    for (i in 1:max_treecount) {
+      amt_trees <- i - 1
+      if (is.null(feature_subsampling)) {
+        selected_feat <- NULL
+      } else {
+        if (feature_subsampling[["mode"]] == "cyclical") {
+          selected_feat <- names(data_classes)[((((i - 1) * feature_subsampling[["selection"]]) %% length(data_classes)) + 1):
+                                                 (((i * feature_subsampling[["selection"]] - 1) %% length(data_classes)) + 1)]
+        } else if (feature_subsampling[["mode"]] == "random") {
+          if (feature_subsampling[["selection"]] < 1) {
+            amt_feat <- stats::rbinom(1, length(data_classes), feature_subsampling[["selection"]])
+            if (amt_feat == 0) {
+              amt_feat <- 1L
+            }
+            selected_feat <- sample(names(data_classes), amt_feat)
+          } else {
+            selected_feat <- sample(names(data_classes), feature_subsampling[["selection"]])
           }
-          selected_feat <- sample(names(data_classes), amt_feat)
-        } else {
-          selected_feat <- sample(names(data_classes), feature_subsampling[["selection"]])
         }
       }
+      save_list <- list(selected_feat = selected_feat)
+      exist_check <- c(selected_feat = FALSE)
+      ds.save_variables(data_name, save_list, exist_check, datasources)
+      
+      # We train the next tree.
+      tree_return <- ds.train_tree(data_name, bounds_and_levels, data_classes,
+                                   output_var, amt_trees, max_splits,
+                                   split_method, loss_function, amt_spp,
+                                   selected_feat, cand_select, weight_update,
+                                   reg_par, dropout_rate, ithess_stop, add_par,
+                                   datasources)
+      if (shrinkage < 1) {
+        tree_return[[1]] <- ds.add_shrinkage(tree_return[[1]], shrinkage)
+      }
+      if (dropout_rate > 0) {
+        scale_par <- 1 / (length(tree_return[[3]]) + 1)
+        tree_return[[1]] <- ds.add_shrinkage(tree_return[[1]], scale_par)
+        for (j in tree_return[[3]]) {
+          tree_list[[j]] <- ds.add_shrinkage(tree_list[[j]], length(tree_return[[3]]) * scale_par)
+        }
+      }
+      tree_list[[i]] <- tree_return[[1]]
+      add_par <- tree_return[[2]]
     }
-    save_list <- list(selected_feat = selected_feat)
-    exist_check <- c(selected_feat = FALSE)
-    ds.save_variables(data_name, save_list, exist_check, datasources)
+  } else {
+    amt_server <- length(datasources)
     
-    # We train the next tree.
-    tree_return <- ds.train_tree(data_name, bounds_and_levels, data_classes,
-                                 output_var, amt_trees, max_splits,
-                                 split_method, loss_function, amt_spp,
-                                 selected_feat, cand_select, weight_update,
-                                 reg_par, dropout_rate, ithess_stop, add_par,
-                                 datasources)
-    if (shrinkage < 1) {
-      tree_return[[1]] <- ds.add_shrinkage(tree_return[[1]], shrinkage)
-    }
-    if (dropout_rate > 0) {
-      scale_par <- 1 / (length(tree_return[[3]]) + 1)
-      tree_return[[1]] <- ds.add_shrinkage(tree_return[[1]], scale_par)
-      for (j in tree_return[[3]]) {
-        tree_list[[j]] <- ds.add_shrinkage(tree_list[[j]], length(tree_return[[3]]) * scale_par)
+    #initialisation round
+    ds.initialise_remote_tree(federation)
+    
+    
+    
+    if (max_treecount > 1) {
+      for (i in 2:max_treecount) {
+        if(federation[["mode"]] == "cyclical") {
+          selected_server <- 1
+        } else if(federation[["mode"]] == "random") {
+          selected_server <- 1
+        }
+        ds.train_remote_tree(selected_server, datasources)
       }
     }
-    tree_list[[i]] <- tree_return[[1]]
-    add_par <- tree_return[[2]]
   }
 
   # After the training we can save our model locally.
