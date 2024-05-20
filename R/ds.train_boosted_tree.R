@@ -282,18 +282,18 @@ ds.train_boosted_tree <- function(data_name, bounds_and_levels, output_var,
     amt_server <- length(datasources)
     
     #initialisation round
-    ds.initialise_remote_tree(federation)
+    trees <- ds.initialise_remote_tree(data_name, federation, weight_update,
+                                       dropout_rate, cand_select, ithess_stop,
+                                       split_method, reg_par, amt_server,
+                                       datasources)
     
-    
-    
+    tree_list <- trees
     if (max_treecount > 1) {
       for (i in 2:max_treecount) {
-        if(federation[["mode"]] == "cyclical") {
-          selected_server <- 1
-        } else if(federation[["mode"]] == "random") {
-          selected_server <- 1
-        }
-        ds.train_remote_tree(selected_server, datasources)
+        
+        trees <- ds.train_remote_tree(data_name, federation, i, prev_amt_trees,
+                                      feature_subsampling, data_classes,
+                                      dropout_rate, datasources)
       }
     }
   }
