@@ -11,6 +11,7 @@ ds.train_boosted_tree(
   drop_columns = NULL,
   drop_NA = TRUE,
   train_test_ratio = 0.9,
+  federation,
   max_treecount = 10L,
   max_splits = 5L,
   split_method,
@@ -40,6 +41,9 @@ ds.train_boosted_tree(
 
 \item{train_test_ratio}{Percentage of the data which should be used for
 Training.}
+
+\item{federation}{Through which method we share the data between client and
+the servers.}
 
 \item{max_treecount}{Maximum amount of trees to build our boosted decision
 tree.}

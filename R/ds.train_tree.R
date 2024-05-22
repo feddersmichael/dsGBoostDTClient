@@ -100,6 +100,13 @@ ds.train_tree <- function(data_name, bounds_and_levels, data_classes,
                              w_s_left_value = numeric(), w_s_right = logical(),
                              w_s_right_value = numeric(), par_spp = numeric(),
                              par_dir = logical())
+  split_scores_left <- data.frame(sp_sc = numeric(), feature = character(),
+                                  split_val = numeric(), cont_NA = numeric(),
+                                  weight_l = numeric(), weight_r = numeric())
+  
+  split_scores_right <- data.frame(sp_sc = numeric(), feature = character(),
+                                   split_val = numeric(), cont_NA = numeric(),
+                                   weight_l = numeric(), weight_r = numeric())
   
   # In this loop we build a tree with up to 'max_splits' many splits.
   for (i in 1:max_splits) {
@@ -114,14 +121,6 @@ ds.train_tree <- function(data_name, bounds_and_levels, data_classes,
                                     reg_par)
       
       if (i == 1) {
-        split_scores_left <- data.frame(sp_sc = numeric(), feature = character(),
-                                        split_val = numeric(), cont_NA = numeric(),
-                                        weight_l = numeric(), weight_r = numeric())
-        
-        split_scores_right <- data.frame(sp_sc = numeric(), feature = character(),
-                                         split_val = numeric(), cont_NA = numeric(),
-                                         weight_l = numeric(), weight_r = numeric())
-        
         next_split <- list(best_split$feature[[1]], best_split$split_val[[1]],
                             best_split$cont_NA[[1]], TRUE, best_split$weight_l[[1]],
                             TRUE, best_split$weight_r[[1]], 0, TRUE)

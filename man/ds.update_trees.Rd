@@ -4,14 +4,14 @@
 \alias{ds.update_trees}
 \title{Update the trees which got changed through DART.}
 \usage{
-ds.update_trees(data_name, removed_trees, last_tree_nmb, datasources)
+ds.update_trees(data_name, removed_trees, added_trees, datasources)
 }
 \arguments{
 \item{data_name}{The name under which the data is saved on the server.}
 
 \item{removed_trees}{Which trees got removed for training.}
 
-\item{last_tree_nmb}{Number of the last trained tree.}
+\item{added_trees}{Numbers of the trees added this round.}
 
 \item{datasources}{DATASHIELD server connection.}
 }

@@ -23,7 +23,7 @@ ds.calc_hist <- function(data_name, weight_update, amt_trees, dropout_rate,
     stop("The 'datasources' were expected to be a list of DSConnection-class objects", call. = FALSE)
   }
 
-  removed_trees <- c()
+  removed_trees <- integer()
   # We call the server to generate the new histogram values based on the
   # predicted output, updated through the last trained tree
 

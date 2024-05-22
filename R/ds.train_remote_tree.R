@@ -19,6 +19,7 @@ ds.train_remote_tree <- function(data_name, federation, comunication_round, prev
       selected_server <- sample(1:amt_server, federation[["selection"]])
     }
   }
+  
   if (is.null(feature_subsampling)) {
     selected_feat <- NULL
   } else {
@@ -48,7 +49,7 @@ ds.train_remote_tree <- function(data_name, federation, comunication_round, prev
     }
     removed_trees <- sample.int(prev_amt_trees, amt_removed_trees)
   } else {
-    removed_trees <- c()
+    removed_trees <- integer()
   }
   
   cally <- call("calc_histDS", data_name, removed_trees)

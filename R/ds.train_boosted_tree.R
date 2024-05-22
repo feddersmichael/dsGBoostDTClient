@@ -231,9 +231,9 @@ ds.train_boosted_tree <- function(data_name, bounds_and_levels, output_var,
   # In this loop we train up to 'max_treecount' amount of trees.
   # If the function 'ds.train_tree' returns a break criteria instead of a tree
   # we stop the loop and return the trained boosted tree.
-  add_par <- list(spp_cand = list())
   
   if (federation[["mode"]] == "histograms") {
+    add_par <- list(spp_cand = list())
     for (i in 1:max_treecount) {
       amt_trees <- i - 1
       if (is.null(feature_subsampling)) {
@@ -278,23 +278,21 @@ ds.train_boosted_tree <- function(data_name, bounds_and_levels, output_var,
       tree_list[[i]] <- tree_return[[1]]
       add_par <- tree_return[[2]]
     }
-  } else {
-    amt_server <- length(datasources)
-    
+  } else if (federation[["mode"]] %in% c("trees_cyclical", "trees_random")){
     #initialisation round
     trees <- ds.initialise_remote_tree(data_name, federation, weight_update,
                                        dropout_rate, cand_select, ithess_stop,
-                                       split_method, reg_par, amt_server,
-                                       datasources)
-    
+                                       split_method, reg_par,
+                                       feature_subsampling, data_classes,
+                                       amt_spp, max_splits, datasources)
     tree_list <- trees
     if (max_treecount > 1) {
       for (i in 2:max_treecount) {
-        
-        trees <- ds.train_remote_tree(data_name, federation, i, prev_amt_trees,
-                                      feature_subsampling, data_classes,
-                                      dropout_rate, datasources)
+        trees <- ds.train_remote_tree(data_name, federation, i,
+                                      length(tree_list), feature_subsampling,
+                                      data_classes, dropout_rate, datasources)
       }
+      tree_list <- append(tree_list, trees)
     }
   }
 

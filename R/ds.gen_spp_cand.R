@@ -46,10 +46,9 @@ ds.gen_spp_cand <- function(data_name, bounds_and_levels, data_classes, amt_spp,
     add_par[["hessians"]] <- Reduce(reduce_hessian, hessians_list)
   }
 
-  spp_cand <- add_par[["spp_cand"]]
+  
   if (cand_select[["numeric"]] == "ithess") {
     hessians <- add_par[["hessians"]]
-    prev_spp_cand <- add_par[["spp_cand"]]
   }
   
   if (is.null(selected_feat)) {
@@ -58,12 +57,13 @@ ds.gen_spp_cand <- function(data_name, bounds_and_levels, data_classes, amt_spp,
     feature_choices <- selected_feat
   }
   
+  spp_cand <- add_par[["spp_cand"]]
   for (feature in feature_choices) {
     if (data_classes[[feature]] == "numeric") {
       if (new_num_spp) {
         if (cand_select[["numeric"]] == "ithess") {
           add_par_feat <- list(hessians = hessians[[feature]],
-                          prev_spp_cand = prev_spp_cand[[feature]])
+                          prev_spp_cand = spp_cand[[feature]])
         } else {
           add_par_feat <- NULL
         }
@@ -71,8 +71,6 @@ ds.gen_spp_cand <- function(data_name, bounds_and_levels, data_classes, amt_spp,
                                                        amt_spp[[feature]],
                                                        cand_select[["numeric"]],
                                                        add_par_feat)
-      } else {
-        spp_cand[[feature]] <- add_par[["spp_cand"]][[feature]]
       }
     } else {
       spp_cand[[feature]] <- ds.gen_factor_spp_cand(length(bounds_and_levels[[feature]]),
