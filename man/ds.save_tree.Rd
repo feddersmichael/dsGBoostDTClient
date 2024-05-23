@@ -4,7 +4,7 @@
 \alias{ds.save_tree}
 \title{Save a single tree}
 \usage{
-ds.save_tree(data_name, tree, tree_number, amt_drops, datasources)
+ds.save_tree(data_name, tree, tree_number, amt_drops, amt_adds, datasources)
 }
 \arguments{
 \item{data_name}{The name under which the data is saved on the server.}
@@ -14,6 +14,8 @@ ds.save_tree(data_name, tree, tree_number, amt_drops, datasources)
 \item{tree_number}{How many trees have been trained.}
 
 \item{amt_drops}{How many tree were dropped to train this tree.}
+
+\item{amt_adds}{How many trees were added this round}
 
 \item{datasources}{DATASHIELD server connection.}
 }

@@ -288,7 +288,7 @@ ds.train_tree <- function(data_name, bounds_and_levels, data_classes,
     }
   }
   ds.save_tree(data_name, current_tree, amt_trees + 1, length(removed_trees),
-               datasources)
+               1L, datasources)
   
   if (dropout_rate < 1) {
     ds.update_trees(data_name, removed_trees, amt_trees + 1, datasources)

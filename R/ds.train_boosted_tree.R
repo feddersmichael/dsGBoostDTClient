@@ -291,8 +291,9 @@ ds.train_boosted_tree <- function(data_name, bounds_and_levels, output_var,
         trees <- ds.train_remote_tree(data_name, federation, i,
                                       length(tree_list), feature_subsampling,
                                       data_classes, dropout_rate, datasources)
+        
+        tree_list <- append(tree_list, trees)
       }
-      tree_list <- append(tree_list, trees)
     }
   }
 

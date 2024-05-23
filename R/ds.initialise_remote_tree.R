@@ -1,4 +1,22 @@
 
+#' Title
+#'
+#' @param data_name 
+#' @param federation 
+#' @param weight_update 
+#' @param dropout_rate 
+#' @param cand_select 
+#' @param ithess_stop 
+#' @param split_method 
+#' @param reg_par 
+#' @param feature_subsampling 
+#' @param data_classes 
+#' @param amt_spp 
+#' @param max_splits 
+#' @param datasources 
+#'
+#' @return The trained Tree
+#' @export
 ds.initialise_remote_tree <- function(data_name, federation, weight_update,
                                       dropout_rate, cand_select, ithess_stop,
                                       split_method, reg_par,
@@ -72,12 +90,12 @@ ds.initialise_remote_tree <- function(data_name, federation, weight_update,
   amt_trees <- length(trees)
   if (amt_trees > 1) {
     for (i in 1:amt_trees) {
-      ds.save_tree(data_name, ds.add_shrinkage(trees[[i]], 1 / amt_trees), i, 0,
-                   datasources)
+      ds.save_tree(data_name, trees[[i]], i, 0, amt_trees, datasources)
     }
   } else {
-    ds.save_tree(data_name, trees[[1]], 1, 0, datasources)
+    ds.save_tree(data_name, trees[[1]], 1L, 0, 1L, datasources)
   }
+  
   ds.update_trees(data_name, removed_trees, 1:amt_trees, datasources)
   
   return(trees)

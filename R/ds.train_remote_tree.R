@@ -5,10 +5,10 @@ ds.train_remote_tree <- function(data_name, federation, comunication_round, prev
   
   amt_server <- length(datasources)
   
-  if(federation[["mode"]] == "cyclical") {
+  if(federation[["mode"]] == "trees_cyclical") {
     selected_server <- ((((comunication_round - 1) * federation[["selection"]]) %% amt_server) + 1):
       (((comunication_round * federation[["selection"]] - 1) %% amt_server) + 1)
-  } else if(federation[["mode"]] == "random") {
+  } else if(federation[["mode"]] == "trees_random") {
     if (federation[["selection"]] < 1) {
       selected_server_amt <- stats::rbinom(1, amt_server, federation[["selection"]])
       if(selected_server_amt == 0) {
@@ -38,8 +38,9 @@ ds.train_remote_tree <- function(data_name, federation, comunication_round, prev
       }
     }
   }
-  save_list <- list(selected_feat = selected_feat)
-  exist_check <- c(selected_feat = FALSE)
+  save_list <- list(selected_feat = selected_feat,
+                    comunication_round = comunication_round)
+  exist_check <- c(selected_feat = FALSE, comunication_round = FALSE)
   ds.save_variables(data_name, save_list, exist_check, datasources)
   
   if (dropout_rate > 0) {
@@ -56,21 +57,21 @@ ds.train_remote_tree <- function(data_name, federation, comunication_round, prev
   DSI::datashield.assign.expr(datasources, paste0(data_name, "_training"), cally)
   
   cally <- call("gen_spp_candDS", data_name)
-  DSI::datashield.assign.expr(datasources, paste0(data_name, "_spp_cand"), cally)
+  DSI::datashield.assign.expr(datasources[selected_server], paste0(data_name, "_spp_cand"), cally)
   
   cally <- call("train_treeDS", data_name)
-  trees <- DSI::datashield.aggregate(datasources, cally)
+  trees <- DSI::datashield.aggregate(datasources[selected_server], cally)
   
   amt_trees <- length(trees)
   
   if (amt_trees > 1) {
     for (i in 1:amt_trees) {
-      ds.save_tree(data_name, ds.add_shrinkage(trees[[i]], 1 / amt_trees),
-                   prev_amt_trees + i, length(removed_trees), datasources)
+      ds.save_tree(data_name, trees[[i]], prev_amt_trees + i,
+                   length(removed_trees), amt_trees, datasources)
     }
   } else {
     ds.save_tree(data_name, trees[[1]], prev_amt_trees + 1,
-                 length(removed_trees), datasources)
+                 length(removed_trees), 1, datasources)
   }
   
   ds.update_trees(data_name, removed_trees,

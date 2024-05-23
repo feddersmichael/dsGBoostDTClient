@@ -16,8 +16,9 @@ ds.update_trees <- function(data_name, removed_trees, added_trees,
                               cally)
   
   amt_drops <- length(removed_trees)
+  amt_adds <- length(added_trees)
   for (i in removed_trees) {
-    cally <- call("update_treeDS", data_name, i, amt_drops)
+    cally <- call("update_treeDS", data_name, i, amt_drops, amt_adds)
     DSI::datashield.assign.expr(datasources, paste0(data_name, "_tree_", i),
                                 cally)
   }
