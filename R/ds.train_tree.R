@@ -125,7 +125,7 @@ ds.train_tree <- function(data_name, bounds_and_levels, data_classes,
                             best_split$cont_NA[[1]], TRUE, best_split$weight_l[[1]],
                             TRUE, best_split$weight_r[[1]], 0, TRUE)
         current_tree[1, ] <- next_split
-        if (cand_select[["numeric"]] == "ithess" && is.null(selected_feat)) {
+        if (cand_select[["numeric"]] == "ithess" && (selected_feat == names(bounds_and_levels))) {
           add_par[["hessians"]] <- histograms_per_leave[[1]]$hess
         }
       } else {

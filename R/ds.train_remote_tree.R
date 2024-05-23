@@ -1,7 +1,7 @@
 
-ds.train_remote_tree <- function(data_name, federation, comunication_round, prev_amt_trees,
-                                 feature_subsampling, data_classes, dropout_rate,
-                                 datasources) {
+ds.train_remote_tree <- function(data_name, federation, comunication_round,
+                                 prev_amt_trees, feature_subsampling,
+                                 data_classes, dropout_rate, datasources) {
   
   amt_server <- length(datasources)
   
@@ -21,7 +21,7 @@ ds.train_remote_tree <- function(data_name, federation, comunication_round, prev
   }
   
   if (is.null(feature_subsampling)) {
-    selected_feat <- NULL
+    selected_feat <- names(bounds_and_levels)
   } else {
     if (feature_subsampling[["mode"]] == "cyclical") {
       selected_feat <- names(data_classes)[((((comunication_round - 1) * feature_subsampling[["selection"]]) %% length(data_classes)) + 1):
@@ -38,6 +38,7 @@ ds.train_remote_tree <- function(data_name, federation, comunication_round, prev
       }
     }
   }
+  
   save_list <- list(selected_feat = selected_feat,
                     comunication_round = comunication_round)
   exist_check <- c(selected_feat = FALSE, comunication_round = FALSE)

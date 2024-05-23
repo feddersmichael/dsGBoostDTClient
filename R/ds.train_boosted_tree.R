@@ -26,7 +26,7 @@
 #' @param dropout_rate Chance that a tree is not used for building the next
 #' tree.
 #' @param ithess_stop Maximum amount of times we update the split-point
-#' candidates if the split-method is "totally_random"
+#' candidates if the split-method is "totally_random".
 #' @param seed If we want to choose a specific random behavior client side.
 #' @param datasources DATASHIELD server connection.
 #'
@@ -237,7 +237,7 @@ ds.train_boosted_tree <- function(data_name, bounds_and_levels, output_var,
     for (i in 1:max_treecount) {
       amt_trees <- i - 1
       if (is.null(feature_subsampling)) {
-        selected_feat <- NULL
+        selected_feat <- names(bounds_and_levels)
       } else {
         if (feature_subsampling[["mode"]] == "cyclical") {
           selected_feat <- names(data_classes)[((((i - 1) * feature_subsampling[["selection"]]) %% length(data_classes)) + 1):

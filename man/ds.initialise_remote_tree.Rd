@@ -2,7 +2,7 @@
 % Please edit documentation in R/ds.initialise_remote_tree.R
 \name{ds.initialise_remote_tree}
 \alias{ds.initialise_remote_tree}
-\title{Title}
+\title{First training round of a remote tree.}
 \usage{
 ds.initialise_remote_tree(
   data_name,
@@ -21,35 +21,39 @@ ds.initialise_remote_tree(
 )
 }
 \arguments{
-\item{data_name}{}
+\item{data_name}{The name under which the data is saved on the server.}
 
-\item{federation}{}
+\item{federation}{Through which method we share the data between client and
+the servers.}
 
-\item{weight_update}{}
+\item{weight_update}{Through which method we choose the weights for our tree.}
 
-\item{dropout_rate}{}
+\item{dropout_rate}{Chance that a tree is not used for building the next
+tree.}
 
-\item{cand_select}{}
+\item{cand_select}{Splitting-point selection for numeric and factor features.}
 
-\item{ithess_stop}{}
+\item{ithess_stop}{Maximum amount of times we update the split-point
+candidates if the split-method is "totally_random".}
 
-\item{split_method}{}
+\item{split_method}{Through which method we choose the tree-splits.}
 
-\item{reg_par}{}
+\item{reg_par}{Regularisation parameter which prevent overfitting.}
 
-\item{feature_subsampling}{}
+\item{feature_subsampling}{Which part of the feature space we use to build
+the trees.}
 
-\item{data_classes}{}
+\item{data_classes}{Data class for all features.}
 
-\item{amt_spp}{}
+\item{amt_spp}{The amount of splitting point candidates per feature.}
 
-\item{max_splits}{}
+\item{max_splits}{The maximum amount of splits in the trained tree.}
 
-\item{datasources}{}
+\item{datasources}{DATASHIELD server connection.}
 }
 \value{
 The trained Tree
 }
 \description{
-Title
+First training round of a remote tree.
 }

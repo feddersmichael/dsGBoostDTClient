@@ -72,7 +72,7 @@ the trees.}
 tree.}
 
 \item{ithess_stop}{Maximum amount of times we update the split-point
-candidates if the split-method is "totally_random"}
+candidates if the split-method is "totally_random".}
 
 \item{seed}{If we want to choose a specific random behavior client side.}
 

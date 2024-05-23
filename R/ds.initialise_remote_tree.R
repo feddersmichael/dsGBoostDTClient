@@ -1,19 +1,23 @@
 
-#' Title
+#' First training round of a remote tree.
 #'
-#' @param data_name 
-#' @param federation 
-#' @param weight_update 
-#' @param dropout_rate 
-#' @param cand_select 
-#' @param ithess_stop 
-#' @param split_method 
-#' @param reg_par 
-#' @param feature_subsampling 
-#' @param data_classes 
-#' @param amt_spp 
-#' @param max_splits 
-#' @param datasources 
+#' @param data_name The name under which the data is saved on the server.
+#' @param federation Through which method we share the data between client and
+#' the servers.
+#' @param weight_update Through which method we choose the weights for our tree.
+#' @param dropout_rate Chance that a tree is not used for building the next
+#' tree.
+#' @param cand_select Splitting-point selection for numeric and factor features.
+#' @param ithess_stop Maximum amount of times we update the split-point
+#' candidates if the split-method is "totally_random".
+#' @param split_method Through which method we choose the tree-splits.
+#' @param reg_par Regularisation parameter which prevent overfitting.
+#' @param feature_subsampling Which part of the feature space we use to build
+#' the trees.
+#' @param data_classes Data class for all features.
+#' @param amt_spp The amount of splitting point candidates per feature.
+#' @param max_splits The maximum amount of splits in the trained tree.
+#' @param datasources DATASHIELD server connection.
 #'
 #' @return The trained Tree
 #' @export
@@ -39,7 +43,7 @@ ds.initialise_remote_tree <- function(data_name, federation, weight_update,
   }
   
   if (is.null(feature_subsampling)) {
-    selected_feat <- NULL
+    selected_feat <- names(bounds_and_levels)
   } else {
     if (feature_subsampling[["mode"]] == "cyclical") {
       selected_feat <- names(data_classes)[1:feature_subsampling[["selection"]]]
