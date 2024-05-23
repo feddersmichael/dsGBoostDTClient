@@ -1,7 +1,8 @@
 
 ds.train_remote_tree <- function(data_name, federation, comunication_round,
                                  prev_amt_trees, feature_subsampling,
-                                 data_classes, dropout_rate, datasources) {
+                                 data_classes, dropout_rate, shrinkage,
+                                 datasources) {
   
   amt_server <- length(datasources)
   
@@ -21,7 +22,7 @@ ds.train_remote_tree <- function(data_name, federation, comunication_round,
   }
   
   if (is.null(feature_subsampling)) {
-    selected_feat <- names(bounds_and_levels)
+    selected_feat <- names(data_classes)
   } else {
     if (feature_subsampling[["mode"]] == "cyclical") {
       selected_feat <- names(data_classes)[((((comunication_round - 1) * feature_subsampling[["selection"]]) %% length(data_classes)) + 1):
@@ -67,17 +68,28 @@ ds.train_remote_tree <- function(data_name, federation, comunication_round,
   
   if (amt_trees > 1) {
     for (i in 1:amt_trees) {
-      ds.save_tree(data_name, trees[[i]], prev_amt_trees + i,
-                   length(removed_trees), amt_trees, datasources)
+      if (shrinkage < 1) {
+        ds.save_tree(data_name, ds.add_shrinkage(trees[[i]], shrinkage),
+                     prev_amt_trees + i, length(removed_trees), amt_trees,
+                     datasources)
+      } else {
+        ds.save_tree(data_name, trees[[i]], prev_amt_trees + i,
+                     length(removed_trees), amt_trees, datasources)
+      }
     }
   } else {
-    ds.save_tree(data_name, trees[[1]], prev_amt_trees + 1,
-                 length(removed_trees), 1, datasources)
+    if (shrinkage < 1) {
+      ds.save_tree(data_name, ds.add_shrinkage(trees[[1]], shrinkage),
+                   prev_amt_trees + 1, length(removed_trees), 1, datasources)
+    } else {
+      ds.save_tree(data_name, trees[[1]], prev_amt_trees + 1,
+                   length(removed_trees), 1, datasources)
+    }
   }
   
   ds.update_trees(data_name, removed_trees,
                   (prev_amt_trees + 1):(prev_amt_trees + amt_trees),
                   datasources)
   
-  return(trees)
+  return(list(trees, removed_trees))
 }

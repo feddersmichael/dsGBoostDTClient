@@ -7,6 +7,7 @@
 #' @param weight_update Through which method we choose the weights for our tree.
 #' @param dropout_rate Chance that a tree is not used for building the next
 #' tree.
+#' @param shrinkage The shrinkage factor for the tree.
 #' @param cand_select Splitting-point selection for numeric and factor features.
 #' @param ithess_stop Maximum amount of times we update the split-point
 #' candidates if the split-method is "totally_random".
@@ -22,8 +23,8 @@
 #' @return The trained Tree
 #' @export
 ds.initialise_remote_tree <- function(data_name, federation, weight_update,
-                                      dropout_rate, cand_select, ithess_stop,
-                                      split_method, reg_par,
+                                      dropout_rate, shrinkage, cand_select,
+                                      ithess_stop, split_method, reg_par,
                                       feature_subsampling, data_classes,
                                       amt_spp, max_splits, datasources) {
   
@@ -43,7 +44,7 @@ ds.initialise_remote_tree <- function(data_name, federation, weight_update,
   }
   
   if (is.null(feature_subsampling)) {
-    selected_feat <- names(bounds_and_levels)
+    selected_feat <- names(data_classes)
   } else {
     if (feature_subsampling[["mode"]] == "cyclical") {
       selected_feat <- names(data_classes)[1:feature_subsampling[["selection"]]]
@@ -94,10 +95,18 @@ ds.initialise_remote_tree <- function(data_name, federation, weight_update,
   amt_trees <- length(trees)
   if (amt_trees > 1) {
     for (i in 1:amt_trees) {
-      ds.save_tree(data_name, trees[[i]], i, 0, amt_trees, datasources)
+      if (shrinkage < 1) {
+        ds.save_tree(data_name, ds.add_shrinkage(trees[[i]], shrinkage), i, 0, amt_trees, datasources)
+      } else {
+        ds.save_tree(data_name, trees[[i]], i, 0, amt_trees, datasources)
+      }
     }
   } else {
-    ds.save_tree(data_name, trees[[1]], 1L, 0, 1L, datasources)
+    if (shrinkage < 1) {
+      ds.save_tree(data_name, ds.add_shrinkage(trees[[1]], shrinkage), 1L, 0, 1L, datasources)
+    } else {
+      ds.save_tree(data_name, trees[[1]], 1L, 0, 1L, datasources)
+    }
   }
   
   ds.update_trees(data_name, removed_trees, 1:amt_trees, datasources)

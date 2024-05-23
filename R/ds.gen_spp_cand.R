@@ -34,7 +34,7 @@ ds.gen_spp_cand <- function(data_name, bounds_and_levels, data_classes, amt_spp,
   # TODO: Add after weight update new hessians.
   if (cand_select[["numeric"]] == "ithess" && new_num_spp &&
       (split_method == "totally_random" || (split_method == "histograms" &&
-                                            !(selected_feat == names(data_classes))))) {
+                                            !identical(selected_feat, names(data_classes))))) {
     cally <- call("hessiansDS", data_name)
     hessians_list <- DSI::datashield.aggregate(datasources, cally)
     

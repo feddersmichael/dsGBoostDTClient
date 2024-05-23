@@ -19,6 +19,7 @@
 #' @param reg_par Regularisation parameter which prevent overfitting.
 #' @param dropout_rate Chance that a tree is not used for building the next
 #' tree.
+#' @param shrinkage The shrinkage factor for the tree.
 #' @param ithess_stop Maximum amount of times we update the split-point
 #' candidates if the split-method is "totally_random"
 #' @param add_par Additional parameters for the iterative hessian mode.
@@ -30,8 +31,8 @@ ds.train_tree <- function(data_name, bounds_and_levels, data_classes,
                           output_var, amt_trees, max_splits = 5L, split_method,
                           loss_function, amt_spp, selected_feat, cand_select,
                           weight_update, reg_par = c(lambda = 5, gamma = 5),
-                          dropout_rate = 0.05, ithess_stop, add_par = NULL,
-                          datasources = NULL) {
+                          dropout_rate = 0.05, shrinkage = 1, ithess_stop,
+                          add_par = NULL, datasources = NULL) {
 
   # We first check all the inputs for appropriate class and set defaults if
   # no input is given.
@@ -53,7 +54,7 @@ ds.train_tree <- function(data_name, bounds_and_levels, data_classes,
       spp_cand <- ds.gen_spp_cand(data_name, bounds_and_levels, data_classes,
                                   amt_spp, list(numeric = "uniform",
                                                 factor = cand_select[["factor"]]),
-                                  add_par, TRUE, NULL, NULL,
+                                  add_par, TRUE, NULL, names(data_classes),
                                   datasources)
     } else {
       spp_cand <- ds.gen_spp_cand(data_name, bounds_and_levels, data_classes,
@@ -125,7 +126,7 @@ ds.train_tree <- function(data_name, bounds_and_levels, data_classes,
                             best_split$cont_NA[[1]], TRUE, best_split$weight_l[[1]],
                             TRUE, best_split$weight_r[[1]], 0, TRUE)
         current_tree[1, ] <- next_split
-        if (cand_select[["numeric"]] == "ithess" && (selected_feat == names(bounds_and_levels))) {
+        if (cand_select[["numeric"]] == "ithess" && identical(selected_feat, names(data_classes))) {
           add_par[["hessians"]] <- histograms_per_leave[[1]]$hess
         }
       } else {
@@ -287,8 +288,13 @@ ds.train_tree <- function(data_name, bounds_and_levels, data_classes,
       current_tree$w_s_right_value[[tree_row]] <- leaf_weights[[2 * j]]
     }
   }
-  ds.save_tree(data_name, current_tree, amt_trees + 1, length(removed_trees),
-               1L, datasources)
+  if (shrinkage < 1) {
+    ds.save_tree(data_name, ds.add_shrinkage(current_tree, shrinkage),
+                 amt_trees + 1, length(removed_trees), 1L, datasources)
+  } else {
+    ds.save_tree(data_name, current_tree, amt_trees + 1, length(removed_trees),
+                 1L, datasources)
+  }
   
   if (dropout_rate < 1) {
     ds.update_trees(data_name, removed_trees, amt_trees + 1, datasources)

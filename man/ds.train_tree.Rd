@@ -19,6 +19,7 @@ ds.train_tree(
   weight_update,
   reg_par = c(lambda = 5, gamma = 5),
   dropout_rate = 0.05,
+  shrinkage = 1,
   ithess_stop,
   add_par = NULL,
   datasources = NULL
@@ -56,6 +57,8 @@ the tree.}
 
 \item{dropout_rate}{Chance that a tree is not used for building the next
 tree.}
+
+\item{shrinkage}{The shrinkage factor for the tree.}
 
 \item{ithess_stop}{Maximum amount of times we update the split-point
 candidates if the split-method is "totally_random"}

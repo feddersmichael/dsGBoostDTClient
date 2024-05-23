@@ -237,7 +237,7 @@ ds.train_boosted_tree <- function(data_name, bounds_and_levels, output_var,
     for (i in 1:max_treecount) {
       amt_trees <- i - 1
       if (is.null(feature_subsampling)) {
-        selected_feat <- names(bounds_and_levels)
+        selected_feat <- names(data_classes)
       } else {
         if (feature_subsampling[["mode"]] == "cyclical") {
           selected_feat <- names(data_classes)[((((i - 1) * feature_subsampling[["selection"]]) %% length(data_classes)) + 1):
@@ -263,8 +263,8 @@ ds.train_boosted_tree <- function(data_name, bounds_and_levels, output_var,
                                    output_var, amt_trees, max_splits,
                                    split_method, loss_function, amt_spp,
                                    selected_feat, cand_select, weight_update,
-                                   reg_par, dropout_rate, ithess_stop, add_par,
-                                   datasources)
+                                   reg_par, dropout_rate, shrinkage,
+                                   ithess_stop, add_par, datasources)
       if (shrinkage < 1) {
         tree_return[[1]] <- ds.add_shrinkage(tree_return[[1]], shrinkage)
       }
@@ -281,17 +281,42 @@ ds.train_boosted_tree <- function(data_name, bounds_and_levels, output_var,
   } else if (federation[["mode"]] %in% c("trees_cyclical", "trees_random")){
     #initialisation round
     trees <- ds.initialise_remote_tree(data_name, federation, weight_update,
-                                       dropout_rate, cand_select, ithess_stop,
-                                       split_method, reg_par,
+                                       dropout_rate, shrinkage, cand_select,
+                                       ithess_stop, split_method, reg_par,
                                        feature_subsampling, data_classes,
                                        amt_spp, max_splits, datasources)
+    
+    if (shrinkage < 1) {
+      for (j in 1:length(trees)) {
+        trees[[j]] <- ds.add_shrinkage(trees[[j]], shrinkage)
+      }
+    }
     tree_list <- trees
     if (max_treecount > 1) {
       for (i in 2:max_treecount) {
-        trees <- ds.train_remote_tree(data_name, federation, i,
+        tree_return <- ds.train_remote_tree(data_name, federation, i,
                                       length(tree_list), feature_subsampling,
-                                      data_classes, dropout_rate, datasources)
+                                      data_classes, dropout_rate, shrinkage,
+                                      datasources)
+        trees <- tree_return[[1]]
+        removed_trees <- tree_return[[2]]
         
+        if (shrinkage < 1) {
+          for (j in 1:length(trees)) {
+            trees[[j]] <- ds.add_shrinkage(trees[[j]], shrinkage)
+          }
+        }
+        
+        if (dropout_rate > 0) {
+          scale_par <- 1 / (length(trees) + length(removed_trees))
+          for (j in 1:length(trees)) {
+            trees[[j]] <- ds.add_shrinkage(trees[[j]], scale_par)
+          }
+          for (j in removed_trees) {
+            tree_list[[j]] <- ds.add_shrinkage(tree_list[[j]],
+                                               length(removed_trees) * scale_par)
+          }
+        }
         tree_list <- append(tree_list, trees)
       }
     }

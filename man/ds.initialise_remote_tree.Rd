@@ -9,6 +9,7 @@ ds.initialise_remote_tree(
   federation,
   weight_update,
   dropout_rate,
+  shrinkage,
   cand_select,
   ithess_stop,
   split_method,
@@ -30,6 +31,8 @@ the servers.}
 
 \item{dropout_rate}{Chance that a tree is not used for building the next
 tree.}
+
+\item{shrinkage}{The shrinkage factor for the tree.}
 
 \item{cand_select}{Splitting-point selection for numeric and factor features.}
 
