@@ -85,6 +85,43 @@ ds.train_boosted_tree <- function(data_name, bounds_and_levels, output_var,
     stop("'train_test_ratio' needs to be an atomic 'numeric' vector which is greater than 0 and at most 1.")
   }
   
+  if (!is.list(federation) || names(federation)[[1]] != "mode" ||
+      !is.atomic(federation[["mode"]]) || !is.character(federation[["mode"]])) {
+    stop("'federation' needs to be a list where the first element is called 'mode'.")
+  } else {
+    if (federation[["mode"]] %in% c("trees_cyclical", "trees_random")) {
+      if (length(federation) != 2 || names(federation)[[2]] != "selection" ||
+          !is.atomic(federation[["selection"]])) {
+        stop("The 'federation' list needs to have exactly two elements called 'mode' and 'selection'.")
+      }
+      if (federation[["mode"]] == "trees_cyclical") {
+        if(!is.integer(federation[["selection"]]) || federation[["selection"]] < 1 ||
+           federation[["selection"]] > length(datasources)) {
+          stop("'federation$selection' needs to be an atomic 'integer' vector greater than 0.")
+        }
+      }
+      if (federation[["mode"]] == "trees_random") {
+        if (!is.numeric(federation[["selection"]])) {
+          stop("'federation$selection' needs to be an atomic 'numeric' vector.")
+        }
+        if (federation[["selection"]] >= 1 && !is.integer(federation[["selection"]])) {
+          stop("'federation$selection' needs to be an atomic 'integer' vector if it is greater than 1.")
+        }
+        if (federation[["selection"]] > length(datasources)) {
+          stop("'federation$selection' can't be greater than the amount of datasources.")
+        }
+        if (federation[["selection"]] <= 0) {
+          stop("'federation$selection' needs to be an atomic 'numeric' vector greater than 0.")
+        }
+      }
+      if (split_method != "histograms") {
+        stop("If 'federation$mode' is 'trees_cyclical' or 'trees_random', 'split_method' has to be 'histograms'.")
+      }
+    } else if (federation[["mode"]] != "histograms") {
+      stop("This federation mode is not available.")
+    }
+  }
+  
   if (!is.integer(max_treecount) || !is.atomic(max_treecount) || max_treecount < 1.) {
     stop("'max_treecount' needs to be an atomic 'integer' vector greater than 0.")
   }
@@ -92,17 +129,19 @@ ds.train_boosted_tree <- function(data_name, bounds_and_levels, output_var,
   if (!is.integer(max_splits) || !is.atomic(max_splits) || max_splits < 1.) {
     stop("'max_splits' needs to be an atomic 'integer' vector greater than 0.")
   }
-  if (split_method == "totally_random") {
-    save_list <- list(max_splits = max_splits)
-    exist_check <- c(max_splits = TRUE)
-    ds.save_variables(data_name, save_list, exist_check, datasources)
-  }
+  
   
   if (!is.character(split_method) || !is.atomic(split_method)) {
     stop("'split_method' needs to be an atomic 'character' vector.")
   } else if (!(split_method %in% c("histograms", "partially_random",
                                    "totally_random"))) {
     stop("This split-method is not available.")
+  }
+  
+  if (split_method == "totally_random") {
+    save_list <- list(max_splits = max_splits)
+    exist_check <- c(max_splits = TRUE)
+    ds.save_variables(data_name, save_list, exist_check, datasources)
   }
   
   if (!is.character(loss_function) || !is.atomic(loss_function)) {
