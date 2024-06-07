@@ -1,5 +1,5 @@
 
-ds.train_remote_tree <- function(data_name, federation, comunication_round,
+ds.train_remote_tree <- function(data_name, federation, communication_round,
                                  prev_amt_trees, feature_subsampling,
                                  data_classes, dropout_rate, shrinkage,
                                  datasources) {
@@ -7,8 +7,8 @@ ds.train_remote_tree <- function(data_name, federation, comunication_round,
   amt_server <- length(datasources)
   
   if(federation[["mode"]] == "trees_cyclical") {
-    selected_server <- ((((comunication_round - 1) * federation[["selection"]]) %% amt_server) + 1):
-      (((comunication_round * federation[["selection"]] - 1) %% amt_server) + 1)
+    selected_server <- ((((communication_round - 1) * federation[["selection"]]) %% amt_server) + 1):
+      (((communication_round * federation[["selection"]] - 1) %% amt_server) + 1)
   } else if(federation[["mode"]] == "trees_random") {
     if (federation[["selection"]] < 1) {
       selected_server_amt <- stats::rbinom(1, amt_server, federation[["selection"]])
@@ -25,8 +25,8 @@ ds.train_remote_tree <- function(data_name, federation, comunication_round,
     selected_feat <- names(data_classes)
   } else {
     if (feature_subsampling[["mode"]] == "cyclical") {
-      selected_feat <- names(data_classes)[((((comunication_round - 1) * feature_subsampling[["selection"]]) %% length(data_classes)) + 1):
-                                             (((comunication_round * feature_subsampling[["selection"]] - 1) %% length(data_classes)) + 1)]
+      selected_feat <- names(data_classes)[((((communication_round - 1) * feature_subsampling[["selection"]]) %% length(data_classes)) + 1):
+                                             (((communication_round * feature_subsampling[["selection"]] - 1) %% length(data_classes)) + 1)]
     } else if (feature_subsampling[["mode"]] == "random") {
       if (feature_subsampling[["selection"]] < 1) {
         amt_feat <- stats::rbinom(1, length(data_classes), feature_subsampling[["selection"]])
@@ -41,8 +41,8 @@ ds.train_remote_tree <- function(data_name, federation, comunication_round,
   }
   
   save_list <- list(selected_feat = selected_feat,
-                    comunication_round = comunication_round)
-  exist_check <- c(selected_feat = FALSE, comunication_round = FALSE)
+                    communication_round = communication_round)
+  exist_check <- c(selected_feat = FALSE, communication_round = FALSE)
   ds.save_variables(data_name, save_list, exist_check, datasources)
   
   if (dropout_rate > 0) {

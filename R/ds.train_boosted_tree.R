@@ -12,6 +12,8 @@
 #' the servers.
 #' @param max_treecount Maximum amount of trees to build our boosted decision
 #' tree.
+#' @param max_communications The amount of communications between the client and
+#' the servers.
 #' @param max_splits The maximum amount of splits in the trained tree.
 #' @param split_method Through which method we choose the tree-splits.
 #' @param loss_function The name of the loss function we want to use for our
@@ -260,7 +262,7 @@ ds.train_boosted_tree <- function(data_name, bounds_and_levels, output_var,
       
       # We train the next tree.
       tree_return <- ds.train_tree(data_name, bounds_and_levels, data_classes,
-                                   output_var, amt_trees, max_splits,
+                                   output_var, amt_trees, i, max_splits,
                                    split_method, loss_function, amt_spp,
                                    selected_feat, cand_select, weight_update,
                                    reg_par, dropout_rate, shrinkage,

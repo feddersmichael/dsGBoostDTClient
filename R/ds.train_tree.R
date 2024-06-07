@@ -7,6 +7,8 @@
 #' @param data_classes Data class for all features.
 #' @param output_var Name of the output variable.
 #' @param amt_trees How many trees have been built already.
+#' @param max_communications The amount of communications between the client and
+#' the servers.
 #' @param max_splits The maximum amount of splits in the trained tree.
 #' @param split_method Through which method we choose the tree-splits.
 #' @param loss_function The type of loss function under which we optimise the
@@ -110,7 +112,7 @@ ds.train_tree <- function(data_name, bounds_and_levels, data_classes,
                                    weight_l = numeric(), weight_r = numeric())
   
   # In this loop we build a tree with up to 'max_splits' many splits.
-  for (i in 1:max_splits) {
+  for (i in 1:communication_rounds) {
     if (split_method == "histograms") {
       
       histograms_per_leave <- ds.split_bins(data_name, current_tree,
@@ -130,6 +132,23 @@ ds.train_tree <- function(data_name, bounds_and_levels, data_classes,
           add_par[["hessians"]] <- histograms_per_leave[[1]]$hess
         }
       } else {
+        for (j in 2^(i - 1):(2^i - 1)) {
+          
+          parent_index <- floor(j / 2)
+          if (j %% 2 == 0) {
+            parent_dir <- TRUE
+            current_tree$w_s_left[[parent_index]] <- FALSE
+            current_tree$w_s_left_value[[parent_index]] <- j
+          } else {
+            parent_dir <- FALSE
+            current_tree$w_s_right[[parent_index]] <- FALSE
+            current_tree$w_s_right_value[[parent_index]] <- j
+          }
+          new_split <- list(best_split$feature[[1]], best_split$split_val[[1]],
+                            best_split$cont_NA[[1]], TRUE, best_split$weight_l[[1]],
+                            TRUE, best_split$weight_r[[1]], parent_index, parent_dir)
+          current_tree[j, ] <- new_split
+        }
         # TODO: Fix rownames for copying rows into df
         split_scores_left[i - 1, ] <- best_split[1, ]
         split_scores_right[i - 1, ] <- best_split[2, ]
