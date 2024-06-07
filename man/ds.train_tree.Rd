@@ -66,6 +66,9 @@ candidates if the split-method is "totally_random"}
 \item{add_par}{Additional parameters for the iterative hessian mode.}
 
 \item{datasources}{DATASHIELD server connection.}
+
+\item{max_communications}{The amount of communications between the client and
+the servers.}
 }
 \value{
 The trained tree.

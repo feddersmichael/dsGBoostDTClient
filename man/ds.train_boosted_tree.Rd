@@ -77,6 +77,9 @@ candidates if the split-method is "totally_random".}
 \item{seed}{If we want to choose a specific random behavior client side.}
 
 \item{datasources}{DATASHIELD server connection.}
+
+\item{max_communications}{The amount of communications between the client and
+the servers.}
 }
 \value{
 The trained decision tree model.

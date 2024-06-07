@@ -8,7 +8,7 @@
 #' tree.
 #' @param datasources DATASHIELD server connection.
 #'
-#' @return WHich trees got removed from training.
+#' @return Which trees got removed from training.
 #' @export
 ds.calc_hist <- function(data_name, weight_update, amt_trees, dropout_rate,
                          datasources = NULL) {

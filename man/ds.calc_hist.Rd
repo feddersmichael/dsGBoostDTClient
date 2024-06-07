@@ -25,7 +25,7 @@ tree.}
 \item{datasources}{DATASHIELD server connection.}
 }
 \value{
-WHich trees got removed from training.
+Which trees got removed from training.
 }
 \description{
 Calculate the predicted output
